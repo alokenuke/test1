@@ -1,0 +1,13 @@
+/* 
+    Document   : style-print
+    Created on : 25 Sep, 2013, 3:58:12 PM
+    Author     : Rajeev
+    Description:
+        Purpose of the stylesheet follows.
+*/
+@import url("bootstrap.min.css");
+@import url("bootstrap-responsive.min.css");
+
+table {page-break-inside:auto }
+tr    { page-break-inside:avoid; page-break-after:auto }
+

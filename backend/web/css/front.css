@@ -1,0 +1,25 @@
+@charset "utf-8";
+
+/*------------ Front login page CSS ------------*/
+.fronttext {
+    font-size:11px;
+}
+#list_divider_header{
+    text-align : center;
+}
+.emp_form_align{
+    text-align: right;
+}
+.emp_form_label{
+    font-size:11px;    
+}
+.emp_form_label_fill{
+    font-size:13px;
+    font-weight: bold;
+}
+
+.emp_form_val{
+    font-size:11px;
+    font-weight: 200;
+}
+/*------------ Front login page CSS ------------*/
