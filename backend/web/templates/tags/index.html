@@ -1,0 +1,198 @@
+<div role="tabpanel">
+    <!-- Tab panes -->
+    <div role="tabpanel" class="tab-pane col-xs-12 active" id="List_Tags">
+        <div class="row">
+            <div class="col-xs-12 search-box mb-sm-large">
+    <div class="row">
+        <h2 class="col-xs-12 search-title">
+            Search Tags
+            <button class="pull-right btn icon-btn" ng-click="showSearchBox=!showSearchBox;">
+                <i ng-class="{'fa fa-sort-desc fa-2x': !showSearchBox,'fa fa-sort-asc fa-2x': showSearchBox}"></i>
+            </button>
+        </h2>
+    </div><!--/row-->
+    <form id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form" ng-class="{'ng-hide':showSearchBox}">
+        
+        <div class="row">
+            <div class="col-md-6 col-lg-5">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label text-right">Project Name :</label>
+                    <div class="col-sm-6">
+                        <ui-select ng-model="search.project.selected"
+                                   theme="bootstrap" ng-disabled="disabled" >
+                          <ui-select-match placeholder="Select a project...">{{$select.selected.project_name}}</ui-select-match>
+                          <ui-select-choices repeat="project in projects | filter: $select.search"
+                                   refresh-delay="0">
+                              <div ng-bind-html="project.project_name" ng-click="updateLevel(project.id, 0, 0)"></div>
+                          </ui-select-choices>
+                        </ui-select>
+                        <input ng-model="search.project.selected.id" name="search.project_id" type="hidden" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-7">
+                <div class="form-group">
+                    <label class="col-sm-4 col-lg-3 control-label text-right">Project Level :</label>
+                    <div class="col-sm-8 col-lg-9 multi-level">
+                        <ui-select ng-repeat="childlevels in projectlevels" ng-model="search.childlevels[$index].selected"
+                                   theme="bootstrap" class="{{((projectlevels.length-1)===$index?'last-child ':'')}}">
+                          <ui-select-match placeholder="Select a level...">{{$select.selected.level_name}}</ui-select-match>
+                          <ui-select-choices repeat="level in childlevels | filter: $select.search"
+                                   refresh-delay="0">
+                              <div ng-bind-html="level.level_name" ng-click="updateLevel(search.project.selected.id, ($parent.$index+1), level.id)"></div>
+                          </ui-select-choices>
+                        </ui-select>
+                        <div ng-hide="projectlevels.length && search.project.selected.id">
+                            <a ng-href="/#/projects/levels/{{search.project.selected.id}}" ng-hide="(projectlevels.length && search.project.selected.id) || !search.project.selected.id">Click to manage project levels.</a>
+                            <span ng-hide="search.project.selected.id">Select a project first</span>
+                        </div>
+                        <input ng-model="search.childlevels[$index].selected.id" name="search.project_level_id" type="hidden" />
+                    </div>
+                </div>
+            </div>
+        </div><!--/row-->
+        
+        <div class="row">
+            <div class="col-md-6 col-lg-5">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label text-right">Task Name :</label>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" ng-model="search.task_name" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-7">
+                <div class="form-group">
+                    <label class="col-sm-4 col-lg-3 control-label text-right">User Group :</label>
+                    <div class="col-sm-6">
+                        <ui-select ng-model="search.usergroup.selected"
+                                   theme="bootstrap">
+                          <ui-select-match placeholder="Select a group...">{{$select.selected.group_name}}</ui-select-match>
+                          <ui-select-choices repeat="usergroup in usergroups | filter: $select.search"
+                                   refresh-delay="0">
+                              <div ng-bind-html="usergroup.group_name"></div>
+                          </ui-select-choices>
+                          <a ng-href="/#/userGroups/project/{{search.project.selected.id}}" ng-hide="(usergroups.length && search.project.selected.id) || !search.project.selected.id">Click to manage project levels.</a>
+                        </ui-select>
+                        <input ng-model="search.usergroup.selected.id" name="search.user_group_id" type="hidden" />
+                    </div>
+                </div>
+            </div>
+        </div><!--/row-->
+        
+        <div class="row">
+            <div class="col-md-6 col-lg-5">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label text-right">Product Code :</label>
+                    <div class="col-sm-6">
+                        <input type="text" ng-model="search.productcode" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-7">
+                <div class="form-group">
+                    <label class="col-sm-4 col-lg-3 control-label text-right">Item Type :</label>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" />
+                    </div>
+                </div>
+            </div>
+        </div><!--/row-->
+        <div class="row mt-20">
+           <div class="col-sm-10 text-center">
+                <button class="btn btn-primary mb-sm-5">Search</button>
+                <button class="btn btn-primary mb-sm-5">Clear Search</button>
+           </div> 
+        </div>
+    </form>
+</div><!--/search-tag-box-->
+        </div><!--/row-->
+        <div class="row mt-20">
+            <button class="btn btn-default add-new-btn"><i class="fa fa-plus-circle fa-1x"></i>Create New Tag</button>
+            <button class="btn btn-default add-new-btn"><i class="fa fa-plus-circle fa-1x"></i>Create New Master Tag</button>
+        </div><!--/row-->
+        <div class="row mt-15">
+            <div class="">
+                <div class="table-responsive table-responsive-cust">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center">S.No</th>
+                                <th class="text-center">UID</th>
+                                <th class="text-center">Item Type</th>
+                                <th class="text-center">Tag Name</th>
+                                <th class="text-center">Products Code</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Last Updated By</th>
+                                <th class="text-center">Actions</th>
+                                <!-- <th class="text-center"></th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center">1</td>
+                                <td class="text-center">4X4224SSS</td>
+                                <td class="text-center">Sample Text</td>
+                                <td class="text-center">Sample Text</td>
+                                <td class="text-center">Sample Text</td>
+                                <td class="text-center">Material Received - No</td>
+                                <td class="text-center">
+                                    A.R. Hussain<br />
+                                    Nov 11, 2014
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn icon-btn"><i class="fa fa-list-alt fa-lg"></i></button>
+                                    <button class="btn icon-btn spacer"><i class="fa fa-barcode fa-lg"></i></button>
+                                    <button class="btn icon-btn"><i class="fa fa-print fa-lg"></i></button>
+                                    <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>
+                                    <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">2</td>
+                                <td class="text-center">4X4224SSS</td>
+                                <td class="text-center">Sample Text</td>
+                                <td class="text-center">Sample Text</td>
+                                <td class="text-center">Sample Text</td>
+                                <td class="text-center">Material Received - No</td>
+                                <td class="text-center">
+                                    A.R. Hussain<br />
+                                    Nov 11, 2014
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn icon-btn"><i class="fa fa-list-alt fa-lg"></i></button>
+                                    <button class="btn icon-btn spacer"><i class="fa fa-barcode fa-lg"></i></button>
+                                    <button class="btn icon-btn"><i class="fa fa-print fa-lg"></i></button>
+                                    <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>
+                                    <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">3</td>
+                                <td class="text-center">4X4224SSS</td>
+                                <td class="text-center">Sample Text</td>
+                                <td class="text-center">Sample Text</td>
+                                <td class="text-center">Sample Text</td>
+                                <td class="text-center">Material Received - No</td>
+                                <td class="text-center">
+                                    A.R. Hussain<br />
+                                    Nov 11, 2014
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn icon-btn"><i class="fa fa-list-alt fa-lg"></i></button>
+                                    <button class="btn icon-btn spacer"><i class="fa fa-barcode fa-lg"></i></button>
+                                    <button class="btn icon-btn"><i class="fa fa-print fa-lg"></i></button>
+                                    <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>
+                                    <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
+
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>          
+        </div><!--/row-->
+    </div>
+</div><!--/tab-content-->

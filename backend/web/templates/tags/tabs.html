@@ -1,0 +1,19 @@
+<div role="tabpanel">
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#List_Tags" aria-controls="List Tags" role="tab" data-toggle="tab">List Tags</a></li>
+        <li role="presentation"><a href="#Tag_Process_Type" aria-controls="Tag Process Type" role="tab" data-toggle="tab">Tag Process Type</a></li>
+        <li role="presentation"><a href="#Tag_Items" aria-controls="Tag Items" role="tab" data-toggle="tab">Tag Items</a></li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content col-xs-12 pl-lg-25 pr-lg-25">
+        <div role="tabpanel" class="tab-pane col-xs-12 active" id="List_Tags">
+            <div class="row">
+                <div ng-include="'templates/tags/search.html'"></div>
+            </div><!--/row-->
+            <div ng-include="'templates/tags/index.html'"></div>
+        </div>
+        <div role="tabpanel" class="tab-pane col-xs-12" id="Tag_Process_Type">...</div>
+        <div role="tabpanel" class="tab-pane col-xs-12" id="Tag_Items">...</div>
+    </div><!--/tab-content-->
+</div><!--/tabpanel-->

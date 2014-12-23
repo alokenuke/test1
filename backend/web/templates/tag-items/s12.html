@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Site Track</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet" />
+        <link href="css/font-awesome.min.css" rel="stylesheet" />
+        <link href="css/style.css" rel="stylesheet" />
+        
+        <link rel="stylesheet" href="https://jimliu.github.io/angular-ui-tree/dist/angular-ui-tree.min.css">
+        <style>
+            .angular-ui-tree-nodes .angular-ui-tree-nodes {
+                padding-left: 40px;
+            }
+            .btn {
+                margin-right: 8px;
+            }
+
+            .angular-ui-tree-handle {
+                background: #f8faff;
+                border: 1px solid #dae2ea;
+                color: #7c9eb2;
+                padding: 10px 10px;
+            }
+
+            .angular-ui-tree-handle:hover {
+                color: #438eb9;
+                background: #f4f6f7;
+                border-color: #dce2e8;
+            }
+
+            .angular-ui-tree-placeholder {
+                background: #f0f9ff;
+                border: 2px dashed #bed2db;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+            }
+            .group-title {
+                background-color: #687074 !important;
+                color: #FFF !important;
+            }
+        </style>
+        <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+        <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="js/bootstrap-submenu.js"></script>
+        <script type="text/javascript" src="js/html5shiv.js"></script>
+        <script type="text/javascript" src="js/respond.js"></script>
+        <script type="text/javascript" src="js/site.js"></script>
+        <script src="https://jimliu.github.io/angular-ui-tree/bower_components/angular/angular.min.js"></script>
+        <script src="https://jimliu.github.io/angular-ui-tree/dist/angular-ui-tree.js"></script>
+        <script>
+            (function() {
+                'use strict';
+
+                angular.module('demoApp', ['ui.tree'])
+                .controller('MainCtrl', function($scope) {
+                  $scope.list = [{
+                    "id": 1,
+                    "type": "item_group",
+                    "title": "Item Group 1",
+                    "items": []
+                  }, {
+                    "id": 2,
+                    "type": "item_group",
+                    "title": "Item Group 2",
+                    "items": [{
+                      "id": 21,
+                      "type": "item_type",
+                      "title": "Item Type 2.1",
+                    }, {
+                      "id": 22,
+                      "type": "item_type",
+                      "title": "Item Type 2.2",
+                      "items": [{
+                            "id": 211,
+                            "type": "item_subtype",
+                            "title": "Item SubType 2.1.2",
+                          }, {
+                            "id": 212,
+                            "type": "item_subtype",
+                            "title": "Item SubType 2.2.2",
+                          }, {
+                            "id": 213,
+                            "type": "item_subtype",
+                            "title": "Item SubType 2.2.2",
+                          }],
+                    }],
+                  }, {
+                    "id": 3,
+                    "type": "item_group",
+                    "title": "Area 3",
+                    "items": []
+                  }, {
+                    "id": 4,
+                    "type": "item_group",
+                    "title": "Area 4",
+                    "items": []
+                  }];
+
+                  $scope.selectedItem = {};
+
+                  $scope.options = {
+                  };
+
+                  $scope.remove = function(scope) {
+                    scope.remove();
+                  };
+
+                  $scope.toggle = function(scope) {
+                    scope.toggle();
+                  };
+                  
+                  $scope.updateItem = function(scope) {
+                      scope.editing = true;
+                  }
+                  
+                  $scope.addItemGroup = function() {
+                    var nodeData = $scope.list;
+                    nodeData.push({
+                      id: null,
+                      title: "Item Group " + (nodeData.length + 1),
+                      type: "item_group",
+                      items: []
+                    });
+                  };
+
+                  $scope.newSubItem = function(scope, type) {
+                    var nodeData = scope.$modelValue;
+                    if(type)
+                        type = (type=="item_group"?"item_type":"item_subtype");
+                    else
+                        type = "item_group";
+                    
+                    if(nodeData.items==undefined)
+                        nodeData.items = [];
+                    
+                    nodeData.items.push({
+                      id: nodeData.id * 10 + nodeData.items.length,
+                      title: nodeData.title + '.' + (nodeData.items.length + 1),
+                      type: type,
+                      items: []
+                    });
+                  };
+                });
+
+              })();
+        </script>
+    </head>
+    <body ng-app="demoApp">
+        <header class="navbar navbar-default navbar-static-top" role="navigation">
+            <div class="container-fluid">
+                <div class="pull-right welcome-wrapper">
+                    <ul>
+                        <li class="dropdown">
+                        <a href="#" class="dropdown-toggle welcome-text" data-toggle="dropdown" role="button" aria-expanded="false">Welcome : <span class="username">akbarraja</span> <span class="caret"></span></a>
+                            <ul class="dropdown-menu weclome-list dropdown-menu-right" role="menu">
+                                <li>Last Login IP : <span class="ip-address pl-5">111.111.222.11</span></li>
+                                <li>Last login location : <span class="location pl-5">Dubai (UAE)</span></li>
+                            </ul>
+                         </li>
+                        <li><a class="btn btn-primary btn-small" href="#">Logout <i class="fa fa-sign-out"></i></a>
+                        </li>
+                    </ul>
+                    <div class="last-login">Last login : <span class="date-time text-muted">14 Oct 2014 10:am</span></div>
+                </div>
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#"><img src="images/logo.png" alt="" /></a>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="nav-container">
+                <div class="container-fluid">
+                    <nav class="navbar-collapse collapse">
+                        <ul class="nav navbar-nav navbar-left">
+                            <li>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tags <b class="caret"></b></a>
+                                <ul class="dropdown-menu multi-level">
+                                    <li><a href="#">Action</a></li>
+                                    <li><a href="#">Another action</a></li>
+                                    <li><a href="#">Something else here</a></li>
+                                    <li><a href="#">Separated link</a></li>
+                                    <li><a href="#">One more separated link</a></li>
+                                    <li class="dropdown-submenu">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown</a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="#">Action</a></li>
+                                            
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">View / Edit / Print <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="#">Action</a></li>
+                                    <li><a href="#">Another action</a></li>
+                                    <li><a href="#">Something else here</a></li>
+                                    <li><a href="#">Separated link</a></li>
+                                    <li><a href="#">One more separated link</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Manage <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="#">Action</a></li>
+                                    <li><a href="#">Another action</a></li>
+                                    <li><a href="#">Something else here</a></li>
+                                    <li><a href="#">Separated link</a></li>
+                                    <li><a href="#">One more separated link</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Settings <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="#">Action</a></li>
+                                    <li><a href="#">Another action</a></li>
+                                    <li><a href="#">Something else here</a></li>
+                                    <li><a href="#">Separated link</a></li>
+                                    <li><a href="#">One more separated link</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li>
+                                <div class="col-xs-12 pull-right">
+                                    <form class="" role="search">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control search-control" placeholder="Search..." name="q" style="padding:6px 6px;">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-primary search-btn" type="submit"><i class="fa fa-search"></i></button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </li>
+                        </ul>
+                    </nav><!--/.nav-collapse -->
+                </div>
+            </div><!--/nav-container-->
+        </header><!--/navbar-default-->
+        <section class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="content primary-bg-wrapper column-gs-sm">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <ol class="breadcrumb">
+                                    <li><a href="#">Home</a></li>
+                                    <li><a href="#">Manage</a></li>
+                                    <li class="active">Tag Items</li>
+                                </ol>
+                            </div>
+                            <div class="col-sm-6 text-right">
+                                <h4 class="mt-5 mb-0">Manage Tag Items</h4>
+                            </div>              
+                        </div><!--/row-->
+                        <div class="row mt-15">
+                            <div class="col-xs-12">
+                                <div role="tabpanel">
+                                    <!-- Tab panes -->
+                                    <div class="tab-content col-xs-12 pl-lg-25 pr-lg-25">
+                                        <style>
+                                            .item_type, .item_type:hover {
+                                                background-color: #EDEDED;
+                                                cursor: inherit;
+                                            }
+                                            .item_group, .item_group:hover {
+                                                background-color: #555;
+                                                color: #fff;
+                                                cursor: inherit;
+                                            }
+                                            .item_subtype-options {
+                                                padding: 20px;
+                                                border: 1px solid #ccc;
+                                            }
+                                        </style>
+                                         <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="row" ng-controller="MainCtrl">
+                                                  <div class="col-lg-12">
+                                                      <button class='btn btn-primary' ng-click="addItemGroup()">
+                                                          Add Tag Item Group
+                                                      </button>
+                                                      <div class='row' style='padding:20px;' ng->
+                                                        
+                                                        <div ui-tree>
+                                                            <ol ui-tree-nodes="" ng-model="list">
+                                                              <li ng-repeat="item in list" ui-tree-node>
+                                                                <div ui-tree-handle ng-class="item.type">
+                                                                    <a ng-hide="item.type=='item_subtype'" class="btn btn-success btn-xs" data-nodrag ng-click="toggle(this)"><span class="fa" ng-class="{'fa-plus': collapsed, 'fa-minus': !collapsed}"></span></a>
+                                                                    <a ng-hide="item.type!='item_subtype'" class="btn btn-success btn-xs" data-nodrag ng-click="toggle(this)"><span class="fa" ng-class="{'fa-chevron-right': collapsed, 'fa-chevron-down': !collapsed}"></span></a>
+                                                                    {{item.title}}
+                                                                    <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="remove(this)"><span class="fa fa-trash"></span></a>
+                                                                    <a ng-hide="item.type=='item_subtype'" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newSubItem(this, item.type)" style="margin-right: 8px;"><span class="fa fa-plus"></span></a>
+                                                                    <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(this)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
+                                                                    <a ng-hide="item.type!='item_group'" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="showProjects(this)" style="margin-right: 8px;">Projects</a>
+                                                                 </div>
+                                                                 <ol ui-tree-nodes="options" ng-model="item.items" ng-class="{hidden: collapsed}">
+                                                                    <li ng-repeat="item in item.items" ui-tree-node>
+                                                                        <div ui-tree-handle ng-class="item.type">
+                                                                            <a ng-hide="item.type=='item_subtype'" class="btn btn-success btn-xs" data-nodrag ng-click="toggle(this)"><span class="fa" ng-class="{'fa-plus': collapsed, 'fa-minus': !collapsed}"></span></a>
+                                                                            <a ng-hide="item.type!='item_subtype'" class="btn btn-success btn-xs" data-nodrag ng-click="toggle(this)"><span class="fa" ng-class="{'fa-chevron-right': collapsed, 'fa-chevron-down': !collapsed}"></span></a>
+                                                                            {{item.title}}
+                                                                            <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="remove(this)"><span class="fa fa-trash"></span></a>
+                                                                            <a ng-hide="item.type=='item_subtype'" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newSubItem(this, item.type)" style="margin-right: 8px;"><span class="fa fa-plus"></span></a>
+                                                                            <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(this)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
+                                                                            <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="linkProcess(this)" style="margin-right: 8px;">Process Flow: Construction Type <i class="fa fa-chevron-right"></i> Process A</a>
+                                                                        </div>
+                                                                        <ol ui-tree-nodes="options" ng-model="item.items" ng-class="{hidden: collapsed}">
+                                                                            <li ng-repeat="item in item.items" ui-tree-node>
+                                                                                <div ui-tree-handle ng-class="item.type">
+                                                                                    <a ng-hide="item.type=='item_subtype'" class="btn btn-success btn-xs" data-nodrag ng-click="toggle(this)"><span class="fa" ng-class="{'fa-plus': collapsed, 'fa-minus': !collapsed}"></span></a>
+                                                                                    <a ng-hide="item.type!='item_subtype'" class="btn btn-success btn-xs" data-nodrag ng-click="toggle(this)"><span class="fa" ng-class="{'fa-chevron-right': collapsed, 'fa-chevron-down': !collapsed}"></span></a>
+                                                                                    {{item.title}}
+                                                                                    <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="remove(this)"><span class="fa fa-trash"></span></a>
+                                                                                    <a ng-hide="item.type=='item_subtype'" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newSubItem(this, item.type)" style="margin-right: 8px;"><span class="fa fa-plus"></span></a>
+                                                                                    <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(this)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
+                                                                                    <a ng-hide="item.type!='item_group'" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="showProjects(this)" style="margin-right: 8px;">Projects</a>
+                                                                                </div>
+                                                                            </li>
+                                                                        </ol>
+                                                                    </li>
+                                                                 </ol>
+                                                              </li>
+                                                            </ol>
+                                                          </div>
+                                                        
+                                                      </div>
+                                                  </div>
+                                              </div>
+
+                                            </div>
+                                          </div>
+                                        
+                                    </div><!--/tab-content-->
+                                </div><!--/tabpanel-->
+                            </div>      
+                        </div><!--/row-->
+                    </div><!--/content-->
+            </div><!--/row-->
+        </section>
+        <!--/container-fluid-->
+        <footer class="footer-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-12 text-center">
+                        <ul> 
+                            <li><a href="#">Terms and Conditions of Use </a><span>|</span></li>
+                            <li><a href="#">Privacy Policy </a><span>|</span></li>
+                            <li><a href="#">Customer Support </a><span>|</span></li>
+                            <li><a class="active" href="#">Andriod App </a></li>
+                        </ul>
+                    </div>
+                </div><!--/row-->
+                <div class="row">
+                    <div class="col-xs-12 text-center copyright">
+                        <span>&copy;</span> Site Track -nfc.com 2013 , All Rights Reserved
+                    </div>
+                </div><!--/row-->
+            </div>
+        </footer><!--/footer-wrapper-->
+    </body>
+</html>

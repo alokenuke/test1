@@ -1,0 +1,30 @@
+<ul class="breadcrumb"><li><a href="#/">Home</a></li>
+	<li><a href="#/r-{{mod}}">List {{mod}}</a></li>
+        <li class="active">
+            <span ng-show="data.id">Update {{mod}}</span>
+            <span ng-show="!data.id">Create new {{mod}}</span>
+        </li>
+</ul>
+
+<div class="form-post">
+	<h1>{{mod | titlecase}}</h1>
+
+	<div class="row">
+		<div class="col-lg-5">
+			<form class="ng-pristine ng-valid" id="{{mod}}-form" method="post">
+                            
+                            <div ng-repeat="field in fields">
+                                <div class="form-group field-{{mod}}-{{field.key}} required">
+                                    <label class="control-label" for="{{mod}}-{{field.key}}">{{field.label}}</label>
+                                    <input id="{{mod}}-{{field.key}}" class="form-control" ng-model="data[field.key]" type="text">
+                                    
+                                    <div class="help-block"></div>
+				</div>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" ng-click="save()" class="btn btn-primary">Save</button>
+                            </div>
+			</form>
+		</div>
+	</div>
+</div>

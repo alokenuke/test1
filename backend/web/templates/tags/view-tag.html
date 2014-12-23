@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Site Track</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet" />
+        <link href="css/font-awesome.min.css" rel="stylesheet" />
+        <link href="css/style.css" rel="stylesheet" />
+        <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+        <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="js/bootstrap-submenu.js"></script>
+        <script type="text/javascript" src="js/html5shiv.js"></script>
+        <script type="text/javascript" src="js/respond.js"></script>
+        <script type="text/javascript" src="js/site.js"></script>
+    </head>
+    <body>
+        <header class="navbar navbar-default navbar-static-top" role="navigation">
+            <div class="container-fluid">
+                <div class="pull-right welcome-wrapper">
+                    <ul>
+                        <li class="dropdown">
+                        <a href="#" class="dropdown-toggle welcome-text" data-toggle="dropdown" role="button" aria-expanded="false">Welcome : <span class="username">akbarraja</span> <span class="caret"></span></a>
+                            <ul class="dropdown-menu weclome-list dropdown-menu-right" role="menu">
+                                <li>Last Login IP : <span class="ip-address pl-5">111.111.222.11</span></li>
+                                <li>Last login location : <span class="location pl-5">Dubai (UAE)</span></li>
+                            </ul>
+                         </li>
+                        <li><a class="btn btn-primary btn-small" href="#">Logout <i class="fa fa-sign-out"></i></a>
+                        </li>
+                    </ul>
+                    <div class="last-login">Last login : <span class="date-time text-muted">14 Oct 2014 10:am</span></div>
+                </div>
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#"><img src="images/logo.png" alt="" /></a>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="nav-container">
+                <div class="container-fluid">
+                    <nav class="navbar-collapse collapse">
+                        <ul class="nav navbar-nav navbar-left">
+                            <li>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tags <b class="caret"></b></a>
+                                <ul class="dropdown-menu multi-level">
+                                    <li><a href="#">Action</a></li>
+                                    <li><a href="#">Another action</a></li>
+                                    <li><a href="#">Something else here</a></li>
+                                    <li><a href="#">Separated link</a></li>
+                                    <li><a href="#">One more separated link</a></li>
+                                    <li class="dropdown-submenu">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown</a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="#">Action</a></li>
+                                            
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">View / Edit / Print <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="#">Action</a></li>
+                                    <li><a href="#">Another action</a></li>
+                                    <li><a href="#">Something else here</a></li>
+                                    <li><a href="#">Separated link</a></li>
+                                    <li><a href="#">One more separated link</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Manage <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="#">Action</a></li>
+                                    <li><a href="#">Another action</a></li>
+                                    <li><a href="#">Something else here</a></li>
+                                    <li><a href="#">Separated link</a></li>
+                                    <li><a href="#">One more separated link</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Settings <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="#">Action</a></li>
+                                    <li><a href="#">Another action</a></li>
+                                    <li><a href="#">Something else here</a></li>
+                                    <li><a href="#">Separated link</a></li>
+                                    <li><a href="#">One more separated link</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li>
+                                <div class="col-xs-12 pull-right">
+                                    <form class="" role="search">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control search-control" placeholder="Search..." name="q" style="padding:6px 6px;">
+                                            <div class="input-group-btn">
+                                                <button class="btn btn-primary search-btn" type="submit"><i class="fa fa-search"></i></button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </li>
+                        </ul>
+                    </nav><!--/.nav-collapse -->
+                </div>
+            </div><!--/nav-container-->
+        </header><!--/navbar-default-->
+        <section class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="content primary-bg-wrapper column-gs-sm normal-gutter pb-20">
+                        <div class="row mb-xs-20">
+                            <div class="col-sm-6">
+                                <ol class="breadcrumb mb-15">
+                                    <li><a href="#">Home</a></li>
+                                    <li><a href="#">Manage</a></li>
+                                    <li class="active">Tags</li>
+                                </ol>
+                            </div>
+                            <div class="col-sm-6 text-right">
+                                <h4 class="mt-5 mb-0">Tag Analytics : Contruction Work Tag</h4>
+                            </div>              
+                        </div><!--/row-->
+                        <div class="row">
+                            <div class="col-xs-12 secondary-bg">
+                                <div class="col-xs-12 shadow-box">
+                                    <form id="form" class="form-wrapper form-horizontal form-horizontal-type1" role="form">
+                                        <div class="row mb-xs-large">
+                                            <div class="col-sm-9 col-md-10 left-area">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="col-sm-4 text-right">Project Name :</label>
+                                                            <div class="col-sm-8">
+                                                                <div class="dropdown">
+                                                                    <button class="dropdown-toggle item-group" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+                                                                        <div class="item">Construction work at ABC hospital</div>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="col-sm-4 text-right">UNIQUE ID :</label>
+                                                            <div class="col-sm-8">
+                                                                <div class="item-group">20971F00245</div>
+                                                                
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div><!--/row-->
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="col-sm-4 text-right">Project Level:</label>
+                                                            <div class="col-sm-8">
+                                                                <div class="dropdown">
+                                                                    <button class="dropdown-toggle item-group" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+                                                                        <div class="item">Area 1</div>
+                                                                        <div class="item">Section A</div>
+                                                                        <div class="item">Floor 2</div>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="col-sm-4 text-right">User Group :</label>
+                                                            <div class="col-sm-8">
+                                                                <div class="dropdown">
+                                                                    <button class="dropdown-toggle item-group" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+                                                                        <div class="item">Site Personnel</div>
+                                                                    </button>
+                                                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                                                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Construction work at ABC hospital</a></li>
+                                                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Construction work at ABC hospital</a></li>
+                                                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Construction work at ABC hospital</a></li>
+                                                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Construction work at ABC hospital</a></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="col-sm-4 text-right">Tag  Description :</label>
+                                                            <div class="col-sm-8">
+                                                                <div class="item-group">Test Description Construction work at Hospital</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="col-sm-4 text-right">Tag Process :</label>
+                                                            <div class="col-sm-8">
+                                                                <div class="item-group">Site Contruction</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div><!--/row-->
+                                            </div>
+                                            <div class="col-sm-3 col-md-2 bar-code-container pr-lg-45">
+                                                <div class="bar-code text-center">
+                                                    <img src="images/bar-code.jpg" class="img-responsive inline-block-sm" alt="" title="" />
+                                                </div>
+                                                <div class="bar-code-text text-center">
+                                                    QA Code / Bar Code 
+                                                </div>
+                                            </div>
+                                        </div><!--/row-->
+                                    </form>
+                                    <div class="row" style="padding:10px;">
+                                        <div class="col-xs-12 search-tag-box mb-sm-large">
+                                            <div class="row">
+                                                <h2 class="col-xs-12 search-title">Assigned Tasks<button class="pull-right btn icon-btn"><i class="fa fa-sort-desc fa-2x" id="down-arrow"></i><i class="fa fa-sort-asc fa-2x" id="up-arrow" style="display: none"></i></button>
+                                                </h2>
+                                            </div><!--/row-->
+                                            <div class="row mt-10">
+                                        <div class="table-responsive table-responsive-cust form-wrapper" style='padding:10px;'>
+                                            <form class="form-horizontal-typ1">
+                                                <table class="table table-bordered table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center" rowspan="2">S.No</th>
+                                                            <th class="text-center" rowspan="2">User Level</th>
+                                                            <th class="text-center" rowspan="2">
+                                                            </th>
+                                                            <th class="text-center" rowspan="2">From Task Process</th>
+                                                            <th class="text-center" rowspan="2">To Task Process</th>
+                                                            <th class="text-center" rowspan="2">Mandatory</th>
+                                                            <th class="text-center"colspan="2">Email Notification</th> 
+                                                        </tr>
+                                                        <tr>
+                                                            <th class="text-center">Status</th>
+                                                            <th class="text-center">Frequency</th> 
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="text-center">1</td>
+                                                            <td class="text-center">Admin One</td>
+                                                            <td class="text-center"></td>
+                                                            <td class="text-center">
+                                                            </td>
+                                                            <td class="text-center">
+                                                            </td>
+                                                            <td class="text-center">
+                                                            </td>
+                                                            <td class="text-center">
+                                                                
+                                                            </td>
+                                                            <td class="text-center">
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-center"></td>
+                                                            <td class="text-center"></td>
+                                                            <td class="text-center">User 1</td>
+                                                            <td class="text-center">
+                                                               Sample Text
+                                                            </td>
+                                                            <td class="text-center">
+                                                                Sample Text
+                                                            </td>
+                                                            <td class="text-center">
+                                                                No
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <a class="links" href="#">All , On Update</a>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <a class="links" href="#">Daily</a>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-center"></td>
+                                                            <td class="text-center"></td>
+                                                            <td class="text-center">User 1</td>
+                                                            <td class="text-center">
+                                                               Sample Text
+                                                            </td>
+                                                            <td class="text-center">
+                                                                Sample Text
+                                                            </td>
+                                                            <td class="text-center">
+                                                                No
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <a class="links" href="#">All , On Update</a>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <a class="links" href="#">Weekly</a>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-center">2</td>
+                                                            <td class="text-center">Admin Two</td>
+                                                            <td class="text-center"></td>
+                                                            <td class="text-center"></td>
+                                                            <td class="text-center"></td>
+                                                            <td class="text-center"></td>
+                                                            <td class="text-center"></td>
+                                                            <td class="text-center"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-center"></td>
+                                                            <td class="text-center"></td>
+                                                            <td class="text-center">User 1</td>
+                                                            <td class="text-center">
+                                                               Sample Text
+                                                            </td>
+                                                            <td class="text-center">
+                                                                Sample Text
+                                                            </td>
+                                                            <td class="text-center">
+                                                                No
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <a class="links" href="#">All , On Update</a>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <a class="links" href="#">Weekly</a>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-center"></td>
+                                                            <td class="text-center"></td>
+                                                            <td class="text-center">User 1</td>
+                                                            <td class="text-center">
+                                                               Sample Text
+                                                            </td>
+                                                            <td class="text-center">
+                                                                Sample Text
+                                                            </td>
+                                                            <td class="text-center">
+                                                                Yes
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <a class="links" href="#">All , On Update</a>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <a class="links" href="#">Weekly</a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </form>
+                                        </div>     
+                                    </div><!--/row-->
+                                        </div><!--/search-tag-box-->
+                                    </div><!--/row-->
+                                </div><!--/shadow-box-->
+                                <div class="wrapper mt-10 mt-xs-large">
+                                    <button class="btn icon-btn btn-lg pull-left activity-btn"><i class="fa fa-list-alt fa-lg mr-10 "></i>Activity Log List</button>
+                                    <button class="btn btn-primary btn-lg pull-right"><i class="fa fa-download mr-10 fa-lg"></i>Download Report</button>
+                                </div> 
+                                <div class="wrapper mt-20">
+                                    <div class="table-responsive table-responsive-cust">
+                                        <table class="table table-bordered table-striped form-horizontal-typ1 mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center">S.No</th>
+                                                    <th class="text-center">Logged By</th>
+                                                    <th class="text-center">Status</th>
+                                                    <th class="text-center">Comments</th>
+                                                    <th class="text-center">Attachments (click to download)</th>
+                                                    <th class="text-center">Activity Time</th>
+                                                    <th class="text-center">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="text-center">1</td>
+                                                    <td class="text-center">
+                                                        Mr. Ankur Sharma
+                                                    </td>
+                                                    <td class="text-center">
+                                                        Material Received - No
+                                                    </td>
+                                                    <td class="text-center">
+                                                        Material still not received
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <a href=''>Attachment 1 <i class="fa fa-file-word-o"></i></a>, &nbsp;
+                                                        <a href=''>Attachment 2 <i class="fa fa-file-image-o"></i></a>, &nbsp;
+                                                        <a href=''>Attachment 3 <i class="fa fa-file-pdf-o"></i></a>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        24 Nov 2014
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>
+                                                        <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>&nbsp</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>        
+                                </div><!--/wrapper-->
+                            </div><!--/secondary-bg-->
+                        </div><!--/row-->
+                    </div><!--/content-->
+                </div>
+            </div><!--/row-->
+        </section>
+        <!--/container-fluid-->
+        <footer class="footer-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-12 text-center">
+                        <ul> 
+                            <li><a href="#">Terms and Conditions of Use </a><span>|</span></li>
+                            <li><a href="#">Privacy Policy </a><span>|</span></li>
+                            <li><a href="#">Customer Support </a><span>|</span></li>
+                            <li><a class="active" href="#">Andriod App </a></li>
+                        </ul>
+                    </div>
+                </div><!--/row-->
+                <div class="row">
+                    <div class="col-xs-12 text-center copyright">
+                        <span>&copy;</span> Site Track -nfc.com 2013 , All Rights Reserved
+                    </div>
+                </div><!--/row-->
+            </div>
+        </footer><!--/footer-wrapper-->
+    </body>
+</html>
