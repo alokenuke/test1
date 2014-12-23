@@ -20,7 +20,7 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
         })
         
         .when('/', {
-            templateUrl: path+'dashboard.html',
+            templateUrl: SiteUrl+'/dashboard',
             controller: 'SiteIndex',
         })
 
@@ -30,7 +30,7 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
         })
         
         .when('/projects', {
-            templateUrl: path+'project/tabs.html',
+            templateUrl: path+'project/projects.html',
             controller: 'ProjectIndex'
         })
         
@@ -54,14 +54,19 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
             controller: 'TagIndex'
         })
         
-        .when('/tag/create', {
-            templateUrl: path+'tags/create-simple-tag.html',
+        .when('/tags/create', {
+            templateUrl: path+'tags/create.html',
+            controller: 'TagsCreate'
+        })
+        
+         .when('/tags/createmaster', {
+            templateUrl: path+'tags/create-master-tag.html',
             controller: 'TagsCreate'
         })
         
         .when('/tags/:id', {
-            templateUrl: path+'tag/view.html',
-            controller: 'TagView'
+            templateUrl: path+'tags/view-tag.html',
+            controller: 'TagsView'
         })
         
         .when('/tag/update/:id', {
@@ -116,7 +121,6 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
 
     //$locationProvider.html5Mode(true).hashPrefix('!');
 }]);
-
 app.controller('SiteIndex', ['$scope', 'rest', 'breadcrumbsService', '$http', function ($scope, rest, breadcrumbsService, $http) {
         
     rest.path = "projects";
