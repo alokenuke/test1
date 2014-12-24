@@ -55,7 +55,7 @@
         <div class="row">
             <div class="col-md-6 col-lg-5">
                 <div class="form-group">
-                    <label class="col-sm-4 control-label text-right">Task Name :</label>
+                    <label class="col-sm-4 control-label text-right">Tag Name :</label>
                     <div class="col-sm-6">
                         <input type="text" class="form-control" ng-model="search.task_name" />
                     </div>
@@ -91,13 +91,79 @@
             </div>
             <div class="col-md-6 col-lg-7">
                 <div class="form-group">
-                    <label class="col-sm-4 col-lg-3 control-label text-right">Item Type :</label>
+                    <label class="col-sm-4 col-lg-3 control-label text-right">Item:</label>
                     <div class="col-sm-6">
-                        <input type="text" class="form-control" />
+                        <ui-select ng-model="search.project.selected"
+                                   theme="bootstrap" ng-disabled="disabled" >
+                          <ui-select-match placeholder="Select item group...">{{$select.selected.project_name}}</ui-select-match>
+                          <ui-select-choices repeat="project in projects | filter: $select.search"
+                                   refresh-delay="0">
+                              <div ng-bind-html="project.project_name" ng-click="updateLevel(project.id, 0, 0)"></div>
+                          </ui-select-choices>
+                        </ui-select>
                     </div>
                 </div>
             </div>
         </div><!--/row-->
+        
+        <div class="row">
+            <div class="col-md-6 col-lg-5">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label text-right">Tag UID :</label>
+                    <div class="col-sm-6">
+                        <input type="text" ng-model="search.uid" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-7">
+                <div class="form-group">
+                    <label class="col-sm-4 col-lg-3 control-label text-right">Process Flow:</label>
+                    <div class="col-sm-6">
+                        <ui-select ng-model="search.project.selected"
+                                   theme="bootstrap" ng-disabled="disabled" >
+                          <ui-select-match placeholder="Select Process type...">{{$select.selected.project_name}}</ui-select-match>
+                          <ui-select-choices repeat="project in projects | filter: $select.search"
+                                   refresh-delay="0">
+                              <div ng-bind-html="project.project_name" ng-click="updateLevel(project.id, 0, 0)"></div>
+                          </ui-select-choices>
+                        </ui-select>
+                    </div>
+                </div>
+            </div>
+        </div><!--/row-->
+        
+        <div class="row">
+            <div class="col-md-6 col-lg-5">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label text-right">Tag Description :</label>
+                    <div class="col-sm-6">
+                        <input type="text" ng-model="search.uid" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-7 pull-right">
+                <div class="form-group">
+                    <label class="col-sm-4 col-lg-3 control-label text-right">Created Between :</label>
+                    <div class="col-sm-3">
+                        <div class="input-group">
+                            <input type="text" style="padding:6px 6px;" name="q" placeholder="From date..." class="form-control search-control">
+                            <div class="input-group-btn">
+                                <button type="submit" class="btn btn-primary search-btn"><i class="fa fa-calendar"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="input-group">
+                            <input type="text" style="padding:6px 6px;" name="q" placeholder="To date..." class="form-control search-control">
+                            <div class="input-group-btn">
+                                <button type="submit" class="btn btn-primary search-btn"><i class="fa fa-calendar"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!--/row-->
+        
         <div class="row mt-20">
            <div class="col-sm-10 text-center">
                 <button class="btn btn-primary mb-sm-5">Search</button>
@@ -113,76 +179,62 @@
         </div><!--/row-->
         <div class="row mt-15">
             <div class="">
-                <div class="table-responsive table-responsive-cust">
+                <div class="clearfix table-responsive table-responsive-cust">
+                    <div class="pull-right">                    
+                        <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
+                        <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px"><option>20</option></select>
+                    </div>
                     <table class="table table-bordered">
                         <thead>
                             <tr>
                                 <th class="text-center">S.No</th>
-                                <th class="text-center">UID</th>
-                                <th class="text-center">Item Type</th>
-                                <th class="text-center">Tag Name</th>
-                                <th class="text-center">Products Code</th>
-                                <th class="text-center">Status</th>
-                                <th class="text-center">Last Updated By</th>
+                                <th class="text-center" style="min-width: 20%">
+                                    <a href="">Project Level <i class="fa fa-sort"></i></a>
+                                </th>
+                                <th class="text-center">
+                                    <a href="">UID <i class="fa fa-sort"></i></a>
+                                </th>
+                                <th class="text-center">
+                                    <a>Item Type <i class="fa fa-sort"></i></a>
+                                </th>
+                                <th class="text-center">
+                                    <a>Tag Name <i class="fa fa-sort"></i></a>
+                                </th>
+                                <th class="text-center">
+                                    <a>Tag Description <i class="fa fa-sort"></i></a>
+                                </th>
+                                <th class="text-center">
+                                    <a>Products Code <i class="fa fa-sort"></i></a>
+                                </th>
+                                <th class="text-center">
+                                    <a>Status <i class="fa fa-sort"></i></a>
+                                </th>
                                 <th class="text-center">Actions</th>
                                 <!-- <th class="text-center"></th> -->
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            <tr ng-repeat="a in range(3) track by $index">
                                 <td class="text-center">1</td>
+                                <td class="text-center multi-level">
+                                    <div class="level-item">Project A</div>
+                                    <div class="level-item">Area 1</div>
+                                    <div class="level-item">Floor 1</div>
+                                    <div class="level-item last-child">Section A</div>
+                                </td>
                                 <td class="text-center">4X4224SSS</td>
                                 <td class="text-center">Sample Text</td>
                                 <td class="text-center">Sample Text</td>
+                                <td class="text-center">Test description</td>
                                 <td class="text-center">Sample Text</td>
-                                <td class="text-center">Material Received - No</td>
                                 <td class="text-center">
-                                    A.R. Hussain<br />
-                                    Nov 11, 2014
+                                    Material Received - No<br/>
+                                    <small>(A.R. Hussain Nov 11, 2014 13:10:11)</small>
                                 </td>
                                 <td class="text-center">
                                     <button class="btn icon-btn"><i class="fa fa-list-alt fa-lg"></i></button>
-                                    <button class="btn icon-btn spacer"><i class="fa fa-barcode fa-lg"></i></button>
-                                    <button class="btn icon-btn"><i class="fa fa-print fa-lg"></i></button>
-                                    <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>
-                                    <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
-
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">2</td>
-                                <td class="text-center">4X4224SSS</td>
-                                <td class="text-center">Sample Text</td>
-                                <td class="text-center">Sample Text</td>
-                                <td class="text-center">Sample Text</td>
-                                <td class="text-center">Material Received - No</td>
-                                <td class="text-center">
-                                    A.R. Hussain<br />
-                                    Nov 11, 2014
-                                </td>
-                                <td class="text-center">
-                                    <button class="btn icon-btn"><i class="fa fa-list-alt fa-lg"></i></button>
-                                    <button class="btn icon-btn spacer"><i class="fa fa-barcode fa-lg"></i></button>
-                                    <button class="btn icon-btn"><i class="fa fa-print fa-lg"></i></button>
-                                    <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>
-                                    <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
-
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">3</td>
-                                <td class="text-center">4X4224SSS</td>
-                                <td class="text-center">Sample Text</td>
-                                <td class="text-center">Sample Text</td>
-                                <td class="text-center">Sample Text</td>
-                                <td class="text-center">Material Received - No</td>
-                                <td class="text-center">
-                                    A.R. Hussain<br />
-                                    Nov 11, 2014
-                                </td>
-                                <td class="text-center">
-                                    <button class="btn icon-btn"><i class="fa fa-list-alt fa-lg"></i></button>
-                                    <button class="btn icon-btn spacer"><i class="fa fa-barcode fa-lg"></i></button>
+                                    <button class="btn icon-btn"><i class="fa fa-barcode fa-lg"></i></button>
+                                    <button class="btn icon-btn"><i class="fa fa-qrcode fa-lg"></i></button><br />
                                     <button class="btn icon-btn"><i class="fa fa-print fa-lg"></i></button>
                                     <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>
                                     <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
@@ -191,7 +243,10 @@
                             </tr>
                         </tbody>
                     </table>
-                </div>
+                    <div class="pull-right">                    
+                        <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
+                        <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px"><option>20</option></select>
+                    </div>
             </div>          
         </div><!--/row-->
     </div>
