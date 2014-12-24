@@ -28,6 +28,10 @@ appServices.factory('breadcrumbsService', function($rootScope) {
     // create an array of alerts available globally
     $rootScope.breadcrumbs = [];
     
+    $rootScope.range = function(n) {
+        return new Array(n);
+    }
+    
     breadcrumbsService.setTitle = function(title) {
         $rootScope.page_title = title;
     }
