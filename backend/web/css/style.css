@@ -795,8 +795,14 @@ margin-top: -5px
     .bar-code-container {
         width: 14%
     }
+    .bar-code-container2 {
+        width: 13%
+    }
     .left-area {
         width: 86%
+    }
+    .left-area2 {
+        width: 70%
     }
 }
 

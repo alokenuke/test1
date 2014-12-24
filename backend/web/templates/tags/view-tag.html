@@ -1,312 +1,381 @@
-        <section class="container-fluid">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="content primary-bg-wrapper column-gs-sm normal-gutter pb-20">
-                        <div class="row mb-xs-20">
-                            <div class="col-sm-6">
-                                <ol class="breadcrumb mb-15">
-                                    <li><a href="#">Home</a></li>
-                                    <li><a href="#">Manage</a></li>
-                                    <li class="active">Tags</li>
-                                </ol>
-                            </div>
-                            <div class="col-sm-6 text-right">
-                                <h4 class="mt-5 mb-0">Tag Analytics : Contruction Work Tag</h4>
-                            </div>              
-                        </div><!--/row-->
-                        <div class="row">
-                            <div class="col-xs-12 secondary-bg">
-                                <div class="col-xs-12 shadow-box">
-                                    <form id="form" class="form-wrapper form-horizontal form-horizontal-type1" role="form">
-                                        <div class="row mb-xs-large">
-                                            <div class="col-sm-9 col-md-10 left-area">
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label class="col-sm-4 text-right">Project Name :</label>
-                                                            <div class="col-sm-8">
-                                                                <ui-select ng-model="search.project.selected"
+<div class="col-xs-12 secondary-bg">
+    <div class="col-xs-12 shadow-box">
+        <form role="form" class="form-wrapper form-horizontal form-horizontal-type1" id="form">
+            <div class="row mb-xs-large">
+                <div class="col-sm-8 left-area2">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 text-right">Project Name :</label>
+                                <div class="col-sm-8">
+                                    <ui-select ng-model="search.project.selected"
                                    theme="bootstrap" ng-disabled="disabled" >
-                          <ui-select-match placeholder="Select a project...">{{$select.selected.project_name}}</ui-select-match>
-                          <ui-select-choices repeat="project in projects | filter: $select.search"
-                                   refresh-delay="0">
-                              <div ng-bind-html="project.project_name" ng-click="updateLevel(project.id, 0, 0)"></div>
-                          </ui-select-choices>
-                        </ui-select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label class="col-sm-4 text-right">UNIQUE ID :</label>
-                                                            <div class="col-sm-8">
-                                                                <div class="item-group">20971F00245</div>
-                                                                
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div><!--/row-->
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label class="col-sm-4 text-right">Project Level:</label>
-                                                            <div class="col-sm-8">
-                                                                <div class="dropdown">
-                                                                    <button class="dropdown-toggle item-group" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
-                                                                        <div class="item">Area 1</div>
-                                                                        <div class="item">Section A</div>
-                                                                        <div class="item">Floor 2</div>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label class="col-sm-4 text-right">User Group :</label>
-                                                            <div class="col-sm-8">
-                                                                <div class="dropdown">
-                                                                    <button class="dropdown-toggle item-group" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
-                                                                        <div class="item">Site Personnel</div>
-                                                                    </button>
-                                                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                                                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Construction work at ABC hospital</a></li>
-                                                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Construction work at ABC hospital</a></li>
-                                                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Construction work at ABC hospital</a></li>
-                                                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Construction work at ABC hospital</a></li>
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label class="col-sm-4 text-right">Tag  Description :</label>
-                                                            <div class="col-sm-8">
-                                                                <div class="item-group">Test Description Construction work at Hospital</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <label class="col-sm-4 text-right">Tag Process :</label>
-                                                            <div class="col-sm-8">
-                                                                <div class="item-group">Site Contruction</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div><!--/row-->
-                                            </div>
-                                            <div class="col-sm-3 col-md-2 bar-code-container pr-lg-45">
-                                                <div class="bar-code text-center">
-                                                    <img src="/images/bar-code.jpg" class="img-responsive inline-block-sm" alt="" title="" />
-                                                </div>
-                                                <div class="bar-code-text text-center">
-                                                    QA Code / Bar Code 
-                                                </div>
-                                            </div>
-                                        </div><!--/row-->
-                                    </form>
-                                    <div class="row" style="padding:10px;">
-                                        <div class="col-xs-12 search-tag-box mb-sm-large">
-                                            <div class="row">
-                                                <h2 class="col-xs-12 search-title">Assigned Tasks<button class="pull-right btn icon-btn"><i class="fa fa-sort-desc fa-2x" id="down-arrow"></i><i class="fa fa-sort-asc fa-2x" id="up-arrow" style="display: none"></i></button>
-                                                </h2>
-                                            </div><!--/row-->
-                                            <div class="row mt-10">
-                                        <div class="table-responsive table-responsive-cust form-wrapper" style='padding:10px;'>
-                                            <form class="form-horizontal-typ1">
-                                                <table class="table table-bordered table-striped">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="text-center" rowspan="2">S.No</th>
-                                                            <th class="text-center" rowspan="2">User Level</th>
-                                                            <th class="text-center" rowspan="2">
-                                                            </th>
-                                                            <th class="text-center" rowspan="2">From Task Process</th>
-                                                            <th class="text-center" rowspan="2">To Task Process</th>
-                                                            <th class="text-center" rowspan="2">Mandatory</th>
-                                                            <th class="text-center"colspan="2">Email Notification</th> 
-                                                        </tr>
-                                                        <tr>
-                                                            <th class="text-center">Status</th>
-                                                            <th class="text-center">Frequency</th> 
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="text-center">1</td>
-                                                            <td class="text-center">Admin One</td>
-                                                            <td class="text-center"></td>
-                                                            <td class="text-center">
-                                                            </td>
-                                                            <td class="text-center">
-                                                            </td>
-                                                            <td class="text-center">
-                                                            </td>
-                                                            <td class="text-center">
-                                                                
-                                                            </td>
-                                                            <td class="text-center">
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="text-center"></td>
-                                                            <td class="text-center"></td>
-                                                            <td class="text-center">User 1</td>
-                                                            <td class="text-center">
-                                                               Sample Text
-                                                            </td>
-                                                            <td class="text-center">
-                                                                Sample Text
-                                                            </td>
-                                                            <td class="text-center">
-                                                                No
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <a class="links" href="#">All , On Update</a>
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <a class="links" href="#">Daily</a>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="text-center"></td>
-                                                            <td class="text-center"></td>
-                                                            <td class="text-center">User 1</td>
-                                                            <td class="text-center">
-                                                               Sample Text
-                                                            </td>
-                                                            <td class="text-center">
-                                                                Sample Text
-                                                            </td>
-                                                            <td class="text-center">
-                                                                No
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <a class="links" href="#">All , On Update</a>
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <a class="links" href="#">Weekly</a>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="text-center">2</td>
-                                                            <td class="text-center">Admin Two</td>
-                                                            <td class="text-center"></td>
-                                                            <td class="text-center"></td>
-                                                            <td class="text-center"></td>
-                                                            <td class="text-center"></td>
-                                                            <td class="text-center"></td>
-                                                            <td class="text-center"></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="text-center"></td>
-                                                            <td class="text-center"></td>
-                                                            <td class="text-center">User 1</td>
-                                                            <td class="text-center">
-                                                               Sample Text
-                                                            </td>
-                                                            <td class="text-center">
-                                                                Sample Text
-                                                            </td>
-                                                            <td class="text-center">
-                                                                No
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <a class="links" href="#">All , On Update</a>
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <a class="links" href="#">Weekly</a>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="text-center"></td>
-                                                            <td class="text-center"></td>
-                                                            <td class="text-center">User 1</td>
-                                                            <td class="text-center">
-                                                               Sample Text
-                                                            </td>
-                                                            <td class="text-center">
-                                                                Sample Text
-                                                            </td>
-                                                            <td class="text-center">
-                                                                Yes
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <a class="links" href="#">All , On Update</a>
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <a class="links" href="#">Weekly</a>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </form>
-                                        </div>     
-                                    </div><!--/row-->
-                                        </div><!--/search-tag-box-->
-                                    </div><!--/row-->
-                                </div><!--/shadow-box-->
-                                <div class="wrapper mt-10 mt-xs-large">
-                                    <button class="btn icon-btn btn-lg pull-left activity-btn"><i class="fa fa-list-alt fa-lg mr-10 "></i>Activity Log List</button>
-                                    <button class="btn btn-primary btn-lg pull-right"><i class="fa fa-download mr-10 fa-lg"></i>Download Report</button>
-                                </div> 
-                                <div class="wrapper mt-20">
-                                    <div class="table-responsive table-responsive-cust">
-                                        <table class="table table-bordered table-striped form-horizontal-typ1 mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th class="text-center">S.No</th>
-                                                    <th class="text-center">Logged By</th>
-                                                    <th class="text-center">Status</th>
-                                                    <th class="text-center">Comments</th>
-                                                    <th class="text-center">Attachments (click to download)</th>
-                                                    <th class="text-center">Activity Time</th>
-                                                    <th class="text-center">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td class="text-center">1</td>
-                                                    <td class="text-center">
-                                                        Mr. Ankur Sharma
-                                                    </td>
-                                                    <td class="text-center">
-                                                        Material Received - No
-                                                    </td>
-                                                    <td class="text-center">
-                                                        Material still not received
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <a href=''>Attachment 1 <i class="fa fa-file-word-o"></i></a>, &nbsp;
-                                                        <a href=''>Attachment 2 <i class="fa fa-file-image-o"></i></a>, &nbsp;
-                                                        <a href=''>Attachment 3 <i class="fa fa-file-pdf-o"></i></a>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        24 Nov 2014
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>
-                                                        <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>&nbsp</td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>        
-                                </div><!--/wrapper-->
-                            </div><!--/secondary-bg-->
-                        </div><!--/row-->
-                    </div><!--/content-->
+                                        <ui-select-match placeholder="Construction work at Abc hospital">Construction work at Abc hospital</ui-select-match>
+                                        <ui-select-choices repeat="project in projects | filter: $select.search"
+                                                 refresh-delay="0">
+                                            <div ng-bind-html="project.project_name" ng-click="updateLevel(project.id, 0, 0)"></div>
+                                        </ui-select-choices>
+                                      </ui-select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 text-right">UNIQUE ID :</label>
+                                <div class="col-sm-8">
+                                    <div class="item-group">20971F00245</div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--/row-->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 text-right">Project Level:</label>
+                                <div class="col-sm-8">
+                                    <ui-select ng-model="search.project.selected"
+                                   theme="bootstrap" ng-disabled="disabled" >
+                                        <ui-select-match placeholder="Level 1">Level 1</ui-select-match>
+                                        <ui-select-choices repeat="project in projects | filter: $select.search"
+                                                 refresh-delay="0">
+                                            <div ng-bind-html="project.project_name" ng-click="updateLevel(project.id, 0, 0)"></div>
+                                        </ui-select-choices>
+                                      </ui-select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 text-right">User Group :</label>
+                                <div class="col-sm-8">
+                                    <ui-select ng-model="search.project.selected"
+                                   theme="bootstrap" ng-disabled="disabled" >
+                                        <ui-select-match placeholder="User Group A">Level 1</ui-select-match>
+                                        <ui-select-choices repeat="project in projects | filter: $select.search"
+                                                 refresh-delay="0">
+                                            <div ng-bind-html="project.project_name" ng-click="updateLevel(project.id, 0, 0)"></div>
+                                        </ui-select-choices>
+                                      </ui-select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 text-right">Tag  Name :</label>
+                                <div class="col-sm-8">
+                                    <div class="item-group">Engineering </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 text-right">Tag Description :</label>
+                                <div class="col-sm-8">
+                                    <div class="item-group">Tag process at work</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--/row-->
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 text-right">Tag Process:</label>
+                                <div class="col-sm-8">
+                                    Site Construction
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 text-right">Process Level :</label>
+                                <div class="col-sm-8">
+                                    <ui-select ng-model="search.project.selected"
+                                   theme="bootstrap" ng-disabled="disabled" >
+                                        <ui-select-match placeholder="Process Level">Level 1</ui-select-match>
+                                        <ui-select-choices repeat="project in projects | filter: $select.search"
+                                                 refresh-delay="0">
+                                            <div ng-bind-html="project.project_name" ng-click="updateLevel(project.id, 0, 0)"></div>
+                                        </ui-select-choices>
+                                      </ui-select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 text-right">Product Code :</label>
+                                <div class="col-sm-8">
+                                    <div class="item-group">700124F0012</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 text-right">&nbsp;</label>
+                                <div class="col-sm-8">
+                                    <div class="item-group">&nbsp;</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--/row-->
+                    
+                    
+                </div>
+                <div class="col-sm-3 col-md-2 bar-code-container2">
+                    <div class="bar-code text-center">
+                        <i class="fa fa-barcode fa-4x"></i>
+                    </div>
+                    
+                    <div class="bar-code-text text-center">
+                        QA Code / Bar Code 
+                    </div>
+                </div>
+                <div class="col-sm-3 col-md-2 bar-code-container2">
+                    <div class="bar-code text-center">
+                        <i class="fa fa-qrcode fa-4x"></i>
+                    </div>
+                    
+                    <div class="bar-code-text text-center">
+                        QA Code / Bar Code 
+                    </div>
                 </div>
             </div><!--/row-->
-        </section>
+        </form>
+        <div style="padding:10px;" class="row">
+            <div class="col-xs-12 search-tag-box mb-sm-large">
+                <div class="row">
+                    <h2 class="col-xs-12 search-title">Assigned Tasks<button class="pull-right btn icon-btn"><i id="down-arrow" class="fa fa-sort-desc fa-2x"></i><i style="display: none" id="up-arrow" class="fa fa-sort-asc fa-2x"></i></button>
+                    </h2>
+                </div><!--/row-->
+                <div class="row mt-10">
+            <div style="padding:10px;" class="table-responsive table-responsive-cust form-wrapper">
+                <form class="form-horizontal-typ1">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" class="text-center">S.No</th>
+                                <th rowspan="2" class="text-center">User Level</th>
+                                <th rowspan="2" class="text-center">
+                                </th>
+                                <th rowspan="2" class="text-center">From Task Process</th>
+                                <th rowspan="2" class="text-center">To Task Process</th>
+                                <th rowspan="2" class="text-center">Mandatory</th>
+                                <th colspan="2" class="text-center">Email Notification</th> 
+                            </tr>
+                            <tr>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Frequency</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center">1</td>
+                                <td class="text-center">Admin One</td>
+                                <td class="text-center"></td>
+                                <td class="text-center">
+                                </td>
+                                <td class="text-center">
+                                </td>
+                                <td class="text-center">
+                                </td>
+                                <td class="text-center">
+
+                                </td>
+                                <td class="text-center">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                                <td class="text-center">User 1</td>
+                                <td class="text-center">
+                                   Sample Text
+                                </td>
+                                <td class="text-center">
+                                    Sample Text
+                                </td>
+                                <td class="text-center">
+                                    No
+                                </td>
+                                <td class="text-center">
+                                    <a href="#" class="links">All , On Update</a>
+                                </td>
+                                <td class="text-center">
+                                    <a href="#" class="links">Daily</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                                <td class="text-center">User 1</td>
+                                <td class="text-center">
+                                   Sample Text
+                                </td>
+                                <td class="text-center">
+                                    Sample Text
+                                </td>
+                                <td class="text-center">
+                                    No
+                                </td>
+                                <td class="text-center">
+                                    <a href="#" class="links">All , On Update</a>
+                                </td>
+                                <td class="text-center">
+                                    <a href="#" class="links">Weekly</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">2</td>
+                                <td class="text-center">Admin Two</td>
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                                <td class="text-center">User 1</td>
+                                <td class="text-center">
+                                   Sample Text
+                                </td>
+                                <td class="text-center">
+                                    Sample Text
+                                </td>
+                                <td class="text-center">
+                                    No
+                                </td>
+                                <td class="text-center">
+                                    <a href="#" class="links">All , On Update</a>
+                                </td>
+                                <td class="text-center">
+                                    <a href="#" class="links">Weekly</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                                <td class="text-center">User 1</td>
+                                <td class="text-center">
+                                   Sample Text
+                                </td>
+                                <td class="text-center">
+                                    Sample Text
+                                </td>
+                                <td class="text-center">
+                                    Yes
+                                </td>
+                                <td class="text-center">
+                                    <a href="#" class="links">All , On Update</a>
+                                </td>
+                                <td class="text-center">
+                                    <a href="#" class="links">Weekly</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>     
+        </div><!--/row-->
+            </div><!--/search-tag-box-->
+        </div><!--/row-->
+    </div><!--/shadow-box-->
+    <div class="wrapper mt-10 mt-xs-large">
+        <button class="btn icon-btn btn-lg pull-left activity-btn"><i class="fa fa-list-alt fa-lg mr-10 "></i>Activity Log List</button>
+        <button class="btn btn-primary btn-lg pull-right"><i class="fa fa-download mr-10 fa-lg"></i>Download Report</button>
+    </div> 
+    <div class="wrapper mt-20">
+        <div class="table-responsive table-responsive-cust">
+            <table class="table table-bordered table-striped form-horizontal-typ1 mb-0">
+                <thead>
+                    <tr>
+                        <th class="text-center">S.No</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Comments</th>
+                        <th class="text-center">Attachments (click to download)</th>
+                        
+                        <th class="text-center">Logged By</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-center">1</td>
+                        <td class="text-center">
+                            Material Received - No
+                        </td>
+                        <td class="text-center">
+                            Material still not received
+                        </td>
+                        <td class="text-center">
+                            <a href="">Attachment 1 <i class="fa fa-file-word-o"></i></a>, &nbsp;
+                            <a href="">Attachment 2 <i class="fa fa-file-image-o"></i></a>, &nbsp;
+                            <a href="">Attachment 3 <i class="fa fa-file-pdf-o"></i></a>
+                        </td>
+                        <td class="text-center">
+                            Mr. Ankur Sharma <br/>
+                            <small>24 Nov 2014 13:10:11</small>
+                        </td>
+                        <td class="text-center">
+                            <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>
+                            <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">1</td>
+                        <td class="text-center">
+                            Material Received - No
+                        </td>
+                        <td class="text-center">
+                            Material still not received
+                        </td>
+                        <td class="text-center">
+                            <a href="">Attachment 1 <i class="fa fa-file-word-o"></i></a>, &nbsp;
+                            <a href="">Attachment 2 <i class="fa fa-file-image-o"></i></a>, &nbsp;
+                            <a href="">Attachment 3 <i class="fa fa-file-pdf-o"></i></a>
+                        </td>
+                        <td class="text-center">
+                            Mr. Ankur Sharma <br/>
+                            <small>24 Nov 2014 13:10:11</small>
+                        </td>
+                        <td class="text-center">
+                            <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>
+                            <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">1</td>
+                        <td class="text-center">
+                            Material Received - No
+                        </td>
+                        <td class="text-center">
+                            Material still not received
+                        </td>
+                        <td class="text-center">
+                            <a href="">Attachment 1 <i class="fa fa-file-word-o"></i></a>, &nbsp;
+                            <a href="">Attachment 2 <i class="fa fa-file-image-o"></i></a>, &nbsp;
+                            <a href="">Attachment 3 <i class="fa fa-file-pdf-o"></i></a>
+                        </td>
+                        <td class="text-center">
+                            Mr. Ankur Sharma <br/>
+                            <small>24 Nov 2014 13:10:11</small>
+                        </td>
+                        <td class="text-center">
+                            <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>
+                            <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="pull-right">                    
+            <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
+            <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px"><option>20</option></select>
+        </div>
+            
+        </div>        
+    </div><!--/wrapper-->
+</div><!--/secondary-bg-->

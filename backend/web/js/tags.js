@@ -112,7 +112,7 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
 app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 
                 function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService) {
         rest.path = "tags";
-        
+        console.log('sadsa');
         var ctrl = this;
         
         breadcrumbsService.setTitle("Site Track: Tag View");
