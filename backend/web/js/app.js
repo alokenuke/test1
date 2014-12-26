@@ -25,6 +25,11 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
             controller: 'SiteIndex',
         })
 
+        .when('/user-groups', {
+            templateUrl: path+'user-group/index.html',
+            controller: 'UserGroup'
+        })
+        
         .when('/projects', {
             templateUrl: path+'projects/index.html',
             controller: 'ProjectIndex'

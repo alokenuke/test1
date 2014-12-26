@@ -231,7 +231,6 @@ app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route','$routePa
 app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 
                 function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService) {
         rest.path = "tags";
-        console.log('sadsa');
         var ctrl = this;
         
         breadcrumbsService.setTitle("Site Track: Tag View");
@@ -337,6 +336,198 @@ app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParam
         }).error(errorCallback);
         
     }])
+
+app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 
+                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService) {
+        rest.path = "userGroups";
+        
+        var ctrl = this;
+        
+        breadcrumbsService.setTitle("Site Track: Tag View");
+        breadcrumbsService.clearAll();
+        breadcrumbsService.add("", "Home");
+        breadcrumbsService.add("/#/user-group", "Manage");
+        breadcrumbsService.add("/#/user-group", "User Groups");
+        breadcrumbsService.add("/#/user-group", "View Group");
+        
+
+                  $scope.list = [{
+                    "id": 1,
+                    "type": "item_group",
+                    "title": "Construction Site",
+                    "items": [{
+                            "id": 1.1,
+                            "type": "item_subtype",
+                            "title": "Admin",
+                             "items": [],
+                          }, {
+                            "id": 1.2,
+                            "type": "item_subtype",
+                            "title": "Site",
+                          }, {
+                            "id": 1.3,
+                            "type": "item_subtype",
+                            "title": "Personal",
+                          },{
+                            "id": 1.4,
+                            "type": "item_subtype",
+                            "title": "Consultant",
+                          }],
+                  }, {
+                    "id": 2,
+                    "type": "item_group",
+                    "title": "Assets Tracking",
+                    "items": [],
+                  }, {
+                    "id": 3,
+                    "type": "item_group",
+                    "title": "Test user group",
+                    "items": []
+                  },];
+
+                  $scope.selectedItem = {};
+
+                  $scope.options = {
+                  };
+
+                  $scope.remove = function(scope) {
+                    scope.remove();
+                  };
+
+                  $scope.toggle = function(scope) {
+                    scope.toggle();
+                  };
+                  
+                  $scope.updateItem = function(scope) {
+                      scope.editing = true;
+                  }
+                  
+                  $scope.addItemGroup = function() {
+                    var nodeData = $scope.list;
+                    nodeData.push({
+                      id: null,
+                      title: "Item Group " + (nodeData.length + 1),
+                      type: "item_group",
+                      items: []
+                    });
+                  };
+
+                  $scope.newSubItem = function(scope, type) {
+                    var nodeData = scope.$modelValue;
+                    if(type)
+                        type = (type=="item_group"?"item_type":"item_subtype");
+                    else
+                        type = "item_group";
+                    
+                    if(nodeData.items==undefined)
+                        nodeData.items = [];
+                    
+                    nodeData.items.push({
+                      id: nodeData.id * 10 + nodeData.items.length,
+                      title: nodeData.title + '.' + (nodeData.items.length + 1),
+                      type: type,
+                      items: []
+                    });
+                  };
+        
+        ctrl.items = [];
+        $scope.search = [];
+        $scope.search.project = [];
+        $scope.projectlevels = [];
+        $scope.search.childlevels = [];
+        $scope.search.group = [];
+        
+        $scope.updateLevel = function(projectId, level) {
+            $scope.search.project_id = projectId;
+            
+            $scope.projectlevels.splice(level, ($scope.projectlevels.length-level));
+            
+            $http.post("/api/getall?mod=projectLevel", {'search': {'project_id': projectId, 'parent_id': 0}, 'select': ['id', 'level_name']}).success(function(data) {
+                if(data.items.length>0)
+                    $scope.projectlevels.push(data.items);
+            });
+            
+            $http.post("/api/getall?mod=userGroups", {'search': {'project_id': projectId}, 'select': ['id', 'group_name']}).success(function(data) {
+                $scope.usergroups = data.items;
+            });
+        }
+        
+        $scope.fields = [
+            {key: "id",label: "ID",},
+            {key: "modified_date",label: "Modified",},
+            {key: "project_name",label: "Project Name",},
+            {key: "owner_name",label: "Owner",},
+            {key: "address",label: "Address",},
+            {key: "timezone",label: "Timezone",},
+            {key: "project_status",label: "Status",},
+        ];
+        
+        var errorCallback = function (data) {
+            if(data.status!=401) {
+                alertService.add('error', "Error in processing your request. Please try again.");
+            }
+        };
+        
+        $scope.predicate = "";
+        $scope.projects = [];
+        $scope.usergroups = [];
+                
+        if($location.$$search.sort!=undefined) {
+            $scope.predicate = $location.$$search.sort;
+            $scope.reverse = ($scope.predicate.search("-")==-1?false:true);
+        }
+        
+        $scope.order = function(predicate, reverse) {
+            $scope.predicate = (reverse?"-"+predicate:predicate);
+            $scope.reverse = !reverse;
+            $location.search("sort", $scope.predicate);
+        };
+        
+        $scope.delete = function (id) {
+            rest.deleteById({id: id}).success(function () {
+                $location.path('/post');
+                $route.reload();
+            }).error(errorCallback);
+        }
+        
+        $scope.pageChanged = function() {
+            $location.search("page", $scope.currentPage);
+        }
+        
+        $scope.status = {
+            isopen: false
+        };
+        
+        $scope.setSearchFields = function(obj, value) {
+            $scope[obj] = value;
+        }
+
+        $scope.toggleDropdown = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.status.isopen = !$scope.status.isopen;
+        };
+                
+        rest.models().success(function (data) {
+            $scope.data = data.items;
+                        
+            $scope.totalCount = data._meta.totalCount;
+            $scope.pageCount = data._meta.pageCount;
+            $scope.currentPage = (data._meta.currentPage+1);
+            $scope.numPerPage = data._meta.perPage;
+            
+            $http.get("/api/getall?mod=projects").success(function(data) {
+                $scope.projects = data.items;
+            });
+            
+            $http.get("/api/getall?mod=userGroups").success(function(data) {
+                $scope.usergroups = data.items;
+            });
+            
+        }).error(errorCallback);
+        
+    }])
+
 
 
 .controller('Index', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', function ($scope, rest, $location, $route, $routeParams, alertService) {
