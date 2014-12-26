@@ -768,6 +768,15 @@ margin-top: -5px
     text-decoration: none;
     color: #fff
 }
+.required-controls {
+    position: relative;
+    padding-left: 10px
+}
+.required-controls div.required {
+    position: absolute;
+    top: 10px;
+    left: 0px;
+}
 /*------------/footer----------*/
 @media (min-width: 1200px) {
     .pl-lg-25 {
