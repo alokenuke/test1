@@ -1,7 +1,8 @@
-var app = angular.module('siteTrackApp', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'ngResource', 'appApp.services', 'ui.select', 'ngSanitize']);
+var app = angular.module('siteTrackApp', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'ngResource', 'appApp.services', 'ui.select', 'ngSanitize', 'ui.tree']);
 
 app.run(function($http, $window) {
     delete $window.sessionStorage.token;
+    console.log($window);
     if(!$window.sessionStorage.token) {
         $http.get("/api/gettoken?mod=user").success(function(data) {
           $window.sessionStorage.token = data.token; 
@@ -20,18 +21,23 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
         })
         
         .when('/', {
-            templateUrl: SiteUrl+'/dashboard',
+            templateUrl: path+'dashboard.html',
             controller: 'SiteIndex',
         })
 
-        .when('/site/index', {
-            templateUrl: path+'site/main.html',
-            controller: 'SiteIndex'
+        .when('/projects', {
+            templateUrl: path+'projects/index.html',
+            controller: 'ProjectIndex'
         })
         
-        .when('/projects', {
-            templateUrl: path+'project/projects.html',
-            controller: 'ProjectIndex'
+        .when('/projects/levels/:id', {
+            templateUrl: path+'projects/manage-level.html',
+            controller: 'ProjectLevel'
+        })
+        
+        .when('/user-groups', {
+            templateUrl: path+'user-group/index.html',
+            controller: 'UserGroup'
         })
         
         .when('/projects/create', {
@@ -54,12 +60,17 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
             controller: 'TagIndex'
         })
         
+        .when('/tag-process-flow', {
+            templateUrl: path+'process-flow/index.html',
+            controller: 'ProcessFlow'
+        })
+        
         .when('/tags/create', {
-            templateUrl: path+'tags/create.html',
+            templateUrl: path+'tags/create-simple-tag.html',
             controller: 'TagsCreate'
         })
         
-         .when('/tags/createmaster', {
+        .when('/tags/createmaster', {
             templateUrl: path+'tags/create-master-tag.html',
             controller: 'TagsCreate'
         })
@@ -121,6 +132,7 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
 
     //$locationProvider.html5Mode(true).hashPrefix('!');
 }]);
+
 app.controller('SiteIndex', ['$scope', 'rest', 'breadcrumbsService', '$http', function ($scope, rest, breadcrumbsService, $http) {
         
     rest.path = "projects";
