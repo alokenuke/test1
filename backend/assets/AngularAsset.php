@@ -27,6 +27,8 @@ class AngularAsset extends AssetBundle
 		$this->js[] = 'angular-animate' . $prefix . 'js';
                 $this->js[] = 'angular-resource' . $prefix . 'js';
                 $this->js[] = 'angular-sanitize' . $prefix . 'js';
+                $this->js[] = 'angular-ui-tree' . $prefix . 'js';
+                $this->css[] = 'angular-ui-tree' . $prefix . 'css';
                 $this->js[] = 'i18n/angular-locale_' . $language . '.js';
 		parent::registerAssetFiles($view);
 	}

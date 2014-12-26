@@ -3,7 +3,7 @@
                 <div class="pull-right welcome-wrapper">
                     <ul>
                         <li class="dropdown">
-                        <a href="#" class="dropdown-toggle welcome-text" data-toggle="dropdown" role="button" aria-expanded="false">Welcome : 
+                        <a ng-href="" class="dropdown-toggle welcome-text" data-toggle="dropdown" role="button" aria-expanded="false">Welcome : 
                             <span class="username"><?php echo \yii::$app->user->identity->first_name." ".\yii::$app->user->identity->last_name;?></span>
                             <span class="caret"></span></a>
                             <ul class="dropdown-menu weclome-list dropdown-menu-right" role="menu">
@@ -13,10 +13,7 @@
                                         </span></li>
                                     <li>Last login location : <span class="location pl-5">
                                         <?php echo \yii::$app->user->identity->lastTokens->login_location; ?>
-                                        </span></li>
-                                    <li>
-                                        Last login : <span class="date-time text-muted">
-                                        <?php echo date('d M Y h:m a',\yii::$app->user->identity->lastTokens->created_on);?></span>
+                                        </span>
                                     </li>
                                 <?php } else { ?>
                                     <li>This is your first time login.</li>
@@ -35,7 +32,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="#"><img src="images/logo.png" alt="" /></a>
+                    <a class="navbar-brand" href="/#/"><img src="images/logo.png" alt="" /></a>
                 </div>
             </div>
             <div class="clearfix"></div>
