@@ -2,7 +2,6 @@ var app = angular.module('siteTrackApp', ['ngRoute', 'ngAnimate', 'ui.bootstrap'
 
 app.run(function($http, $window) {
     delete $window.sessionStorage.token;
-    console.log($window);
     if(!$window.sessionStorage.token) {
         $http.get("/api/gettoken?mod=user").success(function(data) {
           $window.sessionStorage.token = data.token; 

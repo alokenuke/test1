@@ -1,7 +1,7 @@
 app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 
                 function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService) {
         rest.path = "tags";
-        
+        $scope.tagsNum = 1;
         var ctrl = this;
         
         breadcrumbsService.setTitle("Site Track: Create simple tag");
@@ -16,6 +16,7 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
         $scope.projectlevels = [];
         $scope.search.childlevels = [];
         $scope.search.group = [];
+        $scope.itemList = [];
         
         $scope.updateLevel = function(projectId, level) {
             $scope.search.project_id = projectId;
@@ -32,14 +33,36 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
             });
         }
         
-        $scope.fields = [
-            {key: "id",label: "ID",},
-            {key: "modified_date",label: "Modified",},
-            {key: "project_name",label: "Project Name",},
-            {key: "owner_name",label: "Owner",},
-            {key: "address",label: "Address",},
-            {key: "timezone",label: "Timezone",},
-            {key: "project_status",label: "Status",},
+        $scope.copyTags =  function(tagsNum){
+            var temp = [];
+            temp.pre = $scope.tags[$scope.tags.length-1].pre;
+            temp.tagName = $scope.tags[$scope.tags.length-1].tagName;
+            temp.post = $scope.tags[$scope.tags.length-1].post;
+            
+            for(var i=0;i<tagsNum;i++) {
+                $scope.tags.push({id:'',pre:parseInt(temp.pre)+i+1,tagName:temp.tagName,post:parseInt(temp.post)+i+1,productCode:'',tagDescription:''});
+             }
+        }
+        
+        $scope.updateItems =  function(parentId, level){
+           
+           $scope.itemList.splice(level+1, ($scope.itemList.length-level+1));
+            
+            $http.post("/api/getall?mod=tagItems", {'parent_id': parentId}).success(function(data) {
+               if(data.items.length>0)
+                    $scope.itemList.push(data.items);
+            });
+        }
+        
+        $scope.getUserLevel = function(){
+            $http.post("/api/getall?mod=userLevels",{group_id:$scope.search.usergroup.selected.id}).success(function(data) {
+                $scope.levels = data.items;
+            });
+            //console.log($scope.levels);
+        }
+        
+        $scope.tags = [
+            {id:'',pre:'',tagName:'',post:'',productCode:'',tagDescription:''}
         ];
         
         var errorCallback = function (data) {
@@ -102,6 +125,11 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
             
             $http.get("/api/getall?mod=userGroups").success(function(data) {
                 $scope.usergroups = data.items;
+            
+            $http.get("/api/getall?mod=tagItems", {'search': {'parent_id': 0}}).success(function(data) {
+                $scope.itemList.push(data.items);
+            });
+                
             });
             
         }).error(errorCallback);

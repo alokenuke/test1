@@ -49,13 +49,13 @@
             <div class="col-md-6 col-lg-5">
                 <div class="form-group">
                     <label class="col-sm-4 control-label text-right">Item:</label>
-                    <div class="col-sm-6">
-                        <ui-select ng-model="search.project.selected"
+                    <div class="col-sm-6 multi-level">
+                        <ui-select ng-repeat="items in itemList" ng-model="search.item[$index]"
                                    theme="bootstrap" ng-disabled="disabled" >
-                          <ui-select-match placeholder="Select item group...">{{$select.selected.project_name}}</ui-select-match>
-                          <ui-select-choices repeat="project in projects | filter: $select.search"
+                          <ui-select-match placeholder="Select item group...">{{$select.selected.item_name}}</ui-select-match>
+                          <ui-select-choices repeat="item in items"
                                    refresh-delay="0">
-                              <div ng-bind-html="project.project_name" ng-click="updateLevel(project.id, 0, 0)"></div>
+                              <div ng-bind-html="item.item_name" ng-click="updateItems(item.id, $parent.$index)"></div>
                           </ui-select-choices>
                         </ui-select>
                     </div>
@@ -84,12 +84,13 @@
                     <label class="col-sm-3 control-label text-right">User Group :</label>
                     <div class="col-sm-9">
                         <ui-select ng-model="search.usergroup.selected"
-                                   theme="bootstrap">
+                                   theme="bootstrap" ng-change="getUserLevel()" >
                           <ui-select-match placeholder="Select a group...">{{$select.selected.group_name}}</ui-select-match>
                           <ui-select-choices repeat="usergroup in usergroups | filter: $select.search"
                                    refresh-delay="0">
-                              <div ng-bind-html="usergroup.group_name"></div>
+                              <div ng-bind-html="usergroup.group_name" ></div>
                           </ui-select-choices>
+                          
                           <a ng-href="/#/userGroups/project/{{search.project.selected.id}}" ng-hide="(usergroups.length && search.project.selected.id) || !search.project.selected.id">Click to manage project levels.</a>
                         </ui-select>
                         <input ng-model="search.usergroup.selected.id" name="search.user_group_id" type="hidden" />
@@ -120,10 +121,10 @@
                             <th class="text-center">Frequency</th> 
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody ng-repeat="level in levels">
                         <tr>
-                            <td class="text-center">1</td>
-                            <td class="text-center">User Level A</td>
+                            <td class="text-center">{{$index+1}}</td>
+                            <td class="text-center">{{level.level_name}}</td>
                             <td class="text-center">
                                     <input type="checkbox">
                             </td>
@@ -139,13 +140,13 @@
                             <td class="text-center">
                             </td>
                         </tr>
-                        <tr>
+                       <tr ng-repeat="userDetail in level.userDetails">
                             <td class="text-center"></td>
                             <td class="text-center"></td>
                             <td class="text-center">
                                 <div class="checkbox">
                                     <label>
-                                        <input type="checkbox"> Sample Text<br /><small>(Test designation)</small>
+                                        <input type="checkbox"> {{userDetail.user.first_name}}<br /><small>({{userDetail.user.designation}})</small>
                                     </label>
                                 </div>
                             </td>
@@ -174,181 +175,7 @@
                                 <button class="btn icon-btn" type="button"><i class="fa fa-plus-circle fa-lg"></i>
                                 </button>
                             </td>
-                        </tr>
-                        <tr>
-                            <td class="text-center"></td>
-                            <td class="text-center"></td>
-                            <td class="text-center">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox"> Sample Text<br /><small>(Test designation)</small>
-                                    </label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <select class="form-control">
-                                    <option>Sample Text</option>
-                                </select>
-                            </td>
-                            <td class="text-center">
-                                <select class="form-control">
-                                    <option>Sample Text</option>
-                                </select>
-                            </td>
-                            <td class="text-center">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox"> &nbsp;
-                                    </label>
-                                </div>
-                            </td>
-                            <td class="text-center"><a class="links" href="#">All , On Update</a></td>
-                            <td class="text-center"><a class="links" href="#">Daily</a></td>
-                        </tr>
-                        <tr>
-                            <td class="text-center"></td>
-                            <td class="text-center"></td>
-                            <td class="text-center">
-                                <div class="checkbox">
-                                    <label>
-                                    <input type="checkbox"> Sample Text
-                                    </label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <select class="form-control">
-                                    <option>Sample Text</option>
-                                </select>
-                            </td>
-                            <td class="text-center">
-                                <select class="form-control">
-                                    <option>Sample Text</option>
-                                </select>
-                            </td>
-                            <td class="text-center">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox"> &nbsp;
-                                    </label>
-                                </div>
-                            </td>
-                            <td class="text-center"><a class="links" href="#">All , On Update</a></td>
-                            <td class="text-center"><a class="links" href="#">Daily</a></td>
-                        </tr>
-                        <tr>
-                            <td class="text-center">2</td>
-                            <td class="text-center">User Level B</td>
-                            <td class="text-center">
-                                    <input type="checkbox">
-                            </td>
-                            <td class="text-center">
-                            </td>
-                            <td class="text-center">
-                            </td>
-                            <td class="text-center">
-                            </td>
-                            <td class="text-center">
-
-                            </td>
-                            <td class="text-center">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="text-center"></td>
-                            <td class="text-center"></td>
-                            <td class="text-center">
-                                <div class="checkbox">
-                                    <label>
-                                    <input type="checkbox"> Sample Text
-                                    </label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <select class="form-control">
-                                    <option>Sample Text</option>
-                                </select>
-                            </td>
-                            <td class="text-center">
-                                <select class="form-control">
-                                    <option>Sample Text</option>
-                                </select>
-                            </td>
-                            <td class="text-center">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox"> &nbsp;
-                                    </label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <button class="btn icon-btn" type="button"><i class="fa fa-plus-circle fa-lg"></i>
-                                </button>
-                            </td>
-                            <td class="text-center">
-                                <button class="btn icon-btn" type="button"><i class="fa fa-plus-circle fa-lg"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="text-center"></td>
-                            <td class="text-center"></td>
-                            <td class="text-center">
-                                <div class="checkbox">
-                                    <label>
-                                    <input type="checkbox"> Sample Text
-                                    </label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <select class="form-control">
-                                    <option>Sample Text</option>
-                                </select>
-                            </td>
-                            <td class="text-center">
-                                <select class="form-control">
-                                    <option>Sample Text</option>
-                                </select>
-                            </td>
-                            <td class="text-center">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox"> &nbsp;
-                                    </label>
-                                </div>
-                            </td>
-                            <td class="text-center"><a class="links" href="#">All , On Update</a></td>
-                            <td class="text-center"><a class="links" href="#">Daily</a></td>
-                        </tr>
-                        <tr>
-                            <td class="text-center"></td>
-                            <td class="text-center"></td>
-                            <td class="text-center">
-                                <div class="checkbox">
-                                    <label>
-                                    <input type="checkbox"> Sample Text
-                                    </label>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <select class="form-control">
-                                    <option>-- No process --</option>
-                                </select>
-                            </td>
-                            <td class="text-center">
-                                <select class="form-control">
-                                    <option>-- No process --</option>
-                                </select>
-                            </td>
-                            <td class="text-center">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox"> &nbsp;
-                                    </label>
-                                </div>
-                            </td>
-                            <td class="text-center"><a class="links" href="#">All , On Update</a></td>
-                            <td class="text-center"><a class="links" href="#">Daily</a></td>
-                        </tr>
+                        </tr> 
                     </tbody>
                 </table>
             </form>
@@ -359,9 +186,9 @@
                     <label class="control-label col-sm-8 col-lg-9 text-right">No. of Tags to Create :</label>
                     <div class="col-sm-4 col-lg-3 pull-right" style="padding:0;">
                         <div class="input-group">
-                            <input type="text" class="form-control" value="1" placeholder="" size="2">
+                            <input type="text" class="form-control"  value="1" placeholder="" ng-model="tagsNum" ng-maxlength="2" numbers-only="numbers-only">
                             <span class="input-group-btn">
-                                <button class="btn btn-default" type="button"><i class="fa fa-plus-circle fa-lg"></i></button>
+                                <button class="btn btn-default" type="button"  ng-click="copyTags(tagsNum)"><i class="fa fa-plus-circle fa-lg"></i></button>
                             </span>
                         </div><!-- /input-group -->
                     </div><!-- /.col-lg-6 -->
@@ -383,64 +210,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="text-center">1</td>
-                        <td class="text-center">
-                            <input type="text" class="form-control form-control-small" placeholder="Pre" />
+                    
+                    <tr ng-repeat="tag in tags track by $index">
+                        <td>
+                            {{$index+1}}
+                            <input type="hidden" id="tag-{{$index}}" ng-model="tag.id" />
                         </td>
-                        <td class="text-center">
-                            <div class="required-controls">
-                               <div class="required">*</div>
-                               <input type="text" class="form-control form-control-medium " placeholder="Tag Name" />
-                            </div>
-                        </td>
-                        <td class="text-center">
-                            <input type="text" class="form-control form-control-small" placeholder="Post" />
-                        </td>
-                        <td class="text-center">
-                            <input type="text" class="form-control form-control-small" placeholder="Product Code" />
-                        </td>
-                        <td class="text-center">
-                            <input type="text" class="form-control" placeholder="Tag Description" />
-                        </td>
+                        <td><input type="text" id="tag-pre-{{$index}}" class="form-control form-control-small" ng-model="tag.pre" numbers-only="numbers-only" /></td>
+                        <td><input type="text" id="tag-tagName-{{$index}}" class="form-control form-control-small" ng-model="tag.tagName" /></td>
+                        <td><input type="text" id="tag-post-{{$index}}" class="form-control form-control-small" ng-model="tag.post" numbers-only="numbers-only" /></td>
+                        <td><input type="text" id="tag-productCode-{{$index}}" class="form-control form-control-small" ng-model="tag.productCode" /></td>
+                        <td><input type="text" id="tag-tagDescription-{{$index}}" class="form-control form-control-small" ng-model="tag.tagDescription" /></td>
                     </tr>
-                    <tr>
-                        <td class="text-center">2</td>
-                        <td class="text-center">
-
-                        </td>
-                        <td class="text-center">
-
-                        </td>
-                        <td class="text-center">
-
-                        </td>
-                        <td class="text-center">
-
-                        </td>
-                        <td class="text-center">
-
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="text-center">3</td>
-                        <td class="text-center">
-
-                        </td>
-                        <td class="text-center">
-
-                        </td>
-                        <td class="text-center">
-
-                        </td>
-                        <td class="text-center">
-
-                        </td>
-                        <td class="text-center">
-
-                        </td>
-                    </tr>
-                </tbody>
             </table>
         </div>
         <div class="text-right">
