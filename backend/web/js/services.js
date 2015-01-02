@@ -67,3 +67,36 @@ appServices.directive('numbersOnly', function(){
      }
    };
 });
+
+appServices.directive('checkboxAll', function () {
+  return function(scope, iElement, iAttrs) {
+    var parts = iAttrs.checkboxAll;
+    var selectedVar = "isSelected";
+    iElement.attr('type','checkbox');
+    iElement.bind('change', function (evt) {
+      scope.$apply(function () {
+        var setValue = iElement.prop('checked');
+        angular.forEach(scope.$eval(parts), function (v) {
+          v[selectedVar] = setValue;
+        });
+      });
+    });
+//    scope.$watch(parts, function (newVal) {
+//      var hasTrue=false, hasFalse=false;
+//      angular.forEach(newVal, function (v) {
+//        if (v[selectedVar]) {
+//          hasTrue = true;
+//        } else {
+//          hasFalse = true;
+//        }
+//      });
+//      if (hasTrue && hasFalse) {
+//        iElement.attr('checked', false);
+//        iElement.addClass('greyed');
+//      } else {
+//        iElement.attr('checked', hasTrue);
+//        iElement.removeClass('greyed');
+//      }
+//    }, true);
+  };
+});
