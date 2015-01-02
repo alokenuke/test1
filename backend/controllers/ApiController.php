@@ -18,7 +18,7 @@ class ApiController extends ActiveController
         $this->modelClass = 'common\models\\'.  ucfirst($_REQUEST['mod']);
         
         $this->identity = json_decode(\Yii::$app->getRequest()->getCookies()->getValue('_identity'));
-        
+                
         if(!isset($_GET['access-token']) && isset($this->identity[1]))
             $_GET['access-token'] = $this->identity[1];
         
@@ -45,22 +45,36 @@ class ApiController extends ActiveController
             ];
     }
     
-    public function actionGetall() {
-        if (!empty($_GET)) {
-            $select = ["*"];
+    public function actionGetdata() {
+        if (!$_POST) {
             
             $post = \Yii::$app->request->post();
             
-            if(isset($post['select']))
-               $select = $post['select'];
+            if(isset($post['sort']))
+                $_GET['sort'] = $post['sort'];
+            if(isset($post['page']))
+                $_GET['page'] = $post['page'];
             
             $model = new $this->modelClass;
-            $query = $model->find()->select($select);
             
-            if(isset($post['search'])) {
-                foreach($post['search'] as $key => $val)
-                    $query->andWhere([$key => $val]);
+            try {
+                $provider = new ActiveDataProvider ([
+                    'query' => $model->find()
+                ]);
+            } catch (Exception $ex) {
+                throw new \yii\web\HttpException(500, 'Internal server error');
             }
+            return $provider;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
+    public function actionGetall() {
+        if (!empty($_GET)) {
+            
+            $model = new $this->modelClass;
+            $query = $model->find();
             
             try {
                 $provider = new ActiveDataProvider ([
