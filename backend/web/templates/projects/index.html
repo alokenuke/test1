@@ -30,9 +30,9 @@
         <div class="row">
             <div class="col-md-6 col-lg-5">
                 <div class="form-group">
-                    <label class="col-sm-4 control-label text-right">Contractor :</label>
+                    <label class="col-sm-4 control-label text-right">Location :</label>
                     <div class="col-sm-6">
-                        <input type="text" class="form-control" ng-model="search.contractor" />
+                        <input type="text" class="form-control" ng-model="search.location" />
                     </div>
                 </div>
             </div>
@@ -57,9 +57,30 @@
             </div>
             <div class="col-md-6 col-lg-7">
                 <div class="form-group">
-                    <label class="col-sm-4 col-lg-3 control-label text-right">City :</label>
+                    <label class="col-sm-4 col-lg-3 control-label text-right">Contractor :</label>
                     <div class="col-sm-6 col-lg-5">
+                        <input type="text" class="form-control" ng-model="search.contractor" />
+                    </div>
+                </div>
+            </div>
+        </div><!--/row-->
+
+        <div class="row">
+            <div class="col-md-6 col-lg-5">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label text-right">City :</label>
+                    <div class="col-sm-6">
                         <input type="text" class="form-control" ng-model="search.city" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-7 pull-right">
+                <div class="form-group">
+                    <label class="col-sm-4 col-lg-3 control-label text-right">Project Status :</label>
+                    <div class="col-sm-6 col-lg-5">
+                        <select class="form-control">
+                            <option>-- Select Status --</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -72,16 +93,6 @@
                     <div class="col-sm-6">
                         <select class="form-control">
                             <option>-- Select country --</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-7 pull-right">
-                <div class="form-group">
-                    <label class="col-sm-4 col-lg-3 control-label text-right">Project Status :</label>
-                    <div class="col-sm-6 col-lg-5">
-                        <select class="form-control">
-                            <option>-- Select Status --</option>
                         </select>
                     </div>
                 </div>

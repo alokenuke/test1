@@ -1,6 +1,7 @@
 <style>
-    .angular-ui-tree {
-        border: 2px solid #ccc;
+    .level-0 {
+        background-color: #687074 !important;
+        color: #FFF !important;
     }
     .angular-ui-tree-nodes .angular-ui-tree-nodes {
         padding-left: 40px;
@@ -49,12 +50,13 @@
                               <div class='row' style='padding:20px;'>
                                 <!-- Nested list template -->
                                 <script type="text/ng-template" id="items_renderer.html">
-                                  <div ui-tree-handle>
+                                  <div ui-tree-handle ng-class="'level-'+item.level">
                                     <a class="btn btn-success btn-xs" data-nodrag ng-click="toggle(this)"><span class="fa" ng-class="{'fa-chevron-right': collapsed, 'fa-chevron-down': !collapsed}"></span></a>
                                     {{item.title}}
                                     <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="remove(this)"><span class="fa fa-remove"></span></a>
                                     <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newSubItem(this)" style="margin-right: 8px;"><span class="fa fa-plus"></span></a>
                                     <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(this)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
+                                    <a ng-hide="item.level!=0" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="showProjects(this)" style="margin-right: 8px;">Projects</a>
                                   </div>
                                   <ol ui-tree-nodes="options" ng-model="item.items" ng-class="{hidden: collapsed}">
                                     <li ng-repeat="item in item.items" ui-tree-node ng-include="'items_renderer.html'">
