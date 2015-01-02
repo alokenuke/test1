@@ -145,6 +145,7 @@ class User extends ActiveRecord implements IdentityInterface
             'role',
             'username',
             'contact_number',
+            'designation',
             'company_id',
             'password',
             'status',
@@ -152,6 +153,20 @@ class User extends ActiveRecord implements IdentityInterface
             'modified_date',
             'auth_key' => $auth,
             'LastTokens'
+        ];
+    }
+    
+    public function fields() {
+        return [
+            'id',
+            'first_name',
+            'last_name',
+            'email',
+            'username',
+            'contact_number',
+            'designation',
+            'company_id',
+            'status',
         ];
     }
 

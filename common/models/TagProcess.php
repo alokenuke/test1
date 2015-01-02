@@ -5,27 +5,25 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "project_level".
+ * This is the model class for table "tag_process".
  *
  * @property integer $id
+ * @property integer $type
+ * @property string $process_name
  * @property integer $company_id
- * @property string $level_name
- * @property integer $parent_id
- * @property integer $project_id
  * @property integer $status
+ * @property integer $parent_id
  * @property integer $created_by
  * @property string $created_date
- *
- * @property Tags[] $tags
  */
-class ProjectLevel extends \yii\db\ActiveRecord
+class TagProcess extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'project_level';
+        return 'tag_process';
     }
 
     /**
@@ -34,16 +32,17 @@ class ProjectLevel extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['company_id', 'level_name', 'project_id', 'status', 'created_by'], 'required'],
-            [['company_id', 'parent_id', 'project_id', 'status', 'created_by'], 'integer'],
+            [['type', 'company_id', 'status', 'parent_id', 'created_by'], 'integer'],
+            [['process_name', 'company_id', 'status', 'parent_id', 'created_by'], 'required'],
             [['created_date'], 'safe'],
-            [['level_name'], 'string', 'max' => 256]
+            [['process_name'], 'string', 'max' => 128]
         ];
     }
     
     public static function find()
     {
-        $query = parent::find()->where(['company_id' => \yii::$app->user->identity->company_id, 'status' => 1]);
+        $query = parent::find()->where(['company_id' => \yii::$app->user->identity->company_id, 'status' => 1])
+            ->joinWith("projectIds");
         
         $post = \Yii::$app->request->post();
         
@@ -59,6 +58,7 @@ class ProjectLevel extends \yii\db\ActiveRecord
                 if(isset($val))
                     $query->andWhere([$key => $val]);
         }
+        
         return $query;
     }
 
@@ -69,21 +69,21 @@ class ProjectLevel extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'type' => 'Type',
+            'process_name' => 'Process Name',
             'company_id' => 'Company ID',
-            'level_name' => 'Level Name',
-            'parent_id' => 'Parent ID',
-            'project_id' => 'Project ID',
             'status' => 'Status',
+            'parent_id' => 'Parent ID',
             'created_by' => 'Created By',
             'created_date' => 'Created Date',
         ];
     }
-
+    
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getTags()
+    public function getProjectIds()
     {
-        return $this->hasMany(Tags::className(), ['project_level_id' => 'id']);
+        return $this->hasMany(TagProcessProjects::className(), ['tag_process_id' => 'id']);
     }
 }

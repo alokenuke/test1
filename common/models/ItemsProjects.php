@@ -5,21 +5,21 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "tag_process_type_projects".
+ * This is the model class for table "tag_items_projects".
  *
- * @property integer $tag_process_id
+ * @property integer $item_id
  * @property integer $project_id
  * @property integer $created_by
  * @property string $created_date
  */
-class TagProcessTypeProjects extends \yii\db\ActiveRecord
+class ItemsProjects extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'tag_process_type_projects';
+        return 'tag_items_projects';
     }
 
     /**
@@ -28,8 +28,8 @@ class TagProcessTypeProjects extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['tag_process_id', 'project_id', 'created_by'], 'required'],
-            [['tag_process_id', 'project_id', 'created_by'], 'integer'],
+            [['item_id', 'project_id', 'created_by'], 'required'],
+            [['item_id', 'project_id', 'created_by'], 'integer'],
             [['created_date'], 'safe']
         ];
     }
@@ -40,7 +40,7 @@ class TagProcessTypeProjects extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'tag_process_id' => 'Tag Process ID',
+            'item_id' => 'Item ID',
             'project_id' => 'Project ID',
             'created_by' => 'Created By',
             'created_date' => 'Created Date',

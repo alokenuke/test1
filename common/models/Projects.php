@@ -58,7 +58,23 @@ class Projects extends \yii\db\ActiveRecord
     
     public static function find()
     {
-        return parent::find()->where(['company_id' => \yii::$app->user->identity->company_id, 'project_status' => 1]);
+        $query = parent::find()->where(['company_id' => \yii::$app->user->identity->company_id, 'project_status' => 1]);
+        
+        $post = \Yii::$app->request->post();
+        
+        $select = "*";
+        
+        if(isset($post['select']))
+           $select = $post['select'];
+        
+        $query->select($select);
+        
+        if(isset($post['search'])) {
+            foreach($post['search'] as $key => $val)
+                if(isset($val))
+                    $query->andWhere([$key => $val]);
+        }
+        return $query;
     }
     
     public function fields()

@@ -29,7 +29,7 @@ use Yii;
 class Tags extends \yii\db\ActiveRecord
 {
     const STATUS_DELETED = 0;
-    const STATUS_ACTIVE = 10;
+    const STATUS_ACTIVE = 1;
     
     /**
      * @inheritdoc
@@ -90,13 +90,24 @@ class Tags extends \yii\db\ActiveRecord
     {
         return [
             'id',
+            'type',
             'uid',
             'project_name' => function() {
                 return $this->project->project_name;
             },
             'tag_name',
             'tag_description',
-            'projectLevel',
+            'project_level' => function() {
+                $projectLevel = [];
+                $projectLevel[] = $this->projectLevel->level_name;
+                $parent = $this->projectLevel->parent_id;
+                while($parentLevelDetails = $this->getLevelDetails($parent, ['level_name', 'parent_id'])) {
+                    $projectLevel[] = $parentLevelDetails->level_name;
+                    $parent = $parentLevelDetails->parent_id;
+                }
+                return array_reverse($projectLevel);
+            },
+            'itemDetails',
             'userGroup',
             'product_code',
             'company_id',
@@ -126,6 +137,15 @@ class Tags extends \yii\db\ActiveRecord
     public function getProjectLevel()
     {
         return $this->hasOne(ProjectLevel::className(), ['id' => 'project_level_id']);
+    }
+    
+    public function getLevelDetails($id, $field)
+    {
+        return ProjectLevel::find()->select($field)->where(['id' => $id])->one();
+    }
+    
+    public function getitemDetails() {
+        return $this->hasOne(Items::className(), ['id' => 'tag_item_id']);
     }
 
     /**

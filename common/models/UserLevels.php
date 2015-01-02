@@ -5,27 +5,24 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "project_level".
+ * This is the model class for table "user_levels".
  *
  * @property integer $id
  * @property integer $company_id
+ * @property integer $user_group_id
  * @property string $level_name
- * @property integer $parent_id
- * @property integer $project_id
  * @property integer $status
  * @property integer $created_by
  * @property string $created_date
- *
- * @property Tags[] $tags
  */
-class ProjectLevel extends \yii\db\ActiveRecord
+class UserLevels extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'project_level';
+        return 'user_levels';
     }
 
     /**
@@ -34,10 +31,10 @@ class ProjectLevel extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['company_id', 'level_name', 'project_id', 'status', 'created_by'], 'required'],
-            [['company_id', 'parent_id', 'project_id', 'status', 'created_by'], 'integer'],
+            [['company_id', 'user_group_id', 'level_name', 'status', 'created_by'], 'required'],
+            [['company_id', 'user_group_id', 'status', 'created_by'], 'integer'],
             [['created_date'], 'safe'],
-            [['level_name'], 'string', 'max' => 256]
+            [['level_name'], 'string', 'max' => 128]
         ];
     }
     
@@ -59,7 +56,21 @@ class ProjectLevel extends \yii\db\ActiveRecord
                 if(isset($val))
                     $query->andWhere([$key => $val]);
         }
+        
         return $query;
+    }
+    
+    public function fields()
+    {
+        return [
+            'id',
+            'company_id',
+            'user_group_id',
+            'level_name',
+            'relateUsers',
+            'status',
+            'created_date'
+        ];
     }
 
     /**
@@ -70,20 +81,19 @@ class ProjectLevel extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'company_id' => 'Company ID',
+            'user_group_id' => 'User Group ID',
             'level_name' => 'Level Name',
-            'parent_id' => 'Parent ID',
-            'project_id' => 'Project ID',
             'status' => 'Status',
             'created_by' => 'Created By',
             'created_date' => 'Created Date',
         ];
     }
-
+    
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getTags()
+    public function getRelateUsers()
     {
-        return $this->hasMany(Tags::className(), ['project_level_id' => 'id']);
+        return $this->hasOne(RelUserLevelsUsers::className(), ['user_level_id' => 'id']);
     }
 }
