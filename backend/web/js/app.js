@@ -8,6 +8,14 @@ app.run(function($http, $window) {
         });
     }
 });
+
+app.constant('tooltip', {
+    'from_task_process': "This tooltip related to 'from task process'.",
+    'to_task_process': "This tooltip related to 'to task process'.",
+    'mandatory': "This tooltip related to 'mandatory'.",
+    'email_notification': "This tooltip related to 'email notification'.",
+});
+
 app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($locationProvider, $routeProvider, $httpProvider) {
 
     var path = '/templates/';
@@ -22,6 +30,16 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
         .when('/', {
             templateUrl: path+'dashboard.html',
             controller: 'SiteIndex',
+        })
+        
+        .when('/users', {
+            templateUrl: path+'users/index.html',
+            controller: 'UserIndex'
+        })
+        
+        .when('/users/create', {
+            templateUrl: path+'users/create.html',
+            controller: 'UserCreate'
         })
 
         .when('/user-groups', {
@@ -76,7 +94,7 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
         
         .when('/tags/createmaster', {
             templateUrl: path+'tags/create-master-tag.html',
-            controller: 'TagsCreate'
+            controller: 'TagsCreateMaster'
         })
         
         .when('/tags/:id', {
@@ -179,14 +197,15 @@ app.service('rest', function ($http, $location, $routeParams) {
             }
             return $http.get(this.baseUrl + "?mod=" + this.path + location.search);
         },
-
+        models: function (params) {
+            return $http.post(this.baseUrl + "/getdata?mod=" + this.path, params);
+        },
         model: function () {
             if ($routeParams.expand != null) {
                 return $http.get(this.baseUrl + "/" + $routeParams.id + "?mod=" + this.path +'&expand=' + $routeParams.expand);
             }
             return $http.get(this.baseUrl + "/" + $routeParams.id + "?mod=" + this.path);
         },
-        
         getFields:function() {
             return $http.get(this.baseUrl + "/fields" + "?mod=" + this.path);
         },
@@ -207,6 +226,9 @@ app.service('rest', function ($http, $location, $routeParams) {
         },
         deleteById: function (model) {
             return $http.delete(this.baseUrl + "/" + model.id + "?mod=" + this.path, model);
+        },
+        setData: function(mod, select, cond) {
+            return $http.post("/api/getall?mod="+mod, {'search': cond, 'select': select});;
         }
     };
 });

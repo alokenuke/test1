@@ -103,3 +103,26 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
             });
         });
     }])
+
+app.controller('UserIndex', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService) {
+        
+        rest.path = "user";
+        
+        breadcrumbsService.setTitle("Manage User Groups");
+        breadcrumbsService.clearAll();
+        breadcrumbsService.add("", "Home");
+        breadcrumbsService.add("/#/user-groups", "User Groups");
+    }])
+
+app.controller('UserCreate', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService) {
+        
+        rest.path = "user";
+        
+        breadcrumbsService.setTitle("Create New Users");
+        breadcrumbsService.clearAll();
+        breadcrumbsService.add("", "Home");
+        breadcrumbsService.add("", "Manage");
+        breadcrumbsService.add("", "Users");
+        breadcrumbsService.add("/#/users/create", "Create");
+        
+    }])

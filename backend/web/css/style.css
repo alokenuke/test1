@@ -553,6 +553,12 @@ color: #59caf2;
     font-size: 19px;
     border-color: #bababa;
 }
+
+.input-group .dropdown-menu .btn-default {
+    padding: 5px 18px;
+    font-size: 12px;
+}
+
 .add-new-btn {
     padding-left: 10px
 }
@@ -777,6 +783,8 @@ margin-top: -5px
     top: 10px;
     left: 0px;
 }
+.sT {color: #68c63f;}
+.mT {color: #66afe9;}
 /*------------/footer----------*/
 @media (min-width: 1200px) {
     .pl-lg-25 {
