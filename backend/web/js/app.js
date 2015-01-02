@@ -200,6 +200,9 @@ app.service('rest', function ($http, $location, $routeParams) {
         models: function (params) {
             return $http.post(this.baseUrl + "/getdata?mod=" + this.path, params);
         },
+        getModels: function(mod, select, cond) {
+            return $http.post("/api/getdata?mod="+mod, {'search': cond, 'select': select});;
+        },
         model: function () {
             if ($routeParams.expand != null) {
                 return $http.get(this.baseUrl + "/" + $routeParams.id + "?mod=" + this.path +'&expand=' + $routeParams.expand);

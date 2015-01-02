@@ -81,22 +81,22 @@ appServices.directive('checkboxAll', function () {
         });
       });
     });
-//    scope.$watch(parts, function (newVal) {
-//      var hasTrue=false, hasFalse=false;
-//      angular.forEach(newVal, function (v) {
-//        if (v[selectedVar]) {
-//          hasTrue = true;
-//        } else {
-//          hasFalse = true;
-//        }
-//      });
-//      if (hasTrue && hasFalse) {
-//        iElement.attr('checked', false);
-//        iElement.addClass('greyed');
-//      } else {
-//        iElement.attr('checked', hasTrue);
-//        iElement.removeClass('greyed');
-//      }
-//    }, true);
+    scope.$watch(parts, function (newVal) {
+      var hasTrue=false, hasFalse=false;
+      angular.forEach(newVal, function (v) {
+        if (v[selectedVar]) {
+          hasTrue = true;
+        } else {
+          hasFalse = true;
+        }
+      });
+      if (hasTrue && hasFalse) {
+        iElement.attr('checked', false);
+        iElement.addClass('greyed');
+      } else {
+        iElement.attr('checked', hasTrue);
+        iElement.removeClass('greyed');
+      }
+    }, true);
   };
 });

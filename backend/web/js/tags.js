@@ -124,8 +124,8 @@ app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParam
         
     }])
 
-app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'tooltip',
-                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, tooltip) {
+app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'tooltip', '$modal', '$log',
+                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, tooltip, $modal, $log) {
         
         rest.path = "tags";
         
@@ -145,9 +145,41 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
         $scope.itemList = [];
         $scope.items = [];
         $scope.processes = [];
-        $scope.tags = [{id:'',pre:'',tagName:'',post:'',productCode:'',tagDescription:''}];
+        $scope.tags = [];
         $scope.levels = [];
         $scope.process_stages = [];
+        
+        $scope.createSimilarTagModal = function() {
+            
+            var params = {'search': $scope.search, 'sort': $scope.sortBy};
+            var temp = {};
+
+            rest.getModels("tags", [], {'project_id': $scope.projects.id}).success(function(data) {
+                  temp.tags = data.items;
+                  temp.totalCount = data._meta.totalCount;
+                  temp.pageCount = data._meta.pageCount;
+                  temp.currentPage = (data._meta.currentPage+1);
+                  temp.numPerPage = data._meta.perPage;
+                  
+                  var modalInstance = $modal.open({
+                    templateUrl: 'createSimilarTagModal.html',
+                    controller: 'createSimilarTagModalController',
+                    size: 'lg',
+                    resolve: {
+                      data: function () {
+                          return temp;
+                      }
+                    }
+                  });
+
+                  modalInstance.result.then(function (selectedItem) {
+                    $scope.selected = selectedItem;
+                  }, function () {
+                    $log.info('Modal dismissed at: ' + new Date());
+                  });
+                  
+            });
+        }
         
         $scope.getUserLevel = function(){
             $http.post("/api/getall?mod=userLevels",{group_id:$scope.search.usergroup.id}).success(function(data) {
@@ -549,4 +581,23 @@ app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route','$routePa
             
         });
         
-    }])
+    }]);
+
+app.controller('createSimilarTagModalController', function ($scope, $modalInstance, data) {
+
+  $scope.data = data;
+  
+  $scope.selectedTags = [];
+  
+  $scope.selected = {
+    item: $scope.data.tags[0]
+  };
+
+  $scope.ok = function () {
+    $modalInstance.close($scope.selectedTags);
+  };
+
+  $scope.cancel = function () {
+    $modalInstance.dismiss('cancel');
+  };
+});
