@@ -47,13 +47,9 @@ class UserGroups extends \yii\db\ActiveRecord
             ->joinWith("projectIds");
         
         $post = \Yii::$app->request->post();
-        
-        $select = "*";
-        
+                
         if(isset($post['select']))
-           $select = $post['select'];
-        
-        $query->select($select);
+            $query->select($select);
         
         if(isset($post['search'])) {
             foreach($post['search'] as $key => $val)
@@ -66,6 +62,11 @@ class UserGroups extends \yii\db\ActiveRecord
     
     public function fields()
     {
+        $post = \Yii::$app->request->post();
+        
+        if(isset($post['select']))
+           return $post['select'];
+        
         return [
             'id',
             'company_id',

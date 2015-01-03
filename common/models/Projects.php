@@ -74,11 +74,17 @@ class Projects extends \yii\db\ActiveRecord
                 if(isset($val))
                     $query->andWhere([$key => $val]);
         }
+        
         return $query;
     }
     
     public function fields()
     {
+        $post = \Yii::$app->request->post();
+        
+        if(isset($post['select']))
+           return $post['select'];
+        
         return [
             'id',
             'project_name',

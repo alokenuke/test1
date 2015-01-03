@@ -38,6 +38,21 @@ class Items extends \yii\db\ActiveRecord
         ];
     }
     
+    public function fields()
+    {
+        $post = \Yii::$app->request->post();
+        
+        if(isset($post['select']))
+           return $post['select'];
+        
+        return [
+            'id',
+            'item_name',
+            'parent_id',
+            'status',
+        ];
+    }
+    
     public static function find()
     {
         $query = parent::find()->where(['company_id' => \yii::$app->user->identity->company_id, 'status' => 1])

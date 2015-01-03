@@ -61,6 +61,12 @@ class RelUserLevelsUsers extends \yii\db\ActiveRecord
     
     public function fields()
     {
+        
+        $post = \Yii::$app->request->post();
+        
+        if(isset($post['select']))
+           return $post['select'];
+        
         return [
             'id',
             'user_group_id',
