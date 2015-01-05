@@ -321,7 +321,7 @@
                                <th class="text-center" rowspan="2">S.No</th>
                                <th class="text-center" rowspan="2">User Level</th>
                                <th class="text-center" rowspan="2">
-                                       <input type="checkbox">
+                                   <input type="checkbox" checkbox-all="levels">
                                </th>
                                <th class="text-center" rowspan="2">From Task Process <a tooltip-html-unsafe="{{tooltip.from_task_process}}" class="fa fa-question-circle"></a></th>
                                <th class="text-center" rowspan="2">To Task Process <a tooltip-html-unsafe="{{tooltip.to_task_process}}" class="fa fa-question-circle"></a></th>
@@ -338,7 +338,7 @@
                                <td class="text-center">{{$index+1}}</td>
                                <td class="text-center">{{level.level_name}}</td>
                                <td class="text-center">
-                                       <input type="checkbox">
+                                       <input type="checkbox" checkbox-all="level.relateUsers.users">
                                </td>
                                <td class="text-center">
                                </td>
@@ -358,7 +358,7 @@
                                <td class="text-center">
                                    <div class="checkbox">
                                        <label>
-                                           <input type="checkbox"> {{userDetail.first_name}} {{userDetail.last_name}}<br /><small>({{userDetail.designation}})</small>
+                                           <input type="checkbox" ng-model="userDetail.isSelected"> {{userDetail.first_name}} {{userDetail.last_name}}<br /><small>({{userDetail.designation}})</small>
                                        </label>
                                    </div>
                                </td>

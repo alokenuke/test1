@@ -81,7 +81,7 @@ appServices.directive('checkboxAll', function () {
         });
       });
     });
-    scope.$watch(parts+"."+selectedVar, function (newVal) {
+    scope.$watch(parts, function (newVal) {
       var hasTrue=false, hasFalse=false;
       angular.forEach(newVal, function (v) {
         if (v[selectedVar]) {

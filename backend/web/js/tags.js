@@ -399,7 +399,7 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
             else if(variable=='items') {
                 $scope[variable].splice(level, ($scope[variable].length-level-1));
                 
-                rest.setData("items", ['id', 'item_name'], {'parent_id': parent}).success(function(data) {
+                rest.setData("items/getall", ['id', 'item_name'], {'parent_id': parent}).success(function(data) {
                     if(data.items.length>0)
                         $scope[variable].push(data.items);
                 });
@@ -407,7 +407,7 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
             else if(variable=='processes') {
                 $scope[variable].splice(level, ($scope[variable].length-level-1));
                 
-                rest.setData("tagProcess", ['id', 'process_name'], {'parent_id': parent}).success(function(data) {
+                rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': parent}).success(function(data) {
                     if(data.items.length>0 && level <1)
                         $scope[variable].push(data.items);
                     else if(level==1) {
@@ -772,6 +772,7 @@ app.controller('SelectTagsPopup', function ($scope, $modalInstance, $http, items
          
     $scope.search = {};
     $scope.popupTags = {};
+    $scope.temp = [];
     
     $scope.searchTags = function(){
         $http.post("/tags/getall",{search:$scope.search}).success(function(data) {
@@ -784,13 +785,15 @@ app.controller('SelectTagsPopup', function ($scope, $modalInstance, $http, items
         $scope.searchTags();
     }
      
-     $scope.checkUncheck = function(index, data){
-         if(!$scope.checkboxes[index]){
-             delete $scope.temp[index];
-         } else {
-            $scope.temp[index]=data;
-         }
-     }
+    $scope.$watch("popupTags", function (newVal) {
+      var hasTrue=false, hasFalse=false;
+      $scope.temp = [];
+      angular.forEach(newVal, function (v) {
+        if (v['isSelected']) {
+            $scope.temp.push(v);
+        }
+      });
+    }, true);
      
     $scope.ok = function () {
         $modalInstance.close($scope.temp);
