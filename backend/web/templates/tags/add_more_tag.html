@@ -1,111 +1,111 @@
+<div class=" modal-lg col-xs-12 secondary-bg mt-20">
+    <!--/shadow-box-->
+    <div class="table-responsive table-responsive-cust">
+        <div class="col-xs-12 search-box mb-sm-large">
+            <div class="row">
+                <h2 class="col-xs-12 search-title">Search Tags<button class="pull-right btn icon-btn"><i id="down-arrow" class="fa fa-sort-desc fa-2x"></i><i style="display: none" id="up-arrow" class="fa fa-sort-asc fa-2x"></i></button>
+                </h2>
+            </div><!--/row-->
+            <form ng-submit="searchTags()" role="form" class="form-horizontal form-horizontal-typ1 form-wrapper" id="form">
+                <div class="row">
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">Tag Name :</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" ng-model="search.tag_name">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">Tag UID :</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" ng-model="search.uid"> 
+                            </div>
+                        </div>
+                    </div>
+                </div><!--/row-->
+                <div class="row">
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">Tag Description :</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" ng-model="search.tag_description"> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">Project Level :</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" ng-model="$search.project_level"> 
+                            </div>
+                        </div>
+                    </div>
+                </div><!--/row-->
+                <div class="row mt-20">
+                   <div class="col-sm-10 text-center">
+                        <button class="btn btn-primary mb-sm-5" type="submit" ng-click="searchTags()">Search</button>
+                        <button class="btn btn-primary mb-sm-5" ng-click="clearSearch()">Clear Search</button>
+                   </div>
+                </div>
+            </form>
+            <form class="form-horizontal-typ1">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="text-center">
+                                <input type="checkbox" checkbox-all="popupTags.selected">
+                            </th>
+                            <th rowspan="2" class="text-center">Type</th>
+                              <th rowspan="2" class="text-center">UID</th>
+                            <th rowspan="2" class="text-center">Project Level</th>
 
-                            <div class=" modal-lg col-xs-12 secondary-bg mt-20">
-                                <!--/shadow-box-->
-                                  <div class="table-responsive table-responsive-cust">
-                                        
-                                        
-                                          <div class="col-xs-12 search-box mb-sm-large">
-                                                    <div class="row">
-                                                        <h2 class="col-xs-12 search-title">Search Tags<button class="pull-right btn icon-btn"><i id="down-arrow" class="fa fa-sort-desc fa-2x"></i><i style="display: none" id="up-arrow" class="fa fa-sort-asc fa-2x"></i></button>
-                                                        </h2>
-                                                    </div><!--/row-->
-                                                    <form role="form" class="form-horizontal form-horizontal-typ1 form-wrapper" id="form">
-                                                        <div class="row">
-                                                            <div class="col-md-6 col-lg-5">
-                                                                <div class="form-group">
-                                                                    <label class="col-sm-4 control-label text-right">Tag Name :</label>
-                                                                    <div class="col-sm-6">
-                                                                        <input type="text" class="form-control">
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 col-lg-5">
-                                                                <div class="form-group">
-                                                                    <label class="col-sm-4 control-label text-right">Tag UID :</label>
-                                                                    <div class="col-sm-6">
-                                                                       
-                                              <input type="text" class="form-control"> 
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div><!--/row-->
-                                                        <div class="row">
-                                                            <div class="col-md-6 col-lg-5">
-                                                                <div class="form-group">
-                                                                    <label class="col-sm-4 control-label text-right">Tag Description :</label>
-                                                                    <div class="col-sm-6">
-                                                                        <input type="text" class="form-control"> 
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 col-lg-5">
-                                                                <div class="form-group">
-                                                                    <label class="col-sm-4 control-label text-right">Project Level :</label>
-                                                                    <div class="col-sm-6">
-                                                                        <input type="text" class="form-control"> 
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div><!--/row-->
-                                                        <div class="row mt-20">
-                                                           <div class="col-sm-10 text-center">
-                                                                <button class="btn btn-primary mb-sm-5">Search</button>
-                                                                <button class="btn btn-primary mb-sm-5">Clear Search</button>
-                                                           </div> 
-                                                        </div>
-                                                    </form>
-                                                                                       
-                                        <form class="form-horizontal-typ1">
-                                            <table class="table table-bordered">
-                                                <thead>
-                                                    <tr>
-                                                        <th rowspan="2" class="text-center">
-                                                            <input type="checkbox" checkbox-all="tags"></th>
-                                                        <th rowspan="2" class="text-center">Type</th>
-                                                          <th rowspan="2" class="text-center">Project Level</th>
-                                                        <th rowspan="2" class="text-center">UID</th>
-                                                      
-                                                        <th rowspan="2" class="text-center">Item Type</th>
-                                                        <th class="text-center">Tag Name</th> 
-                                                        <th class="text-center">Product Code</th>                                          
-                                                        <th class="text-center">Last Updated By</th>
-                                                        <th class="text-center">Action</th>
-                                                    </tr>
-                                                    
-                                                </thead>
-                                                <tbody>
-                                                    <tr ng-repeat="dat in tags">
-                                <td class="text-center"><input type="checkbox" ng-model="dat.isSelected"></td>
-                                <td class="text-center {{dat.type}}">{{dat.type}}</td>
+                            <th rowspan="2" class="text-center">Item Type</th>
+                            <th class="text-center">Tag Name</th> 
+                            <th class="text-center">Tag Description</th> 
+                            <th class="text-center">Product Code</th>                                          
+                            <th class="text-center">Last Uptaged By</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                        <tbody>
+                            <tr ng-repeat="tag in popupTags">
+                                <td class="text-center">
+                                    <input type="checkbox" ng-model="tag.selected" ng-change="checkUncheck(tag.id, tag)">
+                                </td>
+                                <td class="text-center {{tag.type}}">{{tag.type}}</td>
+                                <td class="text-center">{{tag.uid}}</td>
                                 <td class="text-center multi-level">
-                                    <div class="level-item">{{dat.project_name}}</div>
-                                    <div class="level-item" ng-repeat="project_level in dat.project_level" ng-class="{'last-child': dat.project_level.length===($index+1)}">
-                                        {{project_level}}
+                                    <div class="level-item">{{tag.project_name}}</div>
+                                    <div class="level-item" ng-repeat="project_level in tag.project_level" ng-class="{'last-child': tag.project_level.length===($index+1)}">
+                                    {{project_level}}
                                     </div>
                                 </td>
-                                <td class="text-center">{{dat.uid}}</td>
-                                <td class="text-center">{{dat.itemDetails.item_name}}</td>
-                                <td class="text-center">{{dat.tag_name}}</td>
-                                <td class="text-center">{{dat.tag_description}}</td>
+                                <td class="text-center">{{tag.itemDetails.item_name}}</td>
+                                <td class="text-center">{{tag.tag_name}}</td>
+                                <td class="text-center">{{tag.tag_description}}</td>
+                                <td class="text-center">{{tag.product_code}}</td>
                                 <td class="text-center">
                                     Material Received - No<br/>
                                     <small>(A.R. Hussain Nov 11, 2014 13:10:11)</small>
                                 </td>
                                 <td class="text-center">
-                                    <a ng-href="/#/tags/{{dat.id}}">Task analysis</a>
-
+                                    <a ng-href="/#/popupTags/{{tag.id}}">Task analysis</a>
                                 </td>
                             </tr>
-                                                  
-                                                </tbody>
-                                            </table>
-                                        </form>
-                                        </div><!--/search-tag-box-->
-                                        
-                                        <div class="pull-right">                    
-            <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
+
+                        </tbody>
+                </table>
+            </form>
+        </div><!--/search-tag-box-->
+
+        <div class="pull-right">                    
+            <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()">
+            </pagination>
             <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px"><option>20</option></select>
+            <div align="right"><button class="btn btn-primary mb-sm-5" ng-click="ok()">Ok</button></div>
         </div>
-                                    </div>
-                              
-                            </div><!--/secondary-bg-->
+    </div>
+
+</div><!--/secondary-bg-->

@@ -131,7 +131,7 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th class="text-center"><i class='fa fa-trash'></i></th>
+                    <th class="text-center"><i class='fa fa-trash' ng-click="deleteTags()"></i></th>
                     <th class="text-center"><a href=''>Type <i class='fa fa-sort'></i></a></th>
                     <th class="text-center"><a>UID <i class='fa fa-sort'></i></a></th>
                     <th class="text-center">Project Level</th>
@@ -139,23 +139,35 @@
                     <th class="text-center" ><a>Tag Name <i class='fa fa-sort'></i></a></th> 
                     <th class="text-center" >Description</th> 
                     <th class="text-center" ><a>Product Code <i class='fa fa-sort'></i></a></th>
-                    <th class="text-center" ><a>Status <i class='fa fa-sort'></i></a></th>
+                    <th class="text-center" ><a>Last updated by</th>
+                    <th class="text-center" >Action</th>
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat='item in range(3) track by $index'>
-                    <td class="text-center"><input type="checkbox" /></td>
-                    <td class="text-center">sT</td>
-                    <td class="text-center">1234xtr22
-                    </td>
-                    <td class="text-center">Villa>Floor1
-                    </td>
-                    <td class="text-center">Item Group > item</td>
-                    <td class="text-center">A12</td>
-                    <td class="text-center">Test description</td>
-                    <td class="text-center">AXA224</td>
-                    <td class="text-center">Material Installed - Yes<br /><small>Hussain R (5 Nov 2014)</small>
-                    </td>
+                <tr ng-repeat='dat in selectedTags track by $index'>
+                    <td class="text-center">
+                        <input type="checkbox" ng-model="$delItems[dat.id]" ng-true-value="{{dat.id}}"></td>
+                                <td class="text-center {{dat.type}}">{{dat.type}}</td>
+                                
+                                <td class="text-center">{{dat.uid}}</td>
+                                <td class="text-center multi-level">
+                                    <div class="level-item">{{dat.project_name}}</div>
+                                    <div class="level-item" ng-repeat="project_level in dat.project_level" ng-class="{'last-child': dat.project_level.length===($index+1)}">
+                                        {{project_level}}
+                                    </div>
+                                </td>
+                                <td class="text-center">{{dat.itemDetails.item_name}}</td>
+                                <td class="text-center">{{dat.tag_name}}</td>
+                                <td class="text-center">{{dat.tag_description}}</td>
+                                <td class="text-center">{{dat.product_code}}</td>
+                                <td class="text-center">
+                                    Material Received - No<br/>
+                                    <small>(A.R. Hussain Nov 11, 2014 13:10:11)</small>
+                                </td>
+                                <td class="text-center">
+                                    <a ng-href="/#/tags/{{dat.id}}">Task analysis</a>
+
+                                </td>
                 </tr>
             </tbody>
         </table>
