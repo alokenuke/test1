@@ -785,6 +785,9 @@ margin-top: -5px
 }
 .sT {color: #68c63f;}
 .mT {color: #66afe9;}
+.modal-lg {
+    width: 1166px;
+}
 /*------------/footer----------*/
 @media (min-width: 1200px) {
     .pl-lg-25 {
