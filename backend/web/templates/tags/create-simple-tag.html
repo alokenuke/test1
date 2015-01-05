@@ -1,7 +1,24 @@
 <div class="col-xs-12">
-    <button class="btn btn-primary btn-lg mr-10 mb-sm-5">Create Similar Tag From</button>
+    <button class="btn btn-primary btn-lg mr-10 mb-sm-5" ng-click="createSimilarTagModal()">Create Similar Tag From</button>
     <button class="btn btn-primary btn-lg">Copy Last Created Tag</button>
-</div>      
+</div>
+<script type="text/ng-template" id="createSimilarTagModal.html">
+    <div class="modal-header">
+        <h3 class="modal-title">I'm a modal!</h3>
+    </div>
+    <div class="modal-body">
+        <ul>
+            <li ng-repeat="item in data.tags">
+                <a ng-click="selected.item = item">{{ item }}</a>
+            </li>
+        </ul>
+        Selected: <b>{{ selected.item }}</b>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">OK</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+    </div>
+</script>
 <div class="col-xs-12 secondary-bg mt-20">
     <div class="col-xs-12 shadow-box">
         <form id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form" ng-class="{'ng-hide':showSearchBox}">
@@ -121,7 +138,7 @@
                                <th class="text-center" rowspan="2">S.No</th>
                                <th class="text-center" rowspan="2">User Level</th>
                                <th class="text-center" rowspan="2">
-                                       <input type="checkbox" checkbox-all="selectedUsers.isSelected">
+                                       <input type="checkbox" checkbox-all="levels">
                                </th>
                                <th class="text-center" rowspan="2">From Task Process <a tooltip-html-unsafe="{{tooltip.from_task_process}}" class="fa fa-question-circle"></a></th>
                                <th class="text-center" rowspan="2">To Task Process <a tooltip-html-unsafe="{{tooltip.to_task_process}}" class="fa fa-question-circle"></a></th>
@@ -138,18 +155,9 @@
                                <td class="text-center">{{$index+1}}</td>
                                <td class="text-center">{{level.level_name}}</td>
                                <td class="text-center">
-                                   <input type="checkbox" checkbox-all="selectedUsers[{{$index}}].isSelected">
+                                   <input type="checkbox" ng-model="level.isSelected" checkbox-all="level.relateUsers.users">
                                </td>
-                               <td class="text-center">
-                               </td>
-                               <td class="text-center">
-                               </td>
-                               <td class="text-center">
-                               </td>
-                               <td class="text-center">
-
-                               </td>
-                               <td class="text-center">
+                               <td class="text-center" colspan="5">
                                </td>
                            </tr>
                           <tr ng-repeat="userDetail in level.relateUsers.users">
@@ -158,7 +166,7 @@
                                <td class="text-center">
                                    <div class="checkbox">
                                        <label>
-                                           <input type="checkbox" ng-model="selectedUsers[$parent.$index][userDetail.id].isSelected">
+                                           <input type="checkbox" ng-model="userDetail.isSelected">
                                             {{userDetail.first_name}} {{userDetail.last_name}}<br /><small>({{userDetail.designation}})</small>
                                        </label>
                                    </div>

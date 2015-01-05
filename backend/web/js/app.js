@@ -3,7 +3,7 @@ var app = angular.module('siteTrackApp', ['ngRoute', 'ngAnimate', 'ui.bootstrap'
 app.run(function($http, $window) {
     delete $window.sessionStorage.token;
     if(!$window.sessionStorage.token) {
-        $http.get("/api/gettoken?mod=user").success(function(data) {
+        $http.get("/api/gettoken").success(function(data) {
           $window.sessionStorage.token = data.token; 
         });
     }
@@ -75,6 +75,11 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
         .when('/projects/update/:id', {
             templateUrl: path+'project/form.html',
             controller: 'ProjectUpdate'
+        })
+        
+        .when('/tagitems', {
+            templateUrl: path+'tagitems/index.html',
+            controller: 'TagItems'
         })
         
         .when('/tags', {
@@ -182,56 +187,44 @@ app.controller('error', ['$scope', function ($scope) {
 
 app.service('rest', function ($http, $location, $routeParams) {
     return {
-        baseUrl: '/api',
+        baseUrl: '/',
         path: "",
         
-        models: function () {
-            if (Object.keys($routeParams).length > 0) {
-                var param = "";
-                $.each($routeParams, function(key, val) {
-                    if(key=="mod")
-                        return;
-                    param = (param==""?"":"&")+key+"=" + val;
-                });
-                return $http.get(this.baseUrl + "?mod=" + this.path +'&' + param);
-            }
-            return $http.get(this.baseUrl + "?mod=" + this.path + location.search);
-        },
         models: function (params) {
-            return $http.post(this.baseUrl + "/getdata?mod=" + this.path, params);
+            return $http.post(this.baseUrl + this.path + "/search", params);
         },
         getModels: function(mod, select, cond) {
-            return $http.post("/api/getdata?mod="+mod, {'search': cond, 'select': select});;
+            return $http.post("/"+ mod, {'search': cond, 'select': select});;
         },
         model: function () {
             if ($routeParams.expand != null) {
-                return $http.get(this.baseUrl + "/" + $routeParams.id + "?mod=" + this.path +'&expand=' + $routeParams.expand);
+                return $http.get(this.baseUrl + this.path + "/" + $routeParams.id + '&expand=' + $routeParams.expand);
             }
-            return $http.get(this.baseUrl + "/" + $routeParams.id + "?mod=" + this.path);
+            return $http.get(this.baseUrl + this.path + "/" + $routeParams.id);
         },
         getFields:function() {
-            return $http.get(this.baseUrl + "/fields" + "?mod=" + this.path);
+            return $http.get(this.baseUrl+ this.path + "/fields");
         },
 
         get: function () {
-            return $http.get(this.baseUrl + "?mod=" + this.path);
+            return $http.get(this.baseUrl + this.path);
         },
 
         postModel: function (model) {
-            return $http.post(this.baseUrl + "?mod=" + this.path, model);
+            return $http.post(this.baseUrl + this.path, model);
         },
 
         putModel: function (model) {
-            return $http.put(this.baseUrl + "/" + $routeParams.id + "?mod=" + this.path, model);
+            return $http.put(this.baseUrl+ this.path + "/" + $routeParams.id, model);
         },
         deleteModel: function (model) {
-            return $http.delete(this.baseUrl + "/" + $routeParams.id + "?mod=" + this.path, model);
+            return $http.delete(this.baseUrl+ this.path + "/" + $routeParams.id, model);
         },
         deleteById: function (model) {
-            return $http.delete(this.baseUrl + "/" + model.id + "?mod=" + this.path, model);
+            return $http.delete(this.baseUrl+ this.path + "/" + model.id, model);
         },
         setData: function(mod, select, cond) {
-            return $http.post("/api/getall?mod="+mod, {'search': cond, 'select': select});;
+            return $http.post("/"+ mod, {'search': cond, 'select': select});;
         }
     };
 });

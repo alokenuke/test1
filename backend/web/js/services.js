@@ -73,7 +73,7 @@ appServices.directive('checkboxAll', function () {
     var parts = iAttrs.checkboxAll;
     var selectedVar = "isSelected";
     iElement.attr('type','checkbox');
-    iElement.bind('change', function (evt) {
+    iElement.on('change', function (evt) {
       scope.$apply(function () {
         var setValue = iElement.prop('checked');
         angular.forEach(scope.$eval(parts), function (v) {
@@ -81,7 +81,7 @@ appServices.directive('checkboxAll', function () {
         });
       });
     });
-    scope.$watch(parts, function (newVal) {
+    scope.$watch(parts+"."+selectedVar, function (newVal) {
       var hasTrue=false, hasFalse=false;
       angular.forEach(newVal, function (v) {
         if (v[selectedVar]) {
@@ -92,10 +92,8 @@ appServices.directive('checkboxAll', function () {
       });
       if (hasTrue && hasFalse) {
         iElement.attr('checked', false);
-        iElement.addClass('greyed');
       } else {
         iElement.attr('checked', hasTrue);
-        iElement.removeClass('greyed');
       }
     }, true);
   };
