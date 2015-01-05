@@ -242,9 +242,9 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
                 if(level==0) {
                     $scope.items = [];
                     $scope.processes = [];
-                    rest.setData("userGroups", ['user_groups.id', 'group_name'], {'project_id': projectId}).success(function(data) {$scope.usergroups= data.items;});
-                    rest.setData("items", ['id', 'item_name'], {'project_id': projectId, 'parent_id': 0}).success(function(data) {$scope.items = [];if(data.items.length)$scope.items.push(data.items);});
-                    rest.setData("tagProcess", ['id', 'process_name'], {'project_id': projectId, 'parent_id': 0}).success(function(data) {$scope.processes = [];if(data.items.length) $scope.processes.push(data.items);});
+                    rest.setData("usergroups/getall", ['user_groups.id', 'group_name'], {}).success(function(data) {$scope.usergroups = data.items;});
+                    rest.setData("items/getall", ['id', 'item_name'], {'parent_id': 0}).success(function(data) {$scope.items.push(data.items);});
+                    rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': 0}).success(function(data) {$scope.processes.push(data.items);});
                 }
             }
             else if(variable=='items') {
@@ -291,8 +291,8 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
         
     }])
 
-app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'tooltip',
-                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, tooltip) {
+app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'tooltip','$modal','$log',
+                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, tooltip,$modal,$log) {
         
         rest.path = "tags";
         
@@ -315,9 +315,51 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
         $scope.tags = [{id:'',pre:'',tagName:'',post:'',productCode:'',tagDescription:''}];
         $scope.levels = [];
         $scope.process_stages = [];
+        $scope.selectedTags = [];
+        $scope.$delItems  = [];  
+        
+        $scope.deleteTags = function() {
+            
+               $scope.$delItems = $scope.$delItems.filter(function(e){return e});
+               
+               console.log($scope.$delItems);
+               for(var i = 0; i < $scope.selectedTags.length; i++) {
+                    var obj = $scope.selectedTags[i];
+
+                    if($scope.$delItems.indexOf(obj.id) !== -1) {
+                        $scope.selectedTags.splice(i, 1);
+                        i--;
+                    }
+                }
+                $scope.$delItems  = [];
+                $scope.selectedTags = $scope.selectedTags.filter(function(e){return e});
+                console.log($scope.selectedTags);
+
+        }
+        
+        
+        $scope.openModel = function () {
+        
+            var modalInstance = $modal.open({
+              templateUrl: '/templates/tags/add_more_tag.html',
+              controller: 'SelectTagsPopup',
+              size: 'lg',
+               resolve: {
+                  items: function () {
+                    return $scope.tags;
+                   }
+               }
+            });
+
+          modalInstance.result.then(function (selectedItem) {
+            $scope.selectedTags = selectedItem.filter(function(e){return e});
+          }, function () {
+          $log.info('Modal dismissed at: ' + new Date());
+          });
+        };
         
         $scope.getUserLevel = function(){
-            $http.post("/api/getall?mod=userLevels",{group_id:$scope.search.usergroup.id}).success(function(data) {
+            $http.post("/userlevels/getall",{group_id:$scope.search.usergroup.id}).success(function(data) {
                 $scope.levels = data.items;
             });
         }
@@ -341,7 +383,7 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
                 
                 $scope[variable].splice(level, ($scope[variable].length-level));
                 
-                $http.post("/api/getall?mod=projectLevel", {'search': {'project_id': projectId, 'parent_id': parent}, 'select': ['id', 'level_name']}).success(function(data) {
+                $http.post("/projectlevel/getall", {'search': {'project_id': projectId, 'parent_id': parent}, 'select': ['id', 'level_name']}).success(function(data) {
                     if(data.items.length>0)
                         $scope[variable].push(data.items);
                 });
@@ -349,9 +391,9 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
                 if(level==0) {
                     $scope.items = [];
                     $scope.processes = [];
-                    rest.setData("userGroups", ['user_groups.id', 'group_name'], {'project_id': projectId}).success(function(data) {$scope.usergroups= data.items;});
-                    rest.setData("items", ['id', 'item_name'], {'project_id': projectId, 'parent_id': 0}).success(function(data) {$scope.items = [];if(data.items.length)$scope.items.push(data.items);});
-                    rest.setData("tagProcess", ['id', 'process_name'], {'project_id': projectId, 'parent_id': 0}).success(function(data) {$scope.processes = [];if(data.items.length) $scope.processes.push(data.items);});
+                    rest.setData("usergroups/getall", ['user_groups.id', 'group_name'], {}).success(function(data) {$scope.usergroups = data.items;});
+                    rest.setData("items/getall", ['id', 'item_name'], {'parent_id': 0}).success(function(data) {$scope.items.push(data.items);});
+                    rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': 0}).success(function(data) {$scope.processes.push(data.items);});
                 }
             }
             else if(variable=='items') {
@@ -394,7 +436,7 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
         
         updateTagList([]);
         
-        rest.setData("projects", ['id', 'project_name'], {'project_status': null}).success(function(data) {$scope.projects = data.items;});
+        rest.setData("projects/getall", ['id', 'project_name'], {'project_status': null}).success(function(data) {$scope.projects = data.items;});
     }])
 
 app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 
@@ -419,13 +461,13 @@ app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParam
             
             $scope.projectlevels.splice(level, ($scope.projectlevels.length-level));
             
-            $http.post("/api/getall?mod=projectLevel", {'search': {'project_id': projectId, 'parent_id': parent}, 'select': ['id', 'level_name']}).success(function(data) {
+            $http.post("/projectlevel/getall", {'search': {'project_id': projectId, 'parent_id': parent}, 'select': ['id', 'level_name']}).success(function(data) {
                 if(data.items.length>0)
                     $scope.projectlevels.push(data.items);
             });
             
             if(level==0)
-                $http.post("/api/getall?mod=userGroups", {'search': {'project_id': projectId}, 'select': ['user_groups.id', 'group_name']}).success(function(data) {
+                $http.post("usergroups/getall", {'search': {'project_id': projectId}, 'select': ['user_groups.id', 'group_name']}).success(function(data) {
                     $scope.usergroups = data.items;
                 });
         }
@@ -476,11 +518,11 @@ app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParam
             $scope.currentPage = (data._meta.currentPage+1);
             $scope.numPerPage = data._meta.perPage;
             
-            $http.get("/api/getall?mod=projects").success(function(data) {
+            $http.get("/projects/getall").success(function(data) {
                 $scope.projects = data.items;
             });
             
-            $http.get("/api/getall?mod=userGroups").success(function(data) {
+            $http.get("/usergroups/getall").success(function(data) {
                 $scope.usergroups = data.items;
             });
             
@@ -595,11 +637,11 @@ app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route','$routePa
             $scope.currentPage = (data._meta.currentPage+1);
             $scope.numPerPage = data._meta.perPage;
             
-            $http.get("/api/getall?mod=projects").success(function(data) {
+            $http.get("/projects/getall").success(function(data) {
                 $scope.projects = data.items;
             });
             
-            $http.get("/api/getall?mod=userGroups").success(function(data) {
+            $http.get("/usergroups/getall").success(function(data) {
                 $scope.usergroups = data.items;
             });
             
@@ -725,3 +767,37 @@ app.controller('createSimilarTagModalController', function ($scope, $modalInstan
     $modalInstance.dismiss('cancel');
   };
 });
+
+app.controller('SelectTagsPopup', function ($scope, $modalInstance, $http, items) {
+         
+    $scope.search = {};
+    $scope.popupTags = {};
+    
+    $scope.searchTags = function(){
+        $http.post("/tags/getall",{search:$scope.search}).success(function(data) {
+            $scope.popupTags = data.items;
+        });
+     }
+     
+    $scope.clearSearch = function() {
+        $scope.search = {};
+        $scope.searchTags();
+    }
+     
+     $scope.checkUncheck = function(index, data){
+         if(!$scope.checkboxes[index]){
+             delete $scope.temp[index];
+         } else {
+            $scope.temp[index]=data;
+         }
+     }
+     
+    $scope.ok = function () {
+        $modalInstance.close($scope.temp);
+    };
+
+   $http.post("/tags/getall").success(function(data) {
+       $scope.popupTags = data.items;
+   });
+                    
+})
