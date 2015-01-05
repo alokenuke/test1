@@ -4,7 +4,7 @@ namespace backend\controllers;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
-use common\models\LoginForm;
+use backend\models\LoginForm;
 use yii\filters\VerbFilter;
 
 /**
@@ -95,7 +95,7 @@ class SiteController extends Controller
         
         Yii::$app->user->logout();
         
-        $authToken = \common\models\UserTokens::findOne(['token' => $authKey, 'user_id' => $userId, 'request_from' => 'webapp']);
+        $authToken = \backend\models\UserTokens::findOne(['token' => $authKey, 'user_id' => $userId, 'request_from' => 'webapp']);
         
         if($authToken) {
             $authToken->expiry_status = 1;

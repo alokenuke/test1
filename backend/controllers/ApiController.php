@@ -13,9 +13,9 @@ class ApiController extends ActiveController
 {
     public $serializer;
     public $identity;
+    public $modelClass;
         
     public function init() {
-        $this->modelClass = 'common\models\\'.  ucfirst($_REQUEST['mod']);
         
         $this->identity = json_decode(\Yii::$app->getRequest()->getCookies()->getValue('_identity'));
                 
@@ -39,6 +39,7 @@ class ApiController extends ActiveController
     }
     
     public function actionGettoken() {
+        $this->modelClass = "backend\models\User";
         if(isset($this->identity[1]))
             return [
                 'token' => $this->identity[1]
@@ -73,9 +74,30 @@ class ApiController extends ActiveController
     public function actionGetall() {
         if (!empty($_GET)) {
             
+            $post = \Yii::$app->request->post();
+            
             $model = new $this->modelClass;
+            
             $query = $model->find();
             
+            if(isset($post['select']))
+               $query->select($post['select']);
+            
+            if(isset($post['search'])) {
+                foreach($post['search'] as $key => $val)
+                    if(isset($val)) {
+                        if(in_array($key, $this->partialMatchFields))
+                            $query->andWhere(['like', $key, $val]);
+                        else
+                            $query->andWhere([$key => $val]);
+                    }
+            }
+            
+            if(isset($post['sort']))
+                $_GET['sort'] = $post['sort'];
+            if(isset($post['page']))
+                $_GET['page'] = $post['page'];
+                        
             try {
                 $provider = new ActiveDataProvider ([
                     'query' => $query,
@@ -91,8 +113,6 @@ class ApiController extends ActiveController
     }
     
     public function actionFields() {
-        
-        $this->modelClass = 'common\models\\'.  ucfirst($_REQUEST['mod']);
         
         return $this->serializeFields($this->getFields());
     }
