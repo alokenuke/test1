@@ -25,8 +25,8 @@ use yii\web\IdentityInterface;
 class User extends ActiveRecord implements IdentityInterface
 {
     const STATUS_DELETED = 0;
-    const STATUS_ACTIVE = 10;
-    const ROLE_USER = 10;
+    const STATUS_ACTIVE = 1;
+    const ROLE_USER = 0;
     public $auth_key = "";
     
     /**
@@ -59,12 +59,29 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
+            [['first_name', 'last_name', 'email', 'username', 'role'], 'required'],
+            ['email', 'email'],
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
 
             ['role', 'default', 'value' => self::ROLE_USER],
-            ['role', 'in', 'range' => [self::ROLE_USER]],
+            ['role', 'in', 'range' => self::getRoleIds()],
         ];
+    }
+    
+    public static function getRoleIds() {
+        $roleIds = self::getArray(Roles::find()->select("id")->andWhere(["status" => 1])->all(), "id");
+        
+        return $roleIds;
+    }
+    
+    public static function getArray($obj, $field) {
+        $result = [];
+        if(count($obj)) {
+            foreach($obj as $key => $val)
+                $result[] = $val[$field];
+        }
+        return $result;
     }
 
     /**
@@ -148,6 +165,8 @@ class User extends ActiveRecord implements IdentityInterface
             'designation',
             'company_id',
             'password',
+            'rec_notification',
+            'allow_ba',
             'status',
             'created_date',
             'modified_date',
@@ -166,6 +185,8 @@ class User extends ActiveRecord implements IdentityInterface
             'contact_number',
             'designation',
             'company_id',
+            'rec_notification',
+            'allow_ba',
             'status',
         ];
     }
@@ -266,5 +287,10 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+    
+    public function getUserGroupIds()
+    {
+        return $this->hasMany(RelUserLevelsUsers::className(), ['id' => 'user_group_id']);
     }
 }

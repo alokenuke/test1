@@ -13,7 +13,7 @@ class TagsController extends ApiController
     public $partialMatchFields;
         
     public function init() {
-        $this->modelClass = 'backend\models\tags';
+        $this->modelClass = 'backend\models\Tags';
         
         $this->partialMatchFields = ['tag_name', 'tag_description', 'uid'];
         
@@ -60,15 +60,20 @@ class TagsController extends ApiController
                             $query->where([$key => $val]);
                     }
             }
-            
+            $pageLimit = 20;
             if(isset($post['sort']))
                 $_GET['sort'] = $post['sort'];
             if(isset($post['page']))
                 $_GET['page'] = $post['page'];
+            if(isset($post['limit']))
+                $pageLimit = $post['limit'];
             
             try {
                 $provider = new ActiveDataProvider ([
-                    'query' => $query
+                    'query' => $query,
+                    'pagination'=>array(
+                        'pageSize'=>$pageLimit
+                    ),
                 ]);
             } catch (Exception $ex) {
                 throw new \yii\web\HttpException(500, 'Internal server error');

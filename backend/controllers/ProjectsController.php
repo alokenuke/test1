@@ -13,7 +13,7 @@ class ProjectsController extends ApiController
     public $partialMatchFields;
         
     public function init() {
-        $this->modelClass = 'backend\models\projects';
+        $this->modelClass = 'backend\models\Projects';
         
         $this->partialMatchFields = ['project_name', 'address', 'location', 'city'];
         

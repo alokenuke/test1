@@ -55,6 +55,7 @@ class UserGroups extends \yii\db\ActiveRecord
             'company_id',
             'group_name',
             'group_status',
+            'levels',
             'created_by',
             'projectIds'
         ];
@@ -91,5 +92,10 @@ class UserGroups extends \yii\db\ActiveRecord
     public function getProjectIds()
     {
         return $this->hasMany(UserGroupProjects::className(), ['user_group_id' => 'id']);
+    }
+    
+    public function getLevels()
+    {
+        return $this->hasMany(UserLevels::className(), ['user_group_id' => 'id']);
     }
 }

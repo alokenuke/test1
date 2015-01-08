@@ -8,14 +8,14 @@ use yii\data\ActiveDataProvider;
  * Class TagsController
  * @package rest\versions\v1\controllers
  */
-class ItemsController extends ApiController
+class RolesController extends ApiController
 {
     public $partialMatchFields;
         
     public function init() {
-        $this->modelClass = 'backend\models\Items';
+        $this->modelClass = 'backend\models\Roles';
         
-        $this->partialMatchFields = ['item_name'];
+        $this->partialMatchFields = ['type','role_name'];
         
         parent::init();
     }
@@ -31,26 +31,23 @@ class ItemsController extends ApiController
             
             if(isset($post['select']))
                $query->select($post['select']);
-
-            if(isset($post['search'])) {
-                foreach($post['search'] as $key => $val)
-                    if(isset($val)) {
-                        if(in_array($key, $this->partialMatchFields))
-                            $query->andWhere(['like', $key, $val]);
-                        else
-                            $query->andWhere([$key => $val]);
-                    }
-            }
             
+            $pageLimit = 20;
             if(isset($post['sort']))
                 $_GET['sort'] = $post['sort'];
             if(isset($post['page']))
                 $_GET['page'] = $post['page'];
+            if(isset($post['limit']))
+                $pageLimit = $post['limit'];
             
             try {
                 $provider = new ActiveDataProvider ([
-                    'query' => $query
+                    'query' => $query,
+                    'pagination'=>array(
+                        'pageSize'=>$pageLimit
+                    ),
                 ]);
+            
             } catch (Exception $ex) {
                 throw new \yii\web\HttpException(500, 'Internal server error');
             }
@@ -59,9 +56,4 @@ class ItemsController extends ApiController
             throw new \yii\web\HttpException(404, 'Invalid Request');
         }
     }
-    
-    public function actionGetall() {
-        return parent::actionGetall();
-    }
-    
 }

@@ -42,9 +42,6 @@ class UserGroupsController extends ApiController
                     }
             }
             
-            print_r($query);
-            die;
-            
             if(isset($post['sort']))
                 $_GET['sort'] = $post['sort'];
             if(isset($post['page']))
@@ -61,6 +58,7 @@ class UserGroupsController extends ApiController
         } else {
             throw new \yii\web\HttpException(404, 'Invalid Request');
         }
+        
     }
     
     public function actionGetall() {

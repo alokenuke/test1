@@ -8,12 +8,12 @@ use yii\data\ActiveDataProvider;
  * Class TagsController
  * @package rest\versions\v1\controllers
  */
-class UserLevelsController extends ApiController
+class UserlevelsController extends ApiController
 {
     public $partialMatchFields;
         
     public function init() {
-        $this->modelClass = 'backend\models\userLevels';
+        $this->modelClass = 'backend\models\UserLevels';
         
         $this->partialMatchFields = ['level_name'];
         

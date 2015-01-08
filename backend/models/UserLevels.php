@@ -84,6 +84,6 @@ class UserLevels extends \yii\db\ActiveRecord
      */
     public function getRelateUsers()
     {
-        return $this->hasOne(RelUserLevelsUsers::className(), ['user_level_id' => 'id']);
+        return $this->hasMany(RelUserLevelsUsers::className(), ['user_level_id' => 'id']);
     }
 }

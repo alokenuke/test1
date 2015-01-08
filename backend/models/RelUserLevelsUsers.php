@@ -80,6 +80,12 @@ class RelUserLevelsUsers extends \yii\db\ActiveRecord
     
     public function getUsers()
     {
-        return $this->hasMany(User::className(), ['id' => 'user_id']);
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
+    
+    public function getUserGroup()
+    {
+        return $this->hasOne(UserGroups::className(), ['user_group_id' => 'id']);
+    }
+    
 }
