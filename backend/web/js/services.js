@@ -52,11 +52,18 @@ appServices.directive('numbersOnly', function(){
      require: 'ngModel',
      link: function(scope, element, attrs, modelCtrl) {
        modelCtrl.$parsers.push(function (inputValue) {
+           var max = parseInt(element.attr("max"));
            // this next if is necessary for when using ng-required on your input. 
            // In such cases, when a letter is typed first, this parser will be called
            // again, and the 2nd time, the value will be undefined
            if (inputValue == undefined) return '' 
-           var transformedInput = inputValue.replace(/[^0-9+.]/g, ''); 
+           if(max) {
+               var transformedInput = inputValue.replace(/[^0-9+.]/g, ''); 
+               if(transformedInput.length>max)
+                   transformedInput = (""+transformedInput).substring(0, max);
+           }
+           else
+               var transformedInput = inputValue.replace(/[^0-9+.]/g, ''); 
            if (transformedInput!=inputValue) {
               modelCtrl.$setViewValue(transformedInput);
               modelCtrl.$render();
@@ -97,4 +104,29 @@ appServices.directive('checkboxAll', function () {
       }
     }, true);
   };
+});
+appServices.directive('ngConfirmClick', [
+    function () {
+        return {
+            priority: 1,
+            terminal: true,
+            link: function (scope, element, attr, $dialogs) {
+                var msg = attr.ngConfirmClick || "Are you sure?";
+                var clickAction = attr.ngClick;
+                element.bind('click', function (event) {
+                    if (window.confirm(msg)) {
+                        scope.$eval(clickAction)
+                    }
+                });
+            }
+        };
+    }])
+
+appServices.filter('titlecase', function() {
+    return function(s) {
+        s = ( s === undefined || s === null ) ? '' : s;
+        return s.toString().toLowerCase().replace( /\b([a-z])/g, function(ch) {
+            return ch.toUpperCase();
+        });
+    };
 });

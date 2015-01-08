@@ -138,7 +138,7 @@
                                <th class="text-center" rowspan="2">S.No</th>
                                <th class="text-center" rowspan="2">User Level</th>
                                <th class="text-center" rowspan="2">
-                                       <input type="checkbox" checkbox-all="levels">
+                                   <input type="checkbox" ng-model="selectAllLevelUsers" ng-click="selectAllLevels($event)">
                                </th>
                                <th class="text-center" rowspan="2">From Task Process <a tooltip-html-unsafe="{{tooltip.from_task_process}}" class="fa fa-question-circle"></a></th>
                                <th class="text-center" rowspan="2">To Task Process <a tooltip-html-unsafe="{{tooltip.to_task_process}}" class="fa fa-question-circle"></a></th>
@@ -155,24 +155,24 @@
                                <td class="text-center">{{$index+1}}</td>
                                <td class="text-center">{{level.level_name}}</td>
                                <td class="text-center">
-                                   <input type="checkbox" ng-model="level.isSelected" checkbox-all="level.relateUsers.users">
+                                   <input type="checkbox" ng-model="level.isSelected" checkbox-all="level.relateUsers">
                                </td>
                                <td class="text-center" colspan="5">
                                </td>
                            </tr>
-                          <tr ng-repeat="userDetail in level.relateUsers.users">
+                          <tr ng-repeat="relateUser in level.relateUsers">
                                <td class="text-center"></td>
                                <td class="text-center"></td>
                                <td class="text-center">
                                    <div class="checkbox">
                                        <label>
-                                           <input type="checkbox" ng-model="userDetail.isSelected">
-                                            {{userDetail.first_name}} {{userDetail.last_name}}<br /><small>({{userDetail.designation}})</small>
+                                           <input type="checkbox" ng-model="relateUser.isSelected" class="checkUserLevel">
+                                            {{relateUser.users.first_name}} {{relateUser.users.last_name}}<br /><small>({{relateUser.users.designation}})</small>
                                        </label>
                                    </div>
                                </td>
                                <td class="text-center">
-                                   <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="stage_from[userDetail.id]">
+                                   <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="stage_from[relateUser.users.id]">
                                        <ui-select-match placeholder="Select task process">{{$select.selected.process_name}}</ui-select-match>
                                        <ui-select-choices repeat="stage in process_stages | filter: $select.search"
                                                 refresh-delay="0">
@@ -181,7 +181,7 @@
                                      </ui-select>
                                </td>
                                <td class="text-center">
-                                   <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="stage_to[userDetail.id]">
+                                   <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="stage_to[relateUser.users.id]">
                                        <ui-select-match placeholder="Select task process">{{$select.selected.process_name}}</ui-select-match>
                                        <ui-select-choices repeat="stage in process_stages | filter: $select.search"
                                                 refresh-delay="0">

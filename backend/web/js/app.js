@@ -16,6 +16,14 @@ app.constant('tooltip', {
     'email_notification': "This tooltip related to 'email notification'.",
 });
 
+app.constant('page_dropdown', {
+    '10': "10",
+    '20': "20",
+    '30': "30",
+    '40': "40",
+    '50': "50"
+});
+
 app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($locationProvider, $routeProvider, $httpProvider) {
 
     var path = '/templates/';
@@ -30,6 +38,11 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
         .when('/', {
             templateUrl: path+'dashboard.html',
             controller: 'SiteIndex',
+        })
+        
+        .when('/roles', {
+            templateUrl: path+'roles/index.html',
+            controller: 'RolesIndex'
         })
         
         .when('/users', {
@@ -166,15 +179,6 @@ app.controller('SiteIndex', ['$scope', 'rest', 'breadcrumbsService', '$http', fu
     
     rest.models().success(function (data) {
         $scope.projects = data.items;
-
-        $scope.totalCount = data._meta.totalCount;
-        $scope.pageCount = data._meta.pageCount;
-        $scope.currentPage = (data._meta.currentPage+1);
-        $scope.numPerPage = data._meta.perPage;
-
-        $http.get("/api/getall?mod=projects").success(function(data) {
-            $scope.projects = data.items;
-        });
     })
 }]);
 
@@ -192,6 +196,9 @@ app.service('rest', function ($http, $location, $routeParams) {
         
         models: function (params) {
             return $http.post(this.baseUrl + this.path + "/search", params);
+        },
+        customModelData: function (path, params) {
+            return $http.post(this.baseUrl + path , params);
         },
         getModels: function(mod, select, cond) {
             return $http.post("/"+ mod, {'search': cond, 'select': select});;

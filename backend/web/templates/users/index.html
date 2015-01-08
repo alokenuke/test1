@@ -2,16 +2,19 @@
     <div class="row">
         <div class="col-xs-12 search-box mb-sm-large">
             <div class="row">
-                <h2 class="col-xs-12 search-title">Search Users<button class="pull-right btn icon-btn"><i class="fa fa-sort-desc fa-2x" id="down-arrow"></i><i class="fa fa-sort-asc fa-2x" id="up-arrow" style="display: none"></i></button>
+                <h2 class="col-xs-12 search-title">Search Users
+                    <button class="pull-right btn icon-btn" ng-click="showSearchBox=!showSearchBox;">
+                        <i ng-class="{'fa fa-sort-desc fa-2x': !showSearchBox,'fa fa-sort-asc fa-2x': showSearchBox}"></i>
+                    </button>
                 </h2>
             </div><!--/row-->
-            <form id="form" class="form-horizontal form-horizontal-typ1 form-wrapper" role="form">
+            <form ng-submit="searchUser()" id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form" ng-class="{'ng-hide':showSearchBox}">
                 <div class="row">
                     <div class="col-md-6 col-lg-5">
                         <div class="form-group">
                             <label class="col-sm-4 control-label text-right">Name :</label>
                             <div class="col-sm-6">
-                                <input type="text" class="form-control" />
+                                <input type="text" class="form-control" ng-model="$search.name" />
                             </div>
                         </div>
                     </div>
@@ -20,7 +23,7 @@
                             <label class="col-sm-4 control-label text-right">Username :</label>
                             <div class="col-sm-6">
 
-      <input type="text" class="form-control" /> 
+      <input type="text" class="form-control" ng-model="$search.username" /> 
                             </div>
                         </div>
                     </div>
@@ -28,9 +31,11 @@
                 <div class="row">
                     <div class="col-md-6 col-lg-5">
                         <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">User Group :</label>
-                            <div class="col-sm-6"><select class="form-control">
-                                    <option>Select user group</option>
+                            <label class="col-sm-4 control-label text-right">User Status :</label>
+                            <div class="col-sm-6">
+                                <select class="form-control" ng-model="$search.status">
+                                    <option value="1" selected="selected">Active</option>
+                                    <option value="0">Inactive</option>
                                 </select>
                             </div>
                         </div>
@@ -39,7 +44,7 @@
                         <div class="form-group">
                             <label class="col-sm-4 control-label text-right">Email :</label>
                             <div class="col-sm-6">
-                                <input class="form-control" />
+                                <input class="form-control" ng-model="$search.email"/>
                             </div>
                         </div>
                     </div>
@@ -49,24 +54,24 @@
                         <div class="form-group">
                             <label class="col-sm-4 control-label text-right">Phone Number :</label>
                             <div class="col-sm-6">
-                                <input class="form-control" />
+                                <input class="form-control" ng-model="$search.contact_number" />
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6 col-lg-5">
                         <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">User Status :</label>
-                            <div class="col-sm-6">
-                                <select class="form-control">
-                                    <option>Select User status</option>
-                                </select>
-                            </div>
-                        </div>
+                    <label class="col-sm-4 control-label text-right">User Group :</label>
+                    <div class="col-sm-6">
+                        <select class="form-control" ng-model="$search.usergroups.id" ng-options=" usergroup.id as usergroup.group_name for usergroup in usergroups">
+                            <option value="">-- Select User Group--</option>
+                        </select>
+                    </div>
+                </div>
                     </div>
                 </div><!--/row-->
                 <div class="row mt-20">
                    <div class="col-sm-10 text-center">
-                        <button class="btn btn-primary mb-sm-5">Search</button>
+                       <button class="btn btn-primary mb-sm-5" type="submit">Search</button>
                         <button class="btn btn-primary mb-sm-5">Clear Search</button>
                    </div> 
                 </div>
@@ -79,7 +84,7 @@
     <div class="row mt-15">
         <div class="">
             <div class="table-responsive table-responsive-cust">
-                <table class="table table-bordered">
+                <table class="table table-bordered rt" id='rt1'>
                     <thead>
                         <tr>
                             <th class="text-center">User ID</th>
@@ -94,68 +99,32 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td class="text-center">1</td>
-                            <td>Test Name</td>
-                            <td>Test username</td>
-                            <td>Test Designation</td>
-                            <td>Test email</td>
-                            <td class="text-right">+112 22333332</td>
+                        <tr ng-repeat="user in users">
+                            <td class="text-center">{{user.id}}</td>
+                            <td>{{user.first_name}} {{user.last_name}}</td>
+                            <td>{{user.username}}</td>
+                            <td>{{user.designation}}</td>
+                            <td>{{user.email}}</td>
+                            <td class="text-right">{{user.contact_number}}</td>
                             <td class="text-center">
-                                <select class="form-control">
-                                    <option>Daily</option>
-                                </select>
+                                {{user.rec_notification | titlecase}}
                             </td>
                             <td class="text-center">
-                                <input type="checkbox" />
-                            </td>
-                            <td class="text-center">
-                                <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>
-                                <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="text-center">1</td>
-                            <td>Test Name</td>
-                            <td>Test username</td>
-                            <td>Test Designation</td>
-                            <td>Test email</td>
-                            <td class="text-right">+112 22333332</td>
-                            <td class="text-center">
-                                <select class="form-control">
-                                    <option>Daily</option>
-                                </select>
-                            </td>
-                            <td class="text-center">
-                                <input type="checkbox" />
+                                <input type="checkbox" ng-model="user.allow_ba" ng-checked="{{user.allow_ba}}" />
                             </td>
                             <td class="text-center">
                                 <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>
                                 <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
                             </td>
                         </tr>
-                        <tr>
-                            <td class="text-center">1</td>
-                            <td>Test Name</td>
-                            <td>Test username</td>
-                            <td>Test Designation</td>
-                            <td>Test email</td>
-                            <td class="text-right">+112 22333332</td>
-                            <td class="text-center">
-                                <select class="form-control">
-                                    <option>Daily</option>
-                                </select>
-                            </td>
-                            <td class="text-center">
-                                <input type="checkbox" />
-                            </td>
-                            <td class="text-center">
-                                <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>
-                                <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
-                            </td>
-                        </tr>
+                     
                     </tbody>
                 </table>
+                <div class="pull-right">                    
+                        <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
+                        <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px" ng-change="setPageLimit()" ng-model="numPerPage" ng-options="k as v for (k,v) in page_dropdown">
+                        </select>
+                </div>
             </div>
         </div>          
     </div><!--/row-->

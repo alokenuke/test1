@@ -177,35 +177,34 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
         $scope.levels = [];
         $scope.process_stages = [];
         
+        $scope.selectAllLevels = function($event) {
+            var parts = "levels";
+            var selectedVar = "isSelected";
+            var element = angular.element($event.currentTarget);
+            var setValue = $scope.selectAllLevelUsers;
+            angular.forEach($scope.$eval(parts), function (v) {
+                v[selectedVar] = setValue;
+                angular.forEach(v.relateUsers, function (v) {
+                    v[selectedVar] = setValue;
+                });
+            });
+        }
+               
         $scope.createSimilarTagModal = function() {
             
             var params = {'search': $scope.search, 'sort': $scope.sortBy};
             var temp = {};
+            
+            var modalInstance = $modal.open({
+              templateUrl: '/templates/tags/add_more_tag.html',
+              controller: 'createSimilarTagModalController',
+              size: 'lg'
+            });
 
-            rest.getModels("tags", [], {'project_id': $scope.projects.id}).success(function(data) {
-                  temp.tags = data.items;
-                  temp.totalCount = data._meta.totalCount;
-                  temp.pageCount = data._meta.pageCount;
-                  temp.currentPage = (data._meta.currentPage+1);
-                  temp.numPerPage = data._meta.perPage;
-                  
-                  var modalInstance = $modal.open({
-                    templateUrl: 'createSimilarTagModal.html',
-                    controller: 'createSimilarTagModalController',
-                    size: 'lg',
-                    resolve: {
-                      data: function () {
-                          return temp;
-                      }
-                    }
-                  });
-
-                  modalInstance.result.then(function (selectedItem) {
-                    $scope.selected = selectedItem;
-                  }, function () {
-                    $log.info('Modal dismissed at: ' + new Date());
-                  });
-                  
+            modalInstance.result.then(function (selectedItem) {
+              $scope.selected = selectedItem;
+            }, function () {
+              $log.info('Modal dismissed at: ' + new Date());
             });
         }
         
@@ -749,23 +748,47 @@ app.controller('TagItems', function($scope, rest, $location, $route, $routeParam
       };
 });
 
-app.controller('createSimilarTagModalController', function ($scope, $modalInstance, data) {
+app.controller('createSimilarTagModalController', function ($scope, $modalInstance, $http) {
 
-  $scope.data = data;
-  
-  $scope.selectedTags = [];
-  
-  $scope.selected = {
-    item: $scope.data.tags[0]
-  };
+  $scope.search = {};
+    $scope.popupTags = {};
+    $scope.temp = [];
+    
+    $scope.searchTags = function(){
+        $http.post("/tags/search",{search:$scope.search}).success(function(data) {
+            $scope.popupTags = data.items;
+            $scope.totalCount = data._meta.totalCount;
+            $scope.pageCount = data._meta.pageCount;
+            $scope.currentPage = (data._meta.currentPage+1);
+            $scope.numPerPage = data._meta.perPage;
+        });
+    }
+     
+    $scope.clearSearch = function() {
+        $scope.search = {};
+        $scope.searchTags();
+    }
 
-  $scope.ok = function () {
-    $modalInstance.close($scope.selectedTags);
-  };
+    $scope.$watch("popupTags", function (newVal) {
+        $scope.temp = [];
+        angular.forEach(newVal, function (v) {
+            if (v['isSelected']) {
+                $scope.temp.push(v);
+            }
+        });
+    }, true);
 
-  $scope.cancel = function () {
-    $modalInstance.dismiss('cancel');
-  };
+    $scope.ok = function () {
+        $modalInstance.close($scope.temp);
+    };
+
+    $http.post("/tags/getall").success(function(data) {
+        $scope.popupTags = data.items;
+    });
+
+    $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
+    };
 });
 
 app.controller('SelectTagsPopup', function ($scope, $modalInstance, $http, items) {
