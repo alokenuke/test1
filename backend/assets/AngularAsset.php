@@ -22,6 +22,8 @@ class AngularAsset extends AssetBundle
 		$prefix = !YII_DEBUG ? '.min.' : '.';
 		$language = $this->language ? $this->language : 'en';
 		$this->js[] = 'angular' . $prefix . 'js';
+                $this->js[] = 'fileUpload/angular-file-upload-shim' . $prefix . 'js';
+                $this->js[] = 'fileUpload/angular-file-upload' . $prefix . 'js';
 		$this->js[] = 'angular-route' . $prefix . 'js';
 		$this->js[] = 'angular-touch' . $prefix . 'js';
 		$this->js[] = 'angular-animate' . $prefix . 'js';
