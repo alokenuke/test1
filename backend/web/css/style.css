@@ -696,17 +696,18 @@ textarea.form-control {
     height: auto !important;
 }
 .preview-box {
-    height: 86px;
-    background-color: #fff;
-    border: 1px solid #c9c9c9;
-    border-radius: 3px
+    border-radius: 3px;
+    margin: 0 auto;
+    max-height: 100px;
+    max-width: 100px;
+    position: relative;
+ 
 }
 .center {
     text-align: center;
     height: 100%
 }
 .center:before {
-    content: '';
     display: inline-block;
     height: 100%;
     vertical-align: middle;
@@ -717,8 +718,7 @@ textarea.form-control {
 }
 .fileUpload {
     position: relative;
-    overflow: hidden;
-    margin-top: 22px
+/*    overflow: hidden;*/
 }
 .fileUpload input.upload {
     position: absolute;
@@ -730,6 +730,7 @@ textarea.form-control {
     cursor: pointer;
     opacity: 0;
     filter: alpha(opacity=0);
+    width: 100px;
 }
 .btn-plr-medium {
  padding-left: 40px !important;

@@ -1,4 +1,4 @@
-var app = angular.module('siteTrackApp', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'ngResource', 'appApp.services', 'ui.select', 'ngSanitize', 'ui.tree']);
+var app = angular.module('siteTrackApp', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'ngResource', 'appApp.services', 'ui.select', 'ngSanitize', 'ui.tree', 'angularFileUpload']);
 
 app.run(function($http, $window) {
     delete $window.sessionStorage.token;
@@ -14,6 +14,7 @@ app.constant('tooltip', {
     'to_task_process': "This tooltip related to 'to task process'.",
     'mandatory': "This tooltip related to 'mandatory'.",
     'email_notification': "This tooltip related to 'email notification'.",
+    'allow_be': "This tooltip is related to 'Allow BE'.",
 });
 
 app.constant('page_dropdown', {
@@ -43,6 +44,11 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
         .when('/roles', {
             templateUrl: path+'roles/index.html',
             controller: 'RolesIndex'
+        })
+        
+        .when('/roles/create', {
+            templateUrl: path+'roles/create.html',
+            controller: 'RolesAdd'
         })
         
         .when('/users', {

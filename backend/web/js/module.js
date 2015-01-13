@@ -59,7 +59,7 @@ app.controller('ProjectIndex', ['$scope', 'rest', '$location', '$route','$routeP
                         
             $scope.totalCount = data._meta.totalCount;
             $scope.pageCount = data._meta.pageCount;
-            $scope.currentPage = (data._meta.currentPage+1);
+            $scope.currentPage = (data._meta.currentPage);
             $scope.numPerPage = data._meta.perPage;
             
             $http.get("/api/getall?mod=projects").success(function(data) {
@@ -157,7 +157,7 @@ app.controller('ProjectLevel', ['$scope', 'rest', '$location', '$route','$routeP
                         
             $scope.totalCount = data._meta.totalCount;
             $scope.pageCount = data._meta.pageCount;
-            $scope.currentPage = (data._meta.currentPage+1);
+            $scope.currentPage = (data._meta.currentPage);
             $scope.numPerPage = data._meta.perPage;
             
             $http.get("/api/getall?mod=projects").success(function(data) {
@@ -213,7 +213,7 @@ app.controller('ProjectLevel', ['$scope', 'rest', '$location', '$route','$routeP
                         
             $scope.totalCount = data._meta.totalCount;
             $scope.pageCount = data._meta.pageCount;
-            $scope.currentPage = (data._meta.currentPage+1);
+            $scope.currentPage = (data._meta.currentPage);
             $scope.numPerPage = data._meta.perPage;
             
         }).error(errorCallback);

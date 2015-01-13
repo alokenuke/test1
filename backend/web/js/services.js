@@ -19,7 +19,9 @@ appServices.factory('alertService', function($rootScope) {
         $rootScope.alerts.splice(index, 1);
     };
     
-    return alertService;
+	alertService.clearAll = function() {
+        $rootScope.alerts = [];
+    };    return alertService;
 });
 
 appServices.factory('breadcrumbsService', function($rootScope) {

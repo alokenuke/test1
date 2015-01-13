@@ -7,7 +7,7 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-4 col-md-5 control-label">Role Name :</label>
                                                     <div class="col-sm-8 col-md-7">
-                                                        <input type="text" ng-model="role.role_name" class="form-control" />
+                                                        <input type="text" ng-model="role.role_name" class="form-control" ng-required="true" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -19,20 +19,18 @@
                                                 <div class="form-group">
                                                     <label class="col-sm-4 col-md-5 control-label">Status :</label>
                                                     <div class="col-sm-8 col-md-7">
-                                                        <select class="form-control ui-select-match" ng-init="role.status = 1" ng-model="role.status">
-                                                <option value="1">Active</option>
-                                                <<option value="0">Inactive</option>
-                                            </select>
+                                                        <select class="form-control ui-select-match" ng-init="role.status = 1" ng-model="role.status" ng-required="true" >
+                                                            <option value="1">Active</option>
+                                                            <option value="0">Inactive</option>
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
                                             
                                         </div><!--/row-->
                                         
-                                        
-                                        
-                                        <div class="row mt-45 mb-left">
-                                            <div class="col-sm-12">
+                                        <div class="row mt-45 text-center">
+                                            <div class="col-sm-6">
                                                 <button class="btn btn-primary" type="submit">Save</button>
                                                 <button class="btn btn-danger">Cancel</button>
                                             </div>

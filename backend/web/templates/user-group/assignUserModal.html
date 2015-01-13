@@ -1,0 +1,125 @@
+<div class=" modal-lg col-xs-12 secondary-bg">
+    <!--/shadow-box-->
+    <div class="table-responsive table-responsive-cust">
+        <div class="col-xs-12 search-box mb-sm-large">
+            <div class="row">
+                <h2 class="col-xs-12 search-title">
+                    Search and Assign Users<button class="pull-right btn icon-btn" ng-click="cancel()"><i class="fa fa-close"></i></button>
+                </h2>
+            </div><!--/row-->
+            <form ng-submit="getUsers()" role="form" class="form-horizontal form-horizontal-typ1 form-wrapper" id="form">
+                <div class="row">
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">Name :</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" ng-model="search.name">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">Username :</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" ng-model="search.username"> 
+                            </div>
+                        </div>
+                    </div>
+                </div><!--/row-->
+                <div class="row">
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">Designation :</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" ng-model="search.designation"> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">User Role :</label>
+                            <div class="col-sm-6">
+                                <select class="form-control" ng-model="search.role" ng-options="rol.id as rol.role_name for rol in roles" >
+                                    <option value="">-- Select Role--</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div><!--/row-->
+                <div class="row">
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">Email :</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" ng-model="search.email"> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">Phone Number :</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" ng-model="$search.contact_number"> 
+                            </div>
+                        </div>
+                    </div>
+                </div><!--/row-->
+                <div class="row mt-20">
+                   <div class="col-sm-10 text-center">
+                        <button class="btn btn-primary mb-sm-5" type="submit">Search</button>
+                        <button class="btn btn-primary mb-sm-5" ng-click="clearSearch()">Clear Search</button>
+                   </div>
+                </div>
+            </form>
+            <form class="form-horizontal-typ1">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="text-center">
+                                <input type="checkbox" ng-change="selectAllUsers(popupUsers, allSelected)" ng-model="allSelected">
+                            </th>
+                            <th rowspan="2" class="text-center">
+                                <a ng-href="" ng-click="sortUser('name')">Name <i class="fa fa-sort{{sort.name}}"></i></a>
+                            </th>
+                            <th rowspan="2" class="text-center"><a ng-href="" ng-click="sortUser('username')">Username <i class="fa fa-sort{{sort.username}}"></i></a></th>
+                            <th rowspan="2" class="text-center"><a ng-href="" ng-click="sortUser('designation')">Designation <i class="fa fa-sort{{sort.designation}}"></i></a></th>
+                            <th rowspan="2" class="text-center"><a ng-href="" ng-click="sortUser('email')">Email <i class="fa fa-sort{{sort.email}}"></i></a></th>
+                            <th class="text-center"><a ng-href="" ng-click="sortUser('contact_number')">Phone Number <i class="fa fa-sort{{sort.contact_number}}"></i></a></th>
+                            <th class="text-center">Role</th>
+                            <th class="text-center"></th>
+                        </tr>
+                    </thead>
+                        <tbody>
+                            <tr ng-repeat="user in popupUsers">
+                                <td class="text-center">
+                                    <input type="checkbox" ng-model="user.isSelected" ng-change="selectUser(user)">
+                                </td>
+                                <td class="text-center">{{user.first_name}} {{user.last_name}}</td>
+                                <td class="text-center">{{user.username}}</td>
+                                <td class="text-center">{{user.designation}}</td>
+                                <td class="text-center">{{user.email}}</td>
+                                <td class="text-center">{{user.contact_number}}</td>
+                                <td class="text-center">{{user.role_name}}</td>
+                                <td class="text-center">
+                                    <a target="_blank" ng-href="/#/users/{{user.id}}">View User</a>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                </table>
+            </form>
+        </div><!--/search-tag-box-->
+
+        <div class="pull-right">
+            <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="getUsers()">
+            </pagination>
+            <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px" ng-change="getUsers()" ng-model="numPerPage" ng-options="k as v for (k,v) in page_dropdown">
+            </select>
+            <div align="right">
+                <button class="btn btn-primary mb-sm-5" ng-click="ok()">Ok</button>
+                <button class="btn btn-danger mb-sm-5" ng-click="cancel()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+</div><!--/secondary-bg-->

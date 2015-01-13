@@ -1,5 +1,5 @@
 <div role="tabpanel" class="tab-pane col-xs-12 active" id="List_Tags">
-      
+    <a href="/#/roles/create" class="btn btn-primary row">Add New Role</a>
     <div class="row mt-15">
         <div class="">
             <div class="table-responsive table-responsive-cust">
@@ -8,8 +8,6 @@
                         <tr>
                             <th class="text-center">ID</th>
                             <th class="text-center">Role Name</th>
-                            <th class="text-center">Type</th>
-                            <th class="text-center">Company Name</th>
                             <th class="text-center">Status</th>
                             <th class="text-center"></th>
                         </tr>
@@ -18,18 +16,14 @@
                         <tr ng-repeat="role in roles">
                             <td class="text-center">{{role.id}}</td>
                             <td>{{role.role_name}}</td>
-                            <td>{{role.type}}</td>
-                            <td>{{role.company.company_name}}</td>
-                            <td>
-                                
+                            <td class="text-center">
                                 <p ng-bind-html="(role.status == '1'?'<span class=\'btn btn-success\'>Active</span>':'<span class=\'btn btn-danger\'>Not Active</span>')"></p>
-                                
-                            </td>           <td class="text-center">
+                            </td>
+                            <td class="text-center">
                                 <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>
                                 <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
                             </td>
                         </tr>
-                     
                     </tbody>
                 </table>
                 <div class="pull-right">                    
