@@ -48,4 +48,8 @@ class UserGroupProjects extends \yii\db\ActiveRecord
             'assigned_date' => 'Assigned Date',
         ];
     }
+    
+    public function actDelete() {
+        return $this->delete();
+    }
 }

@@ -14,6 +14,45 @@ class ApiController extends ActiveController
     public $serializer;
     public $identity;
     public $modelClass;
+    
+    /**
+     * @inheritdoc
+     */
+    public function actions()
+    {
+        return [
+            'index' => [
+                'class' => 'yii\rest\IndexAction',
+                'modelClass' => $this->modelClass,
+                'checkAccess' => [$this, 'checkAccess'],
+            ],
+            'view' => [
+                'class' => 'yii\rest\ViewAction',
+                'modelClass' => $this->modelClass,
+                'checkAccess' => [$this, 'checkAccess'],
+            ],
+            'create' => [
+                'class' => 'yii\rest\CreateAction',
+                'modelClass' => $this->modelClass,
+                'checkAccess' => [$this, 'checkAccess'],
+                'scenario' => $this->createScenario,
+            ],
+            'update' => [
+                'class' => 'yii\rest\UpdateAction',
+                'modelClass' => $this->modelClass,
+                'checkAccess' => [$this, 'checkAccess'],
+                'scenario' => $this->updateScenario,
+            ],
+            'delete' => [
+                'class' => 'backend\models\DeleteAction',
+                'modelClass' => $this->modelClass,
+                'checkAccess' => [$this, 'checkAccess'],
+            ],
+            'options' => [
+                'class' => 'yii\rest\OptionsAction',
+            ],
+        ];
+    }
         
     public function init() {
         
@@ -79,9 +118,6 @@ class ApiController extends ActiveController
             $model = new $this->modelClass;
             
             $query = $model->find();
-            
-            if(isset($post['select']))
-               $query->select($post['select']);
             
             if(isset($post['search'])) {
                 foreach($post['search'] as $key => $val)

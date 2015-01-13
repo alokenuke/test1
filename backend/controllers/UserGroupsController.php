@@ -8,7 +8,7 @@ use yii\data\ActiveDataProvider;
  * Class TagsController
  * @package rest\versions\v1\controllers
  */
-class UserGroupsController extends ApiController
+class UsergroupsController extends ApiController
 {
     public $partialMatchFields;
         
@@ -23,14 +23,16 @@ class UserGroupsController extends ApiController
     public function actionSearch() {
         if (!$_POST) {
             
+            $_GET['expand'] = 'levels, projectIds';
+            
             $post = \Yii::$app->request->post();
             
             $model = new $this->modelClass;
             
             $query = $model->find();
             
-            if(isset($post['select']))
-               $query->select($select);
+            if(isset($post['select']['UserGroups']))
+               $query->select($post['select']['UserGroups']);
 
             if(isset($post['search'])) {
                 foreach($post['search'] as $key => $val)
@@ -59,6 +61,55 @@ class UserGroupsController extends ApiController
             throw new \yii\web\HttpException(404, 'Invalid Request');
         }
         
+    }
+    
+    public function actionAssignprojects($id) {
+        if (!$_POST) {
+            
+            $post = \Yii::$app->request->post();
+            
+            $result = [];
+            
+            if(isset($post['Projects'])) {
+                $companyId = \yii::$app->user->identity->company_id;
+                foreach($post['Projects'] as $project) {
+                    $model = new \backend\models\UserGroupProjects();
+                    $model->project_id = $project;
+                    $model->user_group_id = $id;
+                    $model->assigned_by = \yii::$app->user->identity->id;
+                    $result[] = $model->save();
+                }
+            }
+            else {
+                throw new \yii\web\HttpException(404, 'Invalid Request');
+            }
+            
+            return $result;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
+    public function actionUnassignprojects($id) {
+        if (!$_POST) {
+            
+            $post = \Yii::$app->request->post();
+            
+            $model = new \backend\models\UserGroupProjects();
+            
+            $result = 0;
+            
+            if(isset($post['Projects'])) {
+                $result = $model->deleteAll("user_group_id = :group_id and project_id in (:project_id)", ['group_id' => $id, 'project_id' => implode(",", $post['Projects'])]);
+            }
+            else {
+                throw new \yii\web\HttpException(404, 'Invalid Request');
+            }
+            
+            return $result;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
     }
     
     public function actionGetall() {

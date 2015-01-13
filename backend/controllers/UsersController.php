@@ -40,7 +40,7 @@ class UsersController extends ApiController
                     if($key=="name") {
                             $query->orwhere(['like', 'first_name', $val]);
                             $query->orwhere(['like', 'last_name', $val]);
-                    } else if( $key == "usergroups"){
+                    } else if( $key == "usergroups" && $val['id']){
                             $query->leftJoin('rel_user_levels_users rel_ul', 'rel_ul.user_id=user.id')->andWhere(["rel_ul.user_group_id" => $val['id']]);
                     }else if(is_array ($val)) {
                         if(isset($val['project']))
@@ -53,10 +53,29 @@ class UsersController extends ApiController
                             $query->andWhere([$key => $val]);
                     }
             }
+            if(isset($post['excludeUserIds'])) {
+                $query->andWhere(['not in', 'id', $post['excludeUserIds']]);
+            }
             
             $pageLimit = 20;
-            if(isset($post['sort']))
+            if(isset($post['sort'])) {
                 $_GET['sort'] = $post['sort'];
+                
+                if($post['sort'] == 'name') {
+                    $query->orderBy([
+                            'first_name' => SORT_ASC,
+                            'last_name' => SORT_ASC,
+                        ]);
+                }
+                else if( $post['sort'] == '-name'){
+                    $query->orderBy([
+                        'first_name' => SORT_DESC,
+                        'last_name' => SORT_DESC,
+                    ]); 
+                }
+            }
+            else
+                $_GET['sort'] = "-id";
             if(isset($post['page']))
                 $_GET['page'] = $post['page'];
             if(isset($post['limit']))
@@ -109,6 +128,8 @@ class UsersController extends ApiController
             $pageLimit = 20;
             if(isset($post['sort']))
                 $_GET['sort'] = $post['sort'];
+            else
+                $_GET['sort'] = "-created_date";
             if(isset($post['page']))
                 $_GET['page'] = $post['page'];
             if(isset($post['limit']))
@@ -133,24 +154,37 @@ class UsersController extends ApiController
     
     function actionMultiinsert(){
         
-        $post = Yii::$app->request->post();
-        
-        $models = array_fill ( 0 , count($post) , new $this->modelClass );
-        
-        Model::loadMultiple($models, $post);
+        $post = Yii::$app->request->post("User");
+		
+	$models = $this->loadMultiple($post);
+        $company_id = \yii::$app->user->identity->company_id;
         
         $validate = $this->validateMultiple($models);
                 
         if (!count($validate)) {
-            $count = 0;
-            foreach ($models as $item) {
+            $hasError = false;
+            foreach ($models as $key => $item) {
+                $temp_file = $item->photo;
+                $item->photo = array_pop(explode('/',$item->photo));
+                move_uploaded_file($temp_file, "userUploads/".$company_id."/userImages/".$item->photo);
                // populate and save records for each model
                 if ($item->save()) {
                     // do something here after saving
-                    $count++;
+                    $validate['User'][$key]['id'] = $item->id;
+                }
+                else {
+                    $hasError = true;
+                    Yii::$app->getResponse()->setStatusCode(422, 'Data Validation Failed.');   
+                    
+                    foreach ($item->getErrors() as $attribute => $errors) {
+                        $validate['User'][$key][$attribute] = $errors;
+                    }
                 }
             }
-            return "Success";
+            if($hasError)
+                return $validate;
+            else
+                return "Success";
         }
         
         Yii::$app->getResponse()->setStatusCode(422, 'Data Validation Failed.');               
@@ -172,4 +206,24 @@ class UsersController extends ApiController
         return $result;
     }
     
+	
+    /**
+     * Populates a set of models with the data from end user.
+     * @return boolean whether the model is successfully populated with some data.
+     */
+    public function loadMultiple($data)
+    {
+        $models = [];
+        foreach ($data as $i => $d) {
+            $models[$i] = new $this->modelClass;
+            if($models[$i]['id']>0) {
+                $existingUser = $models[$i]->find(['id' => $id, 'status' => self::STATUS_ACTIVE])->one();
+                if($existingUser)
+                    $models[$i] = $existingUser;
+            }
+            
+            $models[$i]->setAttributes($d);
+        }
+        return $models;
+    }
 }

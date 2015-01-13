@@ -54,4 +54,9 @@ class Company extends \yii\db\ActiveRecord
             'created_date' => 'Created Date',
         ];
     }
+    
+    public function actDelete() {
+        $this->company_status = 2;
+        return $this->save();
+    }
 }

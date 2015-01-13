@@ -157,4 +157,9 @@ class Tags extends \yii\db\ActiveRecord
     {
         return $this->hasOne(UserGroups::className(), ['id' => 'user_group_id']);
     }
+    
+    public function actDelete() {
+        $this->tag_status = 2;
+        return $this->save();
+    }
 }

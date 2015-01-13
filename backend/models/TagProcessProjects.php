@@ -46,4 +46,8 @@ class TagProcessProjects extends \yii\db\ActiveRecord
             'created_date' => 'Created Date',
         ];
     }
+    
+    public function actDelete() {
+        return $this->delete();
+    }
 }

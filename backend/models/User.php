@@ -24,7 +24,8 @@ use yii\web\IdentityInterface;
  */
 class User extends ActiveRecord implements IdentityInterface
 {
-    const STATUS_DELETED = 0;
+    const STATUS_DELETED = 2;
+    const STATUS_NOTACTIVE = 0;
     const STATUS_ACTIVE = 1;
     const ROLE_USER = 0;
     public $auth_key = "";
@@ -60,12 +61,18 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             [['first_name', 'last_name', 'email', 'username', 'role'], 'required'],
-            ['email', 'email'],
+            ['email', 'email','message'=>'Invalid email'],
+            [['allow_be'], 'integer'],
+            [['username','email'], 'unique','message'=>'Already exist'],            
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
-            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
-
+            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_NOTACTIVE, self::STATUS_DELETED]],
+            ['photo','string'],
+            ['company_id', 'default', 'value' => \yii::$app->user->identity->company_id],
+            ['created_date', 'default', 'value' => date("Y-m-d H:i:s")],
             ['role', 'default', 'value' => self::ROLE_USER],
+            ['created_date', 'default', 'value' => date("Y-m-d H:i:s")],
             ['role', 'in', 'range' => self::getRoleIds()],
+            [['rec_notification', 'photo', 'contact_number'], 'safe']
         ];
     }
     
@@ -120,6 +127,17 @@ class User extends ActiveRecord implements IdentityInterface
             }
         }
     }
+    
+    // default scope to check company_id
+    public static function find()
+    {
+        if(isset(\yii::$app->user->identity))
+        {
+            return parent::find()->where(['user.company_id' => \yii::$app->user->identity->company_id])->andWhere(['<>', 'user.status', self::STATUS_DELETED]);
+        }
+        else
+            return parent::find();
+    }
 
     /**
      * Finds user by username
@@ -160,13 +178,14 @@ class User extends ActiveRecord implements IdentityInterface
             'last_name',
             'email',
             'role',
+            'photo',
             'username',
             'contact_number',
             'designation',
             'company_id',
             'password',
             'rec_notification',
-            'allow_ba',
+            'allow_be',
             'status',
             'created_date',
             'modified_date',
@@ -181,14 +200,20 @@ class User extends ActiveRecord implements IdentityInterface
             'first_name',
             'last_name',
             'email',
+			'role',
+            'role_name' => function() {
+                $role = $this->roles;
+                if($role)
+                    return $role->role_name;
+            },            'email',
             'username',
             'contact_number',
             'designation',
             'company_id',
             'rec_notification',
-            'allow_ba',
+            'allow_be',
             'status',
-        ];
+            'photo',        ];
     }
 
     /**
@@ -292,5 +317,16 @@ class User extends ActiveRecord implements IdentityInterface
     public function getUserGroupIds()
     {
         return $this->hasMany(RelUserLevelsUsers::className(), ['id' => 'user_group_id']);
+    }
+
+    public function getRoles()
+    {
+        return $this->hasOne(Roles::className(), ['id' => 'role']);
+    }
+    
+    public function actDelete() {
+        $this->status = 2;
+        $return = $this->save(FALSE);
+        return $return;
     }
 }

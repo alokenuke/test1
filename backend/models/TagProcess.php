@@ -70,4 +70,9 @@ class TagProcess extends \yii\db\ActiveRecord
     {
         return $this->hasMany(TagProcessProjects::className(), ['tag_process_id' => 'id']);
     }
+    
+    public function actDelete() {
+        $this->status = 2;
+        return $this->save();
+    }
 }

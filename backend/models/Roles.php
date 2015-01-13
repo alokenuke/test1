@@ -97,4 +97,9 @@ class Roles extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Company::className(), ['id' => 'company_id']);
     }
+    
+    public function actDelete() {
+        $this->status = 2;
+        return $this->save();
+    }
 }

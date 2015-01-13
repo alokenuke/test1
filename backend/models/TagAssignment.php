@@ -54,4 +54,9 @@ class TagAssignment extends \yii\db\ActiveRecord
             'created_on' => 'Created On',
         ];
     }
+    
+    public function actDelete() {
+        $this->status = 2;
+        return $this->save();
+    }
 }

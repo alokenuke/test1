@@ -39,7 +39,7 @@ class RelUserLevelsUsers extends \yii\db\ActiveRecord
     
     public static function find()
     {
-        $query = parent::find()->where(['company_id' => \yii::$app->user->identity->company_id]);
+        $query = parent::find()->where(['rel_user_levels_users.company_id' => \yii::$app->user->identity->company_id]);
         
         return $query;
     }
@@ -88,4 +88,7 @@ class RelUserLevelsUsers extends \yii\db\ActiveRecord
         return $this->hasOne(UserGroups::className(), ['user_group_id' => 'id']);
     }
     
+    public function actDelete() {
+        return $this->delete();
+    }
 }

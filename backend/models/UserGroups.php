@@ -20,6 +20,8 @@ use Yii;
  */
 class UserGroups extends \yii\db\ActiveRecord
 {
+    const STATUS_DELETED = 0;
+    const STATUS_ACTIVE = 1;
     /**
      * @inheritdoc
      */
@@ -34,16 +36,27 @@ class UserGroups extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['company_id', 'group_name', 'group_notes', 'group_status', 'created_by', 'created_date'], 'required'],
+            [['group_name'], 'required'],
             [['company_id', 'group_status', 'created_by'], 'integer'],
+            ['group_status', 'default', 'value' => self::STATUS_ACTIVE],
+            ['company_id', 'default', 'value' => \yii::$app->user->identity->company_id],
+            ['created_by', 'default', 'value' => \yii::$app->user->id],
+            ['created_date', 'default', 'value' => date("Y-m-d H:i:s")],
             [['created_date', 'updated_date'], 'safe'],
             [['group_name', 'group_notes'], 'string', 'max' => 256]
         ];
     }
         
     public static function find()
-    {
-        $query = parent::find()->where(['company_id' => \yii::$app->user->identity->company_id, 'group_status' => 1])->joinWith("projectIds");
+    {   
+        $post = \Yii::$app->request->post();
+        
+        $select = ['user_groups.id', 'user_groups.group_name'];
+
+        if(isset($post['select']['UserGroups']))
+           $select = $post['select']['UserGroups'];
+
+        $query = parent::find()->select($select)->where(['user_groups.company_id' => \yii::$app->user->identity->company_id, 'group_status' => 1])->joinWith("projectIds");
         
         return $query;
     }
@@ -52,11 +65,15 @@ class UserGroups extends \yii\db\ActiveRecord
     {
         return [
             'id',
-            'company_id',
             'group_name',
             'group_status',
+        ];
+    }
+    
+    public function extraFields()
+    {
+        return [
             'levels',
-            'created_by',
             'projectIds'
         ];
     }
@@ -97,5 +114,10 @@ class UserGroups extends \yii\db\ActiveRecord
     public function getLevels()
     {
         return $this->hasMany(UserLevels::className(), ['user_group_id' => 'id']);
+    }
+    
+    public function actDelete() {
+        $this->group_status = 2;
+        return $this->save();
     }
 }

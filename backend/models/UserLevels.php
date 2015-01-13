@@ -17,6 +17,9 @@ use Yii;
  */
 class UserLevels extends \yii\db\ActiveRecord
 {
+    const STATUS_DELETED = 0;
+    const STATUS_ACTIVE = 1;
+    
     /**
      * @inheritdoc
      */
@@ -31,8 +34,11 @@ class UserLevels extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['company_id', 'user_group_id', 'level_name', 'status', 'created_by'], 'required'],
+            [['user_group_id', 'level_name'], 'required'],
             [['company_id', 'user_group_id', 'status', 'created_by'], 'integer'],
+            ['status', 'default', 'value' => self::STATUS_ACTIVE],
+            ['company_id', 'default', 'value' => \yii::$app->user->identity->company_id],
+            ['created_by', 'default', 'value' => \yii::$app->user->id],
             [['created_date'], 'safe'],
             [['level_name'], 'string', 'max' => 128]
         ];
@@ -40,7 +46,7 @@ class UserLevels extends \yii\db\ActiveRecord
     
     public static function find()
     {
-        $query = parent::find()->where(['company_id' => \yii::$app->user->identity->company_id, 'status' => 1]);
+        $query = parent::find()->where(['user_levels.company_id' => \yii::$app->user->identity->company_id, 'status' => 1]);
         
         return $query;
     }
@@ -57,9 +63,15 @@ class UserLevels extends \yii\db\ActiveRecord
             'company_id',
             'user_group_id',
             'level_name',
-            'relateUsers',
             'status',
             'created_date'
+        ];
+    }
+    
+    public function extraFields()
+    {
+        return [
+            'relateUsers',
         ];
     }
 
@@ -85,5 +97,10 @@ class UserLevels extends \yii\db\ActiveRecord
     public function getRelateUsers()
     {
         return $this->hasMany(RelUserLevelsUsers::className(), ['user_level_id' => 'id']);
+    }
+    
+    public function actDelete() {
+        $this->status = 2;
+        return $this->save();
     }
 }

@@ -41,16 +41,120 @@ class ProjectsController extends ApiController
                             $query->where([$key => $val]);
                     }
             }
+                       
+            if(isset($post['excludeProjects'])) {
+                $projectIds = [];
+                foreach($post['excludeProjects'] as $project)
+                    $projectIds[] = $project['id'];
+                
+                $query->andWhere(['not in', 'id', $projectIds]);
+            }
             
+            $pageLimit = 20;
             if(isset($post['sort']))
                 $_GET['sort'] = $post['sort'];
             if(isset($post['page']))
                 $_GET['page'] = $post['page'];
+            if(isset($post['limit']))
+                $pageLimit = $post['limit'];
             
             try {
                 $provider = new ActiveDataProvider ([
-                    'query' => $query
+                    'query' => $query,
+                    'pagination'=>array(
+                        'pageSize'=>$pageLimit
+                    ),                        
                 ]);
+            } catch (Exception $ex) {
+                throw new \yii\web\HttpException(500, 'Internal server error');
+            }
+            return $provider;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
+    public function actionUsergroup($id) {
+        if (!$_POST) {
+            
+            $post = \Yii::$app->request->post();
+            
+            $model = new $this->modelClass;
+            
+            $query = $model->find()
+                    ->leftJoin('user_group_projects group_projects', 'group_projects.project_id=projects.id')->andWhere(["group_projects.user_group_id" => $id]);
+            
+            if(isset($post['search'])) {
+                foreach($post['search'] as $key => $val)
+                    if(isset($val)) {
+                        if(in_array($key, $this->partialMatchFields))
+                            $query->andWhere(['like', $key, $val]);
+                        else
+                            $query->where([$key => $val]);
+                    }
+            }
+            
+            $pageLimit = 20;
+            if(isset($post['sort']))
+                $_GET['sort'] = $post['sort'];
+            if(isset($post['page']))
+                $_GET['page'] = $post['page'];
+            if(isset($post['limit']))
+                $pageLimit = $post['limit'];
+            
+            try {
+                $provider = new ActiveDataProvider ([
+                    'query' => $query,
+                    'pagination'=>array(
+                        'pageSize'=>$pageLimit
+                    ),
+                ]);
+                
+            } catch (Exception $ex) {
+                throw new \yii\web\HttpException(500, 'Internal server error');
+            }
+            return $provider;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
+    public function actionTagitems($id) {
+        if (!$_POST) {
+            
+            $post = \Yii::$app->request->post();
+            
+            $model = new $this->modelClass;
+            
+            $query = $model->find()
+                    ->leftJoin('tag_items_projects item_projects', 'item_projects.project_id=projects.id')->andWhere(["item_projects.item_id" => $id]);
+            
+            if(isset($post['search'])) {
+                foreach($post['search'] as $key => $val)
+                    if(isset($val)) {
+                        if(in_array($key, $this->partialMatchFields))
+                            $query->andWhere(['like', $key, $val]);
+                        else
+                            $query->where([$key => $val]);
+                    }
+            }
+            
+            $pageLimit = 20;
+            if(isset($post['sort']))
+                $_GET['sort'] = $post['sort'];
+            if(isset($post['page']))
+                $_GET['page'] = $post['page'];
+            if(isset($post['limit']))
+                $pageLimit = $post['limit'];
+            
+            try {
+                $provider = new ActiveDataProvider ([
+                    'query' => $query,
+                    'pagination'=>array(
+                        'pageSize'=>$pageLimit
+                    ),
+                ]);
+                
             } catch (Exception $ex) {
                 throw new \yii\web\HttpException(500, 'Internal server error');
             }

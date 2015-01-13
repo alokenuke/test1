@@ -72,4 +72,9 @@ class ProjectLevel extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Tags::className(), ['project_level_id' => 'id']);
     }
+    
+    public function actDelete() {
+        $this->status = 2;
+        return $this->save();
+    }
 }

@@ -60,6 +60,59 @@ class ItemsController extends ApiController
         }
     }
     
+    public function actionAssignprojects($id) {
+        if (!$_POST) {
+            
+            $post = \Yii::$app->request->post();
+            
+            $result = [];
+            
+            if(isset($post['Projects'])) {
+                foreach($post['Projects'] as $project) {
+                    $model = new \backend\models\ItemsProjects();
+                    $model->project_id = $project;
+                    $model->item_id = $id;
+                    $model->created_by = \yii::$app->user->identity->id;
+                    $result[] = $model->save();
+                }
+            }
+            else {
+                throw new \yii\web\HttpException(404, 'Invalid Request');
+            }
+            
+            return $result;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
+    public function actionUnassignprojects($id) {
+        if (!$_POST) {
+            
+            $post = \Yii::$app->request->post();
+            
+            $model = new \backend\models\ItemsProjects();
+            
+            $result = 0;
+            
+            if(isset($post['Projects'])) {
+                $result = $model->deleteAll("item_id = :item_id and project_id in (:project_id)", ['item_id' => $id, 'project_id' => implode(",", $post['Projects'])]);
+            }
+            else {
+                throw new \yii\web\HttpException(404, 'Invalid Request');
+            }
+            
+            return $result;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
+    public function actionGetItems() {
+        $result = static::getMenuRecrusive(0);
+        return $result;
+    }
+    
     public function actionGetall() {
         return parent::actionGetall();
     }

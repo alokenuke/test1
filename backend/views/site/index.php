@@ -1,5 +1,5 @@
 <div ng-controller="AlertController">
-    <div ng-repeat="alert in alerts" class="alert alert-danger alert-{{alert.type}}" data-dismiss="alert" type="{{alert.type}}" close="closeAlert($index)">
+    <div ng-repeat="alert in alerts" class="alert alert-{{(alert.type=='error'?'danger':alert.type)}}" data-dismiss="alert" type="{{alert.type}}" close="closeAlert($index)">
         <a href="" class="close" data-dismiss="alert">&times;</a>
         <strong>{{alert.type | titlecase}}!</strong> {{alert.msg}}
     </div>

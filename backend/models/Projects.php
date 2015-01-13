@@ -133,4 +133,9 @@ class Projects extends \yii\db\ActiveRecord
             'modified_date' => 'Modified Date',
         ];
     }
+    
+    public function actDelete() {
+        $this->project_status = 2;
+        return $this->save();
+    }
 }
