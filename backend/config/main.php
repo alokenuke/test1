@@ -28,7 +28,7 @@ return [
             ]
         ],
         'user' => [
-            'identityClass' => 'common\models\User',
+            'identityClass' => 'backend\models\User',
             'enableAutoLogin' => true,
         ],
         'log' => [
@@ -45,7 +45,7 @@ return [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
-		    ['class' => 'yii\rest\UrlRule', 'controller' => 'api',  'pluralize'=>false, 'extraPatterns' => ['GET search' => 'search', 'GET mod' => 'mod']],
+		    ['class' => 'yii\rest\UrlRule', 'controller' => ['api', 'users', 'userlevels', 'usergroups', 'roles', 'items'], 'pluralize'=>false, 'extraPatterns' => ['GET search' => 'search']],
 		    'api/fields' => 'api/fields',
                     'dashboard' => 'site/dashboard',
                     '<controller>/<action>' => '<controller>/<action>',
