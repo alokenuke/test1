@@ -115,7 +115,7 @@
                                 <span class="label" ng-class="{'label-success': user.allow_be, 'label-danger': !user.allow_be}">{{user.allow_be?"Yes":"No"}}</span>
                             </td>
                             <td class="text-center">
-                                <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>
+								<a href="/#/users/update/{{user.id}}" class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></a>
                                 <button type="button" ng-confirm-click="Are you sure to remove this user?" title="Click to remove." ng-click="removeUser(user, $index)"><i class="fa fa-trash"></i></button>
                             </td>
                         </tr>

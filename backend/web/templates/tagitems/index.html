@@ -100,7 +100,7 @@
                                                     <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="remove(this)"><span class="fa fa-trash"></span></a>
                                                     <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newSubItem(item, 'item_'+item.parent_id)" style="margin-right: 8px;"><span class="fa fa-plus"></span></a>
                                                     <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(item)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
-                                                    <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="linkProcess(this)" style="margin-right: 8px;">Process Flow: Construction Type <i class="fa fa-chevron-right"></i> Process A</a>
+                                                    <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="linkProcess(item)" style="margin-right: 8px;">Assign Process Flow</a>
                                                 </div>
                                                 <div ng-show="item.editing">
                                                     <form class="form-inline" role="form" ng-submit="saveItem(item, item.tempTitle);">

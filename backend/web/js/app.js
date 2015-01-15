@@ -41,6 +41,16 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
             controller: 'SiteIndex',
         })
         
+        .when('/change-password', {
+            templateUrl: path+'site/change-password.html',
+			controller: 'ChangePassword',
+        })
+        
+        .when('/', {
+            templateUrl: path+'dashboard.html',
+            controller: 'SiteIndex',
+        })
+        
         .when('/roles', {
             templateUrl: path+'roles/index.html',
             controller: 'RolesIndex'
@@ -49,6 +59,10 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
         .when('/roles/create', {
             templateUrl: path+'roles/create.html',
             controller: 'RolesAdd'
+        })
+        .when('/roles/update/:id', {
+            templateUrl: path+'roles/create.html',
+            controller: 'RolesUpdate'
         })
         
         .when('/users', {
@@ -59,6 +73,11 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
         .when('/users/create', {
             templateUrl: path+'users/create.html',
             controller: 'UserCreate'
+        })
+
+		.when('/users/update/:id', {
+            templateUrl: path+'users/update.html',
+            controller: 'UserUpdate',
         })
 
         .when('/user-groups', {
@@ -186,6 +205,33 @@ app.controller('SiteIndex', ['$scope', 'rest', 'breadcrumbsService', '$http', fu
     rest.models().success(function (data) {
         $scope.projects = data.items;
     })
+}]);
+
+
+app.controller('ChangePassword', ['$scope', 'rest', 'breadcrumbsService', '$http', 'alertService', function ($scope, rest, breadcrumbsService, $http, alertService) {
+        
+    rest.path = "site";
+    
+    breadcrumbsService.setTitle("Change Password");
+    breadcrumbsService.clearAll();
+    breadcrumbsService.add("", "Home");
+    breadcrumbsService.add("", "Settings");
+    breadcrumbsService.add("", "Change Password");
+    
+    $scope.model = {};
+    $scope.serverError = {};
+    $scope.change = function(data){
+        $http.post('/users/change-password',{ChangePassword:$scope.model}).success(function() {
+            alertService.clearAll();
+            alertService.add("success", "Password changed successfully.");
+        }).error(function(data){ 
+            alertService.clearAll();
+            angular.forEach(data, function(value) {
+                $scope.serverError[value.field] = value.message;
+            });
+        });
+    }
+    
 }]);
 
 app.controller('error', ['$scope', function ($scope) {

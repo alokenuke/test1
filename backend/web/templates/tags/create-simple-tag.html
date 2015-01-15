@@ -1,269 +1,280 @@
 <div class="col-xs-12">
     <button class="btn btn-primary btn-lg mr-10 mb-sm-5" ng-click="createSimilarTagModal()">Create Similar Tag From</button>
-    <button class="btn btn-primary btn-lg">Copy Last Created Tag</button>
+    <button class="btn btn-primary btn-lg" ng-click="copyLastTag()">Copy Last Created Tag</button>
 </div>
-<script type="text/ng-template" id="createSimilarTagModal.html">
-    <div class="modal-header">
-        <h3 class="modal-title">I'm a modal!</h3>
-    </div>
-    <div class="modal-body">
-        <ul>
-            <li ng-repeat="item in data.tags">
-                <a ng-click="selected.item = item">{{ item }}</a>
-            </li>
-        </ul>
-        Selected: <b>{{ selected.item }}</b>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" ng-click="ok()">OK</button>
-        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
-    </div>
-</script>
 <div class="col-xs-12 secondary-bg mt-20">
-    <div class="col-xs-12 shadow-box">
-        <form id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form" ng-class="{'ng-hide':showSearchBox}">
-        
-        <div class="row">
-            <div class="col-md-6 col-lg-5">
-                <div class="form-group">
-                    <label class="col-sm-4 control-label text-right">Project Name :</label>
-                    <div class="col-sm-6 multi-level">
-                        <ui-select ng-model="search.project"
-                                   theme="bootstrap" class='last-child'>
-                          <ui-select-match placeholder="Select a project...">{{$select.selected.project_name}}</ui-select-match>
-                          <ui-select-choices repeat="project in projects | filter: $select.search"
-                                   refresh-delay="0">
-                              <div ng-bind-html="project.project_name" ng-click="updateSelectBox('projectlevels', project.id, 0, 0)"></div>
-                          </ui-select-choices>
-                        </ui-select>
-                        <input ng-model="search.project.id" name="search.project_id" type="hidden" />
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-7">
-                <div class="form-group">
-                    <label class="col-sm-4 col-lg-3 control-label text-right">Project Level :</label>
-                    <div class="col-sm-8 col-lg-9 multi-level">
-                        <ui-select ng-repeat="childlevels in projectlevels" ng-model="search.childlevels[$index]"
-                                   theme="bootstrap" class="{{((projectlevels.length-1)===$index?'last-child ':'')}}">
-                          <ui-select-match placeholder="Select a level...">{{$select.selected.level_name}}</ui-select-match>
-                          <ui-select-choices repeat="level in childlevels | filter: $select.search"
-                                   refresh-delay="0">
-                              <div ng-bind-html="level.level_name" ng-click="updateSelectBox('projectlevels', search.project.id, ($parent.$index+1), level.id)"></div>
-                          </ui-select-choices>
-                        </ui-select>
-                        <div ng-hide="projectlevels.length && search.project.id">
-                            <a ng-href="/#/projects/levels/{{search.project.id}}" ng-hide="(projectlevels.length && search.project.id) || !search.project.id">Click to manage project levels.</a>
-                            <span ng-hide="search.project.id">Select a project first</span>
-                        </div>
-                        <input ng-model="search.childlevels[$index].id" name="search.project_level_id" type="hidden" />
-                    </div>
-                </div>
-            </div>
-        </div><!--/row-->
-        
-        <div class="row">
-            <div class="col-md-6 col-lg-5">
-                <div class="form-group">
-                    <label class="col-sm-4 control-label text-right">Item:</label>
-                    <div class="col-sm-6 multi-level">
-                        <ui-select ng-repeat="item in items"  ng-model="search.item[$index]"
-                                   theme="bootstrap" ng-disabled="disabled" class="{{((items.length-1)===$index?'last-child ':'')}}">
-                          <ui-select-match placeholder="Select item">{{$select.selected.item_name}}</ui-select-match>
-                          <ui-select-choices repeat="i in item | filter: $select.search"
-                                   refresh-delay="0">
-                              <div ng-bind-html="i.item_name" ng-click="updateSelectBox('items', search.project.id, $parent.$index, i.id)"></div>
-                          </ui-select-choices>
-                        </ui-select>
-                        <div ng-hide="items.length && search.project.id">
-                            <a ng-href="/#/tagitems/project/{{search.project.id}}" ng-hide="(items.length && search.project.id) || !search.project.id">Click to manage project items.</a>
-                            <span ng-hide="search.project.id">Select a project first</span>
+    <form id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form"  ng-submit="saveTagDetails()">
+        <div class="col-xs-12 shadow-box">        
+            <div class="row">
+                <div class="col-md-6 col-lg-5">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label text-right">Project Name :</label>
+                        <div class="col-sm-6 multi-level">
+                            <ui-select ng-model="search.project"
+                                       theme="bootstrap" class='last-child'>
+                              <ui-select-match placeholder="Select a project...">{{$select.selected.project_name}}</ui-select-match>
+                              <ui-select-choices repeat="project in projects | filter: $select.search"
+                                       refresh-delay="0">
+                                  <div ng-bind-html="project.project_name" ng-click="updateSelectBox('projectlevels', project.id, 0, 0)"></div>
+                              </ui-select-choices>
+                            </ui-select>
+                            <input ng-model="tagDetails.project_id" type="hidden" ng-required="true" />
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6 col-lg-7">
-                <div class="form-group">
-                    <label class="col-sm-4 col-lg-3 control-label text-right">Process Flow:</label>
-                    <div class="col-sm-6 multi-level">
-                        <ui-select ng-repeat="process in processes"  ng-model="search.process[$index]"
-                                   theme="bootstrap" ng-disabled="disabled" class="{{((processes.length-1)===$index?'last-child ':'')}}">
-                          <ui-select-match placeholder="Select process">{{$select.selected.process_name}}</ui-select-match>
-                          <ui-select-choices repeat="p in process | filter: $select.search"
-                                   refresh-delay="0">
-                              <div ng-bind-html="p.process_name" ng-click="updateSelectBox('processes', search.project.id, $parent.$index, p.id)"></div>
-                          </ui-select-choices>
-                        </ui-select>
-                        <div ng-hide="processes.length && search.project.id">
-                            <a ng-href="/#/tag-process-flow/project/{{search.project.id}}" ng-hide="(processes.length && search.project.id) || !search.project.id">Click to manage process.</a>
-                            <span ng-hide="search.project.id">Select a project first</span>
+                <div class="col-md-6 col-lg-7">
+                    <div class="form-group">
+                        <label class="col-sm-4 col-lg-3 control-label text-right">Project Level :</label>
+                        <div class="col-sm-8 col-lg-9 multi-level">
+                            <ui-select ng-repeat="childlevels in projectlevels" ng-model="search.childlevels[$index]"
+                                       theme="bootstrap" class="{{((projectlevels.length-1)===$index?'last-child ':'')}}">
+                              <ui-select-match placeholder="Select level...">{{$select.selected.level_name}}</ui-select-match>
+                              <ui-select-choices repeat="level in childlevels | filter: $select.search"
+                                       refresh-delay="0">
+                                  <div ng-bind-html="level.level_name" ng-click="updateSelectBox('projectlevels', tagDetails.project_id, ($parent.$index+1), level.id)"></div>
+                              </ui-select-choices>
+                            </ui-select>
+                            <span ng-if="!(projectlevels.length && tagDetails.project_id)">
+                                <a ng-href="/#/projects/levels/{{tagDetails.project_id}}" ng-if="!((projectlevels.length && tagDetails.project_id) || !tagDetails.project_id)">Click to manage project levels.</a>
+                                <span ng-if="!tagDetails.project_id">Select a project first</span>
+                            </span>
+                            <input ng-model="tagDetails.project_level_id" name="project_level_id" type="hidden" ng-required="true" />
                         </div>
                     </div>
                 </div>
-            </div>
-        </div><!--/row-->
-        
-        <div class="row">
-            <div class="col-md-6 col-lg-5">
-                <div class="form-group">
-                    <label class="col-sm-4 control-label text-right">User Group :</label>
-                    <div class="col-sm-6 multi-level">
-                        <ui-select ng-model="search.usergroup"
-                                   theme="bootstrap" class="last-child" ng-change="getUserLevel()" ng-hide="!usergroups.length">
-                          <ui-select-match placeholder="Select a group...">{{$select.selected.group_name}}</ui-select-match>
-                          <ui-select-choices repeat="usergroup in usergroups | filter: $select.search"
-                                   refresh-delay="0">
-                              <div ng-bind-html="usergroup.group_name"></div>
-                          </ui-select-choices>
-                          <a ng-href="/#/userGroups/project/{{search.project.id}}" ng-hide="(usergroups.length && search.project.id) || !search.project.id">Click to manage project levels.</a>
-                        </ui-select>
-                        <div ng-hide="usergroups.length && search.project.id">
-                            <a ng-href="/#/user-groups/project/{{search.project.id}}" ng-hide="(usergroups.length && search.project.id) || !search.project.id">Click to manage user groups.</a>
-                            <span ng-hide="search.project.id">Select a project first</span>
+            </div><!--/row-->
+
+            <div class="row">
+                <div class="col-md-6 col-lg-5">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label text-right">Item:</label>
+                        <div class="col-sm-6 multi-level">
+                            <ui-select ng-repeat="item in items"  ng-model="search.item[$index]"
+                                       theme="bootstrap" ng-disabled="disabled" class="{{((items.length-1)===$index?'last-child ':'')}}" ng-if="(items.length && tagDetails.project_id)">
+                              <ui-select-match placeholder="Select item {{$index==0?'Group':$index==1?'Type':'Sub Type'}}">{{$select.selected.item_name}}</ui-select-match>
+                              <ui-select-choices repeat="i in item | filter: $select.search"
+                                       refresh-delay="0">
+                                  <div ng-bind-html="i.item_name" ng-click="updateSelectBox('items', tagDetails.project_id, $parent.$index, i.id)"></div>
+                              </ui-select-choices>
+                            </ui-select>
+                            <span ng-if="!(items.length && tagDetails.project_id)">
+                                <a ng-href="/#/tagitems" ng-hide="(items.length && tagDetails.project_id) || !tagDetails.project_id">Click to manage items.</a>
+                                <span ng-hide="tagDetails.project_id">Select a project first</span>
+                            </span>
+                            <input ng-model="tagDetails.tag_item_id" type="hidden" ng-required="true" />
                         </div>
-                        <input ng-model="search.usergroup.id" name="search.user_group_id" type="hidden" />
                     </div>
                 </div>
-            </div>
-        </div><!--/row-->
-    </form>
-    </div><!--/shadow-box-->
-    <div class="slide" ng-class="{'ng-hide':levels.length<=0}">
-        <div class="wrapper mt-35">
-           <div class="table-responsive table-responsive-cust" style="max-height: 400px;overflow:auto;">
-               <form class="form-horizontal-typ1">
-                   <table class="table table-bordered">
+                <div class="col-md-6 col-lg-7">
+                    <div class="form-group">
+                        <label class="col-sm-4 col-lg-3 control-label text-right">Process Flow:</label>
+                        <div class="col-sm-6 multi-level">
+                            <ui-select ng-repeat="process in processes"  ng-model="search.process[$index]"
+                                       theme="bootstrap" ng-disabled="disabled" class="{{((processes.length-1)===$index?'last-child ':'')}}" ng-if="(processes.length && tagDetails.project_id)">
+                              <ui-select-match placeholder="Select process {{$index==0?'Type':'Flow'}}">{{$select.selected.process_name}}</ui-select-match>
+                              <ui-select-choices repeat="p in process | filter: $select.search"
+                                       refresh-delay="0">
+                                  <div ng-bind-html="p.process_name" ng-click="updateSelectBox('processes', tagDetails.project_id, $parent.$index, p.id)"></div>
+                              </ui-select-choices>
+                            </ui-select>
+                            
+                            <span ng-if="!(processes.length && tagDetails.project_id)">
+                                <a ng-href="/#/tag-process-flow" ng-hide="(processes.length && tagDetails.project_id) || !tagDetails.project_id">Click to manage process.</a>
+                                <span ng-hide="tagDetails.project_id">Select a project first</span>
+                            </span>
+                            <span ng-if="(processes.length && tagDetails.project_id && search.process[0] && !search.item[1])">Select an item type first</span>
+                            <input ng-model="tagDetails.tag_process_flow_id" type="hidden" ng-required="true" />
+                        </div>
+                    </div>
+                </div>
+            </div><!--/row-->
+
+            <div class="row">
+                <div class="col-md-6 col-lg-5">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label text-right">User Group :</label>
+                        <div class="col-sm-6 multi-level">
+                            <ui-select ng-model="search.usergroup"
+                                       theme="bootstrap" class="last-child" ng-change="getUserLevel()" ng-hide="!(usergroups.length && tagDetails.project_id)">
+                                <ui-select-match placeholder="Select a group...">{{$select.selected.group_name}}</ui-select-match>
+                                <ui-select-choices repeat="usergroup in usergroups | filter: $select.search"
+                                         refresh-delay="0">
+                                    <div ng-bind-html="usergroup.group_name"></div>
+                                </ui-select-choices>
+                            </ui-select>
+                            <span ng-if="!(usergroups.length && tagDetails.project_id)">
+                                <a ng-href="/#/user-groups" ng-hide="(usergroups.length && tagDetails.project_id) || !tagDetails.project_id">Click to manage user groups.</a>
+                                <span ng-hide="tagDetails.project_id">Select a project first</span>
+                            </span>
+                            <input ng-model="tagDetails.user_group_id" type="hidden" ng-required="true" />
+                        </div>
+                    </div>
+                </div>
+            </div><!--/row-->
+        </div><!--/shadow-box-->
+        <div class="slide" ng-class="{'ng-hide':levels.length<=0}">
+            <div class="wrapper mt-35 shadow-box">
+               <div class="table-responsive table-responsive-cust">
+                   <div class="form-horizontal-typ1" style="max-height: 400px;overflow:auto;">
+                       <table class="table table-bordered">
+                           <thead>
+                               <tr>
+                                   <th class="text-center" rowspan="2">S.No</th>
+                                   <th class="text-center" rowspan="2">User Level</th>
+                                   <th class="text-center" rowspan="2">
+                                       <input type="checkbox" ng-model="selectAllLevelUsers" ng-click="selectAllLevels($event)">
+                                   </th>
+                                   <th class="text-center" rowspan="2">From Task Process <a tooltip-html-unsafe="{{tooltip.from_task_process}}" class="fa fa-question-circle"></a></th>
+                                   <th class="text-center" rowspan="2">To Task Process <a tooltip-html-unsafe="{{tooltip.to_task_process}}" class="fa fa-question-circle"></a></th>
+                                   <th class="text-center" rowspan="2">Mandatory <a tooltip-html-unsafe="{{tooltip.mandatory}}" class="fa fa-question-circle"></a></th>
+                                   <th class="text-center"colspan="2">Email Notification <a tooltip-html-unsafe="{{tooltip.email_notification}}" class="fa fa-question-circle"></a></th> 
+                               </tr>
+                               <tr>
+                                   <th class="text-center" style="">Status</th>
+                                   <th class="text-center">Frequency</th>
+                               </tr>
+                           </thead>
+                            <tbody>
+                                <tr ng-repeat-start="level in levels" >
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <td class="text-center">{{level.level_name}}</td>
+                                    <td class="text-center">
+                                        <input type="checkbox" ng-model="level.isSelected" checkbox-all="level.relateUsers">
+                                    </td>
+                                    <td class="text-center" colspan="5">
+                                    </td>
+                                </tr>
+                                <tr ng-repeat="relateUser in level.relateUsers" ng-if="relateUser.users!=null" ng-repeat-end>
+                                     <td class="text-center"></td>
+                                     <td class="text-center"></td>
+                                     <td class="text-center">
+                                         <div class="checkbox">
+                                             <label>
+                                                 <input type="checkbox" ng-model="relateUser.isSelected" class="checkUserLevel">
+                                                  {{relateUser.users.first_name}} {{relateUser.users.last_name}}<br /><small>{{relateUser.users.designation?'('+relateUser.users.designation+')':''}}</small>
+                                             </label>
+                                         </div>
+                                     </td>
+                                     <td class="text-center">
+                                        <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.stage_from[relateUser.users.id]">
+                                             <ui-select-match placeholder="No task selected">{{$select.selected.process_name}}</ui-select-match>
+                                             <ui-select-choices repeat="stage in process_stages | filter: $select.search"
+                                                      refresh-delay="0">
+                                                 <div ng-bind-html="stage.process_name"></div>
+                                             </ui-select-choices>
+                                        </ui-select>
+                                     </td>
+                                     <td class="text-center">
+                                         <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.stage_to[relateUser.users.id]">
+                                             <ui-select-match placeholder="No task selected">{{$select.selected.process_name}}</ui-select-match>
+                                             <ui-select-choices repeat="stage in process_stages | filter: $select.search"
+                                                      refresh-delay="0">
+                                                 <div ng-bind-html="stage.process_name"></div>
+                                             </ui-select-choices>
+                                           </ui-select>
+                                     </td>
+                                     <td class="text-center">
+                                         <div class="checkbox">
+                                             <label>
+                                                 <input type="checkbox" ng-model="search.mandatory[relateUser.users.id]"> &nbsp;
+                                             </label>
+                                         </div>
+                                     </td>
+                                     <td class="text-center" style="width: 200px;">
+                                         <div class="dropdown">
+                                            <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.notification_status[relateUser.users.id]" multiple style="width: 100%;">
+                                                <ui-select-match placeholder="No task selected">{{$item.process_name}}</ui-select-match>
+                                                <ui-select-choices repeat="stage in process_stages | filter: $select.search"
+                                                         refresh-delay="0">
+                                                    <div ng-bind-html="stage.process_name"></div>
+                                                </ui-select-choices>
+                                           </ui-select>
+                                         </div>
+                                     </td>
+                                     <td class="text-center" style="width: 200px;">
+                                         <div class="dropdown">
+                                            <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.notification_frequency[relateUser.users.id]" style="width: 100%;">
+                                                <ui-select-match placeholder="Select status">{{$select.selected.name}}</ui-select-match>
+                                                <ui-select-choices repeat="frequency in noti_frequency | filter: $select.search"
+                                                         refresh-delay="0">
+                                                    <div ng-bind-html="frequency.name"></div>
+                                                </ui-select-choices>
+                                           </ui-select>
+                                        </div>
+                                     </td>
+                                 </tr>
+                                </tbody>
+                       </table>
+                   </div>
+               </div>
+           </div><!--/row-->
+           <div class="wrapper mt-20">
+               <div class="tag-btn-wrapper row">
+                   <div class="col-sm-5 pull-right ">
+                        <label class="control-label col-sm-8 col-lg-9 text-right">No. of Tags to Create :</label>
+                        <div class="col-sm-4 col-lg-3 pull-right" style="padding:0;">
+                            <div class="input-group">
+                                <input type="text" class="form-control"  value="1" placeholder="" ng-model="tagsNum" ng-init="tagsNum=1" ng-maxlength="2" numbers-only="numbers-only">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button"  ng-click="copyTags(tagsNum)"><i class="fa fa-plus-circle fa-lg"></i></button>
+                                </span>
+                            </div><!-- /input-group -->
+                        </div><!-- /.col-lg-6 -->
+                   </div>
+               </div>
+               <div class="table-responsive table-responsive-cust">
+                   <table class="table table-bordered form-horizontal-typ1">
                        <thead>
                            <tr>
-                               <th class="text-center" rowspan="2">S.No</th>
-                               <th class="text-center" rowspan="2">User Level</th>
-                               <th class="text-center" rowspan="2">
-                                   <input type="checkbox" ng-model="selectAllLevelUsers" ng-click="selectAllLevels($event)">
-                               </th>
-                               <th class="text-center" rowspan="2">From Task Process <a tooltip-html-unsafe="{{tooltip.from_task_process}}" class="fa fa-question-circle"></a></th>
-                               <th class="text-center" rowspan="2">To Task Process <a tooltip-html-unsafe="{{tooltip.to_task_process}}" class="fa fa-question-circle"></a></th>
-                               <th class="text-center" rowspan="2">Mandatory <a tooltip-html-unsafe="{{tooltip.mandatory}}" class="fa fa-question-circle"></a></th>
-                               <th class="text-center"colspan="2">Email Notification <a tooltip-html-unsafe="{{tooltip.email_notification}}" class="fa fa-question-circle"></a></th> 
-                           </tr>
-                           <tr>
-                               <th class="text-center">Status</th>
-                               <th class="text-center">Frequency</th> 
+                               <th class="text-center">S.No</th>
+                               <th class="text-center">Pre</th>
+                               <th class="text-center">Tag Name</th>
+                               <th class="text-center">Post</th>
+                               <th class="text-center">Product Code</th>
+                               <th class="text-center">Tag Description</th>
                            </tr>
                        </thead>
-                       <tbody ng-repeat="level in levels">
-                           <tr>
-                               <td class="text-center">{{$index+1}}</td>
-                               <td class="text-center">{{level.level_name}}</td>
-                               <td class="text-center">
-                                   <input type="checkbox" ng-model="level.isSelected" checkbox-all="level.relateUsers">
+                       <tbody>
+                           <tr ng-repeat="tag in tagDetails.tags track by $index">
+                               <td>
+                                   {{$index+1}}
+                                   <input type="hidden" id="tag-{{$index}}" ng-model="tag.id" />
                                </td>
-                               <td class="text-center" colspan="5">
+                               <td><input type="text" id="tag-pre-{{$index}}" class="form-control form-control-small" ng-model="tag.pre" numbers-only="numbers-only" /></td>
+                               <td><input type="text" id="tag-tagName-{{$index}}" ng-required="true" class="form-control form-control-small" ng-model="tag.tagName" /></td>
+                               <td><input type="text" id="tag-post-{{$index}}" class="form-control form-control-small" ng-model="tag.post" numbers-only="numbers-only" /></td>
+                               <td><input type="text" id="tag-productCode-{{$index}}" class="form-control form-control-small" ng-model="tag.productCode" /></td>
+                               <td>
+                                   <div class="input-group">
+                                       <input type="text" id="tag-tagDescription-{{$index}}" class="form-control form-control-small" ng-model="tag.tagDescription" />
+                                       <span class="input-group-btn">
+                                           <button ng-click="(tagDetails.tags.length>1?tagDetails.tags.splice($index,1):0)" type="button" class="btn btn-default" style="padding:3px 10px;"><i class="fa fa-trash"></i></button>
+                                       </span>
+                                   </div>
                                </td>
                            </tr>
-                          <tr ng-repeat="relateUser in level.relateUsers">
-                               <td class="text-center"></td>
-                               <td class="text-center"></td>
-                               <td class="text-center">
-                                   <div class="checkbox">
-                                       <label>
-                                           <input type="checkbox" ng-model="relateUser.isSelected" class="checkUserLevel">
-                                            {{relateUser.users.first_name}} {{relateUser.users.last_name}}<br /><small>({{relateUser.users.designation}})</small>
-                                       </label>
-                                   </div>
-                               </td>
-                               <td class="text-center">
-                                   <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="stage_from[relateUser.users.id]">
-                                       <ui-select-match placeholder="Select task process">{{$select.selected.process_name}}</ui-select-match>
-                                       <ui-select-choices repeat="stage in process_stages | filter: $select.search"
-                                                refresh-delay="0">
-                                           <div ng-bind-html="stage.process_name"></div>
-                                       </ui-select-choices>
-                                     </ui-select>
-                               </td>
-                               <td class="text-center">
-                                   <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="stage_to[relateUser.users.id]">
-                                       <ui-select-match placeholder="Select task process">{{$select.selected.process_name}}</ui-select-match>
-                                       <ui-select-choices repeat="stage in process_stages | filter: $select.search"
-                                                refresh-delay="0">
-                                           <div ng-bind-html="stage.process_name"></div>
-                                       </ui-select-choices>
-                                     </ui-select>
-                               </td>
-                               <td class="text-center">
-                                   <div class="checkbox">
-                                       <label>
-                                           <input type="checkbox"> &nbsp;
-                                       </label>
-                                   </div>
-                               </td>
-                               <td class="text-center">
-                                   <button class="btn icon-btn" type="button"><i class="fa fa-plus-circle fa-lg"></i>
-                                   </button>
-                               </td>
-                               <td class="text-center">
-                                   <button class="btn icon-btn" type="button"><i class="fa fa-plus-circle fa-lg"></i>
-                                   </button>
-                               </td>
-                           </tr> 
-                       </tbody>
                    </table>
-               </form>
-           </div>
-           <div class="tag-btn-wrapper row">
-               <div class="col-sm-5 pull-right ">
-                   <form id="form" class="form-horizontal form-horizontal-typ1" role="form">
-                       <label class="control-label col-sm-8 col-lg-9 text-right">No. of Tags to Create :</label>
-                       <div class="col-sm-4 col-lg-3 pull-right" style="padding:0;">
-                           <div class="input-group">
-                               <input type="text" class="form-control"  value="1" placeholder="" ng-model="tagsNum" ng-maxlength="2" numbers-only="numbers-only">
-                               <span class="input-group-btn">
-                                   <button class="btn btn-default" type="button"  ng-click="copyTags(tagsNum)"><i class="fa fa-plus-circle fa-lg"></i></button>
-                               </span>
-                           </div><!-- /input-group -->
-                       </div><!-- /.col-lg-6 -->
-                   </form>
                </div>
-           </div>      
-       </div><!--/row-->
-       <div class="wrapper mt-20">
-           <div class="table-responsive table-responsive-cust">
-               <table class="table table-bordered form-horizontal-typ1">
-                   <thead>
-                       <tr>
-                           <th class="text-center">S.No</th>
-                           <th class="text-center">Pre</th>
-                           <th class="text-center">Tag Name</th>
-                           <th class="text-center">Post</th>
-                           <th class="text-center">Product Code</th>
-                           <th class="text-center">Tag Description</th>
-                       </tr>
-                   </thead>
-                   <tbody>
+               <div class="text-right">
+                   <button type="submit" ng-disabled="working" class="btn btn-primary btn-lg mr-10 plr-large mb-sm-5">
+                       <span ng-show="!working">Save</span>
+                       <span ng-show="working"><i class="fa fa-refresh"></i> Saving...</span>
+                   </button>
 
-                       <tr ng-repeat="tag in tags track by $index">
-                           <td>
-                               {{$index+1}}
-                               <input type="hidden" id="tag-{{$index}}" ng-model="tag.id" />
-                           </td>
-                           <td><input type="text" id="tag-pre-{{$index}}" class="form-control form-control-small" ng-model="tag.pre" numbers-only="numbers-only" /></td>
-                           <td><input type="text" id="tag-tagName-{{$index}}" class="form-control form-control-small" ng-model="tag.tagName" /></td>
-                           <td><input type="text" id="tag-post-{{$index}}" class="form-control form-control-small" ng-model="tag.post" numbers-only="numbers-only" /></td>
-                           <td><input type="text" id="tag-productCode-{{$index}}" class="form-control form-control-small" ng-model="tag.productCode" /></td>
-                           <td>
-                               <div class="input-group">
-                                   <input type="text" id="tag-tagDescription-{{$index}}" class="form-control form-control-small" ng-model="tag.tagDescription" />
-                                   <span class="input-group-btn">
-                                       <button ng-click="(tags.length>1?tags.splice($index,1):0)" type="button" class="btn btn-default" style="padding:3px 10px;"><i class="fa fa-trash"></i></button>
-                                   </span>
-                               </div>
-                           </td>
-                       </tr>
-               </table>
-           </div>
-           <div class="text-right">
-               <button class="btn btn-primary btn-lg mr-10 plr-large mb-sm-5">Save</button>
-               <button class="btn btn-danger btn-lg plr-large">Cancel</button>
-           </div>        
-       </div><!--/wrapper-->
-    </div>
+                   <a ng-disabled="working" href="/#/tags" class="btn btn-default btn-lg plr-large">< Back</a>
+               </div>        
+           </div><!--/wrapper-->
+        </div>
+    </form>
 </div><!--/secondary-bg-->
+<style>
+.ui-select-multiple.ui-select-bootstrap {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    height: auto;
+    padding: 0.3em;
+}
+.ui-select-multiple.ui-select-bootstrap input.ui-select-search {
+    width: 100% !important;
+}
+</style>

@@ -555,3 +555,77 @@ app.controller('UserCreate',
 
     $scope.listProjects();                
 })
+
+app.controller('UserUpdate',
+['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService','$upload', 'tooltip',
+    function ($scope, rest, $location, $route, $rootScope, alertService, $http, breadcrumbsService,$upload, tooltip) {
+        
+        rest.path = "users";
+        $scope.user = [];
+        
+        $scope.tooltip = tooltip;
+        breadcrumbsService.setTitle("Update User");
+        breadcrumbsService.clearAll();
+        breadcrumbsService.add("", "Home");
+        breadcrumbsService.add("", "Manage");
+        breadcrumbsService.add("", "Users");
+        breadcrumbsService.add("/#/users/update", "Update");
+            
+        $scope.rec_noti = [
+            {id: 'daily', name:'Daily'},
+            {id: 'weekly', name:'Weekly'},
+            {id: 'monthly', name:'Monthly'},
+            {id: 'yearly', name:'Yearly'},
+        ];
+        
+        $scope.serverError = [];
+        
+        rest.setData("roles/getall", ['id', 'role_name'], {}).success(function(data) {
+            $scope.roles = data.items;
+        });
+        
+        rest.model({'id': $rootScope.id}).success(function(data) {
+            $scope.user = data;
+            if($scope.user.photo)
+                $scope.user.photo = '/userUploads/'+$scope.user.company_id+'/userImages/'+$scope.user.photo;
+        });
+        
+        $scope.onFileSelect = function($files) {
+            //$files: an array of files selected, each file has name, size, and type.
+            for (var i = 0; i < $files.length; i++) {
+                var file = $files[i];
+                $scope.upload = $upload.upload({
+                    url: 'fileupload/upload', //upload.php script, node.js route, or servlet url
+                    data: {myObj: $scope.myModelObj},
+                    file: file,
+                }).progress(function(evt) {
+                    console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
+                }).success(function(data, status, headers, config) {
+                    // file is uploaded successfully
+                    //console.log(data);
+                    $scope.user.photo = data;
+                });
+            }
+        }; 
+        
+        $scope.removePhoto = function(){
+             $scope.user.photo = null;
+         }
+         
+        $scope.updateUser  = function(){
+            
+            rest.putModel($scope.user).success(function(data) {
+                alertService.clearAll();
+                alertService.add("success", "User updated.");
+                $location.path('/users').replace();
+            }).error(function(data) { 
+                alertService.clearAll();
+                alertService.add("error", "Validation Error");
+                angular.forEach(data, function(child_value, child_key) {
+                    $scope.serverError[child_value['field']] = child_value['message'];
+                });
+            });
+            
+            
+        }
+ }]);

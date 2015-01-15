@@ -35,6 +35,13 @@ app.controller('RolesIndex', ['$scope', 'rest', '$location', '$route','$routePar
         
         updateUserList();
         
+		$scope.removeRole =  function(model, $index) {
+            
+            rest.deleteById(model);
+            
+            $scope.roles.splice($index, 1);
+        }
+        
     }])
 
 app.controller('RolesAdd', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService','page_dropdown','$location',
@@ -56,5 +63,38 @@ app.controller('RolesAdd', ['$scope', 'rest', '$location', '$route','$routeParam
                 $location.path("/user/roles");
             });
         }
+        
+    }])
+
+app.controller('RolesUpdate', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService','page_dropdown','$location',
+                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService,page_dropdown,$location) {
+        $scope.tagsNum = 1;
+        rest.path = "roles";
+        $scope.page_dropdown = page_dropdown;
+        breadcrumbsService.setTitle("Manage Roles");
+        breadcrumbsService.clearAll();
+        breadcrumbsService.add("", "Home");
+        breadcrumbsService.add("/#/user/roles/update", "Update Roles");
+        
+        $scope.role = {};
+        
+        rest.model({'id': $routeParams.id}).success(function(data) {
+                $scope.role = data;
+        });
+        
+        $scope.addRoles = function(){ 
+            
+            $scope.role['type'] = 'Client';
+            rest.putModel($scope.role).success(function(data) {
+                alertService.clearAll();
+                alertService.add("success", "Role updated.");
+                $location.path('/roles').replace();
+            }).error(function(data) { 
+                alertService.clearAll();
+                alertService.add("error", "Validation Error");
+            });
+            
+        }
+        
         
     }])
