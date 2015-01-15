@@ -2,7 +2,7 @@
 
 namespace backend\models;
 
-use Yii;
+use \Yii;
 
 /**
  * This is the model class for table "tags".
@@ -45,13 +45,34 @@ class Tags extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['uid', 'project_id', 'tag_name', 'tag_description', 'project_level_id', 'user_group_id', 'product_code', 'company_id', 'tag_status', 'created_by', 'created_date'], 'required'],
+            [['project_id', 'tag_name', 'tag_description', 'project_level_id', 'user_group_id'], 'required'],
             [['project_id', 'project_level_id', 'user_group_id', 'company_id', 'tag_status', 'created_by'], 'integer'],
             [['created_date', 'modified_date'], 'safe'],
-            [['uid', 'product_code'], 'string', 'max' => 128],
+            
+            ['uid', 'unique', 'targetAttribute' => ['company_id', 'uid']],
+            ['tag_name', 'unique', 'targetAttribute' => ['company_id', 'tag_name']],
+            
+            [['product_code'], 'string', 'max' => 128],
             [['tag_name'], 'string', 'max' => 256],
-            [['tag_description'], 'string', 'max' => 512]
+            [['tag_description'], 'string', 'max' => 512],
+            ['tag_status', 'default', 'value' => self::STATUS_ACTIVE],
+            ['tag_status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
+            ['company_id', 'default', 'value' => \yii::$app->user->identity->company_id],
+            ['created_by', 'default', 'value' => \yii::$app->user->identity->id],
+            ['created_date', 'default', 'value' => date("Y-m-d H:i:s")],
         ];
+    }
+    
+    static public function generateUID($length)
+    {
+        if (is_readable('/dev/urandom')) {
+            $randomData = base64_encode(file_get_contents('/dev/urandom', false, null, 0, $length) . uniqid(mt_rand(), true));
+        } else {
+            $randomData = uniqid(Yii::$app->security->generateRandomString(6), true);
+        }
+        
+        $return = substr(str_replace(".", "", $randomData), 0, $length);
+        return $return;
     }
     
     // default scope to check company_id
@@ -99,6 +120,14 @@ class Tags extends \yii\db\ActiveRecord
             },
             'tag_name',
             'tag_description',
+            'product_code',
+            'company_id',
+            'created_date',
+        ];
+    }
+    
+    public function extraFields() {
+        return [
             'project_level' => function() {
                 $projectLevel = [];
                 $projectLevel[] = $this->projectLevel->level_name;
@@ -111,9 +140,6 @@ class Tags extends \yii\db\ActiveRecord
             },
             'itemDetails',
             'userGroup',
-            'product_code',
-            'company_id',
-            'created_date',
         ];
     }
     
@@ -161,5 +187,13 @@ class Tags extends \yii\db\ActiveRecord
     public function actDelete() {
         $this->tag_status = 2;
         return $this->save();
+    }
+    
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTagAssignment()
+    {
+        return $this->hasMany(TagAssignment::className(), ['tag_id' => 'id']);
     }
 }

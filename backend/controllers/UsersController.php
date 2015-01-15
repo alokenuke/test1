@@ -216,8 +216,8 @@ class UsersController extends ApiController
         $models = [];
         foreach ($data as $i => $d) {
             $models[$i] = new $this->modelClass;
-            if($models[$i]['id']>0) {
-                $existingUser = $models[$i]->find(['id' => $id, 'status' => self::STATUS_ACTIVE])->one();
+            if(isset($d['id']) && $d['id']>0) {
+                $existingUser = $models[$i]->find(['id' => $d['id'], 'status' => self::STATUS_ACTIVE])->one();
                 if($existingUser)
                     $models[$i] = $existingUser;
             }
@@ -226,4 +226,28 @@ class UsersController extends ApiController
         }
         return $models;
     }
+    
+    public function actionChangePassword()
+    {        
+        try {
+            $model = new \backend\models\ChangePassword();
+            
+            if($model->load(\Yii::$app->request->post()) && $model->validate()) {
+                $userObj = \yii::$app->user->identity;
+                
+                $userObj->setPassword($model->new_password);
+                
+                $userObj->save();
+                
+                return "Success";
+            }
+            else
+                return $model;
+            
+        } catch (InvalidParamException $e) {
+            throw new BadRequestHttpException($e->getMessage());
+        }
+
+    }
+
 }

@@ -29,6 +29,8 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_ACTIVE = 1;
     const ROLE_USER = 0;
     public $auth_key = "";
+	public $newPassword = "";
+    public $company;
     
     /**
      * @inheritdoc
@@ -63,7 +65,7 @@ class User extends ActiveRecord implements IdentityInterface
             [['first_name', 'last_name', 'email', 'username', 'role'], 'required'],
             ['email', 'email','message'=>'Invalid email'],
             [['allow_be'], 'integer'],
-            [['username','email'], 'unique','message'=>'Already exist'],            
+            [['username','email'], 'unique','message'=>'Already exist'],
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_NOTACTIVE, self::STATUS_DELETED]],
             ['photo','string'],
@@ -72,8 +74,35 @@ class User extends ActiveRecord implements IdentityInterface
             ['role', 'default', 'value' => self::ROLE_USER],
             ['created_date', 'default', 'value' => date("Y-m-d H:i:s")],
             ['role', 'in', 'range' => self::getRoleIds()],
-            [['rec_notification', 'photo', 'contact_number'], 'safe']
+            [['rec_notification', 'photo', 'contact_number', 'designation'], 'safe']
         ];
+    }
+    
+	public function beforeSave($insert)
+    {	
+        if(!$insert)
+        {
+            $company_id = \yii::$app->user->identity->company_id;
+            if(isset($this->photo)) {
+                $temp_file = $this->photo;
+                $this->photo = array_pop(explode('/',$this->photo));
+                try {
+                    rename($temp_file, "userUploads/".$company_id."/userImages/".$this->photo);
+                }catch(Exception $e) {}
+            }
+        }
+        else {
+            
+            $this->newPassword = Yii::$app->security->generateRandomString(6);
+            
+            $this->setPassword($this->newPassword);
+            
+            $this->company = Company::findOne($this->company_id);
+            
+            SendMails::send("newUserConfirmation", $this->email, "New User confirmation", $this);
+            
+        }
+        return parent::beforeSave($insert);
     }
     
     public static function getRoleIds() {

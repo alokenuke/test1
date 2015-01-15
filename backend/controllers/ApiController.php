@@ -133,7 +133,7 @@ class ApiController extends ActiveController
                 $_GET['sort'] = $post['sort'];
             if(isset($post['page']))
                 $_GET['page'] = $post['page'];
-                        
+             
             try {
                 $provider = new ActiveDataProvider ([
                     'query' => $query,

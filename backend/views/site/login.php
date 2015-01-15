@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     <div class="text-center">
         <ul class="list-inline">
-            <li><a class="text-muted" href="#forgot" data-toggle="tab">Forgot Password</a></li>
+            <li><a class="text-muted" href="<?php echo Yii::$app->urlManager->createAbsoluteUrl(['site/request-password-reset'])?>" data-toggle="tab">Forgot Password</a></li>
         </ul>
     </div>
 </div>

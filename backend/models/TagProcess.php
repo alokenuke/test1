@@ -41,9 +41,23 @@ class TagProcess extends \yii\db\ActiveRecord
     
     public static function find()
     {
-        $query = parent::find()->where(['company_id' => \yii::$app->user->identity->company_id, 'status' => 1])
+        $query = parent::find()->where(['tag_process.company_id' => \yii::$app->user->identity->company_id, 'status' => 1])
             ->joinWith("projectIds");
                 return $query;
+    }
+
+    public function fields() {
+        return [
+            'id',
+            'process_name',
+            'status'
+        ];
+    }
+    
+    public function extraFields() {
+        return [
+            'parentProcess'
+        ];
     }
 
     /**
@@ -74,5 +88,8 @@ class TagProcess extends \yii\db\ActiveRecord
     public function actDelete() {
         $this->status = 2;
         return $this->save();
+    }
+    public function getParentProcess() {
+        return $this->hasOne(TagProcess::className(), ['id' => 'parent_id']);
     }
 }

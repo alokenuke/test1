@@ -49,6 +49,8 @@ class UsergroupsController extends ApiController
             if(isset($post['page']))
                 $_GET['page'] = $post['page'];
             
+            $query->groupBy("user_groups.id");
+            
             try {
                 $provider = new ActiveDataProvider ([
                     'query' => $query

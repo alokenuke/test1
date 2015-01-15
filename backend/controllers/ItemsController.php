@@ -107,14 +107,52 @@ class ItemsController extends ApiController
             throw new \yii\web\HttpException(404, 'Invalid Request');
         }
     }
-    
-    public function actionGetItems() {
-        $result = static::getMenuRecrusive(0);
-        return $result;
-    }
-    
+        
     public function actionGetall() {
         return parent::actionGetall();
     }
     
+    public function actionAssignprocess(){
+        
+        $post = \Yii::$app->request->post('process');
+
+        $model = new \backend\models\RelItemProcess();
+        
+        $model->setAttributes($post);
+        
+        $model->save($post);
+        
+        return $model;
+        
+    }
+    
+    public function actionGetrelatedprocess($id){
+        
+        $post = \Yii::$app->request->post();
+        if(isset($post['expand']))
+            $_GET['expand'] = $post['expand'];
+        
+        $model = new \backend\models\TagProcess();
+        
+        $query = $model->find()->join("left join", "rel_item_process", "rel_item_process.process_flow_id = tag_process.id")
+                ->andWhere(['rel_item_process.item_type_id' => $id]);
+        
+        try {
+            $provider = new ActiveDataProvider ([
+                'query' => $query,
+                'pagination' => false
+            ]); 
+        } catch (Exception $ex) {
+            throw new \yii\web\HttpException(500, 'Internal server error');
+        }
+        return $provider;
+    }
+    
+    public function actionUnassignprocess(){
+        
+        $post = \Yii::$app->request->post();
+        $model = new \backend\models\RelItemProcess();
+        return $model::find($post)->one()->delete();
+        
+    }
 }
