@@ -50,6 +50,7 @@ class TagProcess extends \yii\db\ActiveRecord
         return [
             'id',
             'process_name',
+            'parent_id',
             'status'
         ];
     }

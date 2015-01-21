@@ -91,15 +91,45 @@ class TagsController extends ApiController
         return parent::actionGetall();
     }
     
+    public function actionGetLastTag() {
+        
+        if (!$_POST) {
+            $_GET['field'] = "id";
+            
+            $post = \yii::$app->request->post();
+            
+            if(isset($post['search']['project_id'])) {
+                $projectId = $post['search']['project_id'];
+                
+                $model = new \backend\models\Tags();
+                $data = $model->find()->andWhere(['project_id' => $projectId, 'tag_status' => 1, 'type' => 'sT'])->orderBy("created_date DESC")->one();
+                
+                if($data)
+                    return $data->id;
+                else
+                    return 0;
+                
+            }
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
     public function actionCreateSimpleTags() {
         if (!$_POST) {
             
             $post = \yii::$app->request->post("tagDetails");
+            
+            
+            $connection = \Yii::$app->db;
+            $transaction = $connection->beginTransaction();
 		
             $models = $this->loadMultiple($post);
             $company_id = \yii::$app->user->identity->company_id;
 
             $validate = $this->validateMultiple($models);
+            
+            try {
 
             if (!count($validate)) {
                 $hasError = false;
@@ -116,11 +146,7 @@ class TagsController extends ApiController
                             $temp['process_stage_to'] = (int) $v['process_stage_to']['id'];
                             $temp['mandatory'] = (int) $v['mandatory'];
                             $notification_status = [];
-                            foreach($v['notification_status'] as $status)
-                                $notification_status[] = $status['id'];
-
-                            $temp['notification_status'] = implode(",", $notification_status);
-
+                            
                             $temp['notification_frequency'] = $v['notification_frequency']['id'];
 
                             $tagAssignmentModel = new \backend\models\TagAssignment();
@@ -128,6 +154,25 @@ class TagsController extends ApiController
                             $tagAssignmentModel->setAttributes($temp);
 
                             $tag->link("tagAssignment", $tagAssignmentModel);
+                            
+                            foreach($v['notification_status'] as $status) {
+                                if($status['id']=='all') {
+                                    $temp['notification_status'] = "all";
+                                    break;
+                                }
+                                else if($status['id']=='assigned') {
+                                    $temp['notification_status'] = "assigned";
+                                    break;
+                                }
+                                else {
+                                    unset($tagNotificationStatus);
+                                    $tagNotificationStatus = new \backend\models\TagUserNotificationStatus();
+                                    $tagNotificationStatus->tag_id = $tag->id;
+                                    $tagNotificationStatus->process_stage_id = $status['id'];
+                                    
+                                    $tagAssignmentModel->link("tagNotificationStatus", $tagNotificationStatus);
+                                }
+                            }
                         }
                     }
                     else {
@@ -139,15 +184,212 @@ class TagsController extends ApiController
                         }
                     }
                 }
-                if($hasError)
-                    return $validate;
-                else
+                if(!$hasError) {
+                    $transaction->commit();
                     return "Success";
+                }
             }
 
-            \yii::$app->getResponse()->setStatusCode(422, 'Data Validation Failed.');               
-
+            \yii::$app->getResponse()->setStatusCode(422, 'Data Validation Failed.');
+            $transaction->rollBack();
             return $validate;
+            
+            } catch (Exception $e) {
+                $transaction->rollBack();
+            }
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
+    public function actionUpdatesimpletags($id) {
+        
+        $model = \backend\models\Tags::findOne(['id' => $id]);
+        
+        if (!$_POST && $model) {
+            
+            $company_id = \yii::$app->user->identity->company_id;
+            $post = \yii::$app->request->post("tagDetails");
+            
+            if(!$model->uid)
+                $model->uid = $model->generateUID(10);
+            $model->product_code = $post['product_code'];
+            $model->project_level_id = $post['project_level_id'];
+            $model->tag_item_id = $post['tag_item_id'];
+            $model->tag_name = $post['tag_name'];
+            $model->tag_description = $post['tag_description'];
+            $model->tag_process_flow_id = $post['tag_process_flow_id'];
+            $model->user_group_id = $post['user_group_id'];
+            
+            $connection = \Yii::$app->db;
+            $transaction = $connection->beginTransaction();
+            
+            try {
+                $hasError = false;
+                if ($model->save()) {
+                    // do something here after saving
+                    
+                    foreach($post['tag_assignment'] as $i => $v) {
+                        $tagAssignmentModel = \backend\models\TagAssignment::findOne(['user_id' => (int) $v['user_id'], 'tag_id' => $id]);
+                        
+                        if(!$tagAssignmentModel) {
+                            $tagAssignmentModel = new \backend\models\TagAssignment();
+                            $tagAssignmentModel->user_id = (int) $v['user_id'];
+                            $tagAssignmentModel->tag_id = $id;
+                        }
+                        
+                        $tagAssignmentModel->status = 1;
+                        
+                        $tagAssignmentModel->process_stage_from = (int) $v['process_stage_from']['id'];
+                        $tagAssignmentModel->process_stage_to = (int) $v['process_stage_to']['id'];
+                        $tagAssignmentModel->mandatory = (int) $v['mandatory'];
+                        $tagAssignmentModel->notification_frequency = $v['notification_frequency']['id'];
+                        
+                        if(!$tagAssignmentModel->save()) {
+                            $hasError = true;
+                        }
+
+                        $notification_status = [];
+                        
+                        \backend\models\TagUserNotificationStatus::deleteAll(['tag_id' => $model->id, 'tag_assignment_id' => $tagAssignmentModel->id]);
+                        
+                        foreach($v['notification_status'] as $status) {
+                            if($status['id']=='all') {
+                                $tagAssignmentModel->notification_status = "all";
+                                break;
+                            }
+                            else if($status['id']=='assigned') {
+                                $tagAssignmentModel->notification_status = "assigned";
+                                break;
+                            }
+                            else {
+                                unset($tagNotificationStatus);
+                                $tagNotificationStatus = new \backend\models\TagUserNotificationStatus();
+                                $tagNotificationStatus->tag_id = $model->id;
+                                $tagNotificationStatus->process_stage_id = $status['id'];
+                                $tagNotificationStatus->tag_assignment_id = $tagAssignmentModel->id;
+
+                                if(!$tagNotificationStatus->save()) {
+                                    $hasError = true;
+                                }
+                            }
+                        }
+                        
+                    }
+                }
+                else {
+                    $hasError = true;
+                }
+                if(!$hasError) {
+                    $transaction->commit();
+                    return "Success";
+                }
+            } catch (Exception $e) {
+                $transaction->rollBack();
+            }
+            
+            $transaction->rollBack();
+            return $model;
+            
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
+    public function actionCreateMasterTags() {
+        if (!$_POST) {
+            
+            $post = \yii::$app->request->post('tagDetails');
+            $relatedTag = \yii::$app->request->post('relatedTags');
+            
+            $connection = \Yii::$app->db;
+            $transaction = $connection->beginTransaction();
+		
+            $model = new \backend\models\Tags();            
+
+            $model->type = "mT";
+            $model->project_id = $post['project_id'];
+            $model->uid = $model->generateUID(10);
+            $model->project_level_id = $post['project_level_id'];
+            $model->user_group_id = $post['user_group_id'];
+            $model->tag_name = $post['tag_name'];
+            $model->tag_description = $post['tag_description'];
+                        
+            $company_id = \yii::$app->user->identity->company_id;
+
+            try {
+
+                $hasError = false;
+                
+                if ($model->save()) {
+                    // do something here after saving
+                    
+                     foreach($relatedTag as $rTag)
+                    {
+                        $relatedTagModel = new \backend\models\RelatedTags();
+                        $relatedTagModel->tag_id = $rTag['id'];
+                        $relatedTagModel->master_tag_id = $model->id;
+                        $relatedTagModel->save();
+                    }
+                    
+                    $validate[$key]['id'] = $model->id;
+
+                    foreach($post['tag_assignment'] as $i => $v) {
+                       unset($temp);
+                        unset($tagAssignmentModel);
+                        $temp['user_id'] = (int) $v['user_id'];
+                        $temp['process_stage_from'] = (int) $v['process_stage_from']['id'];
+                        $temp['process_stage_to'] = (int) $v['process_stage_to']['id'];
+                        $temp['mandatory'] = (int) $v['mandatory'];
+                        $notification_status = [];
+
+                        $temp['notification_frequency'] = $v['notification_frequency']['id'];
+                            
+                        $tagAssignmentModel = new \backend\models\TagAssignment();
+
+                        $tagAssignmentModel->setAttributes($temp);
+                        $model->link("tagAssignment", $tagAssignmentModel);
+
+                        foreach($v['notification_status'] as $status) {
+                            if($status['id']=='all') {
+                                $temp['notification_status'] = "all";
+                                break;
+                            }
+                            else if($status['id']=='assigned') {
+                                $temp['notification_status'] = "assigned";
+                                break;
+                            }
+                            else {
+                                unset($tagNotificationStatus);
+                                $tagNotificationStatus = new \backend\models\TagUserNotificationStatus();
+                                $tagNotificationStatus->tag_id = $model->id;
+                                $tagNotificationStatus->process_stage_id = $status['id'];
+
+                                $tagAssignmentModel->link("tagNotificationStatus", $tagNotificationStatus);
+                            }
+                        }
+                    }
+                }
+                else {
+                    $hasError = true;
+                    \yii::$app->getResponse()->setStatusCode(422, 'Data Validation Failed.');   
+
+                    foreach ($model->getErrors() as $attribute => $errors) {
+                        $validate[$key][$attribute] = $errors;
+                    }
+                }
+                if(!$hasError) {
+                    $transaction->commit();
+                    return "Success";
+                }
+
+            \yii::$app->getResponse()->setStatusCode(422, 'Data Validation Failed.');
+            $transaction->rollBack();
+            return $validate;
+            
+            } catch (Exception $e) {
+                $transaction->rollBack();
+            }
         } else {
             throw new \yii\web\HttpException(404, 'Invalid Request');
         }
@@ -178,7 +420,7 @@ class TagsController extends ApiController
         $company_id = \yii::$app->user->identity->company_id;
         
         $temp['notification_status'] = [];
-        
+                
         foreach ($data['tags'] as $i => $tag) {
             $models[$i] = new $this->modelClass;
             if(isset($tag['id']) && $tag['id']>0) {
@@ -187,8 +429,8 @@ class TagsController extends ApiController
                     $models[$i] = $existingTag;
             }
             
-            if(isset($tag['id']) && $tag['id'] > 0)
-                $models[$i]->uid = static::generateUID(10);
+            if(!(isset($tag['id']) && $tag['id'] > 0))
+                $models[$i]->uid = \backend\models\Tags::generateUID(10);
             
             $models[$i]->type = "sT";
             $models[$i]->project_id = $data['project_id'];

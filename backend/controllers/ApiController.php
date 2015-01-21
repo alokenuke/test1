@@ -84,6 +84,42 @@ class ApiController extends ActiveController
                 'token' => $this->identity[1]
             ];
     }
+
+    public function actionGenCode() {
+        $text = $_GET['text']; 
+        $type = $_GET['type'];
+        if($_GET) {           
+            
+            error_reporting(0);
+         
+            if($type=='2') {
+                $qrCode= new \backend\models\BarCodeGenerator\DNS2DBarcode();
+                $qrCode->save_path= "userUploads/".\yii::$app->user->identity->company_id . "/tagsImages/qrCode/";
+                echo "<img src='/".$qrCode->getBarcodePNGPath($text, 'qrcode',10, 10)."'>";
+                die;
+            }
+            else {
+                $qrCode= new \backend\models\BarCodeGenerator\DNS1DBarcode();
+                $qrCode->save_path= "userUploads/".\yii::$app->user->identity->company_id . "/tagsImages/barCode/";
+                echo "<img src='/".$qrCode->getBarcodePNGPath($text, 'PHARMA', 5, 100)."'>";
+                
+//                echo $qrCode->getBarcodePNGPath($text, 'C128');
+//                echo "<br />";
+//                echo $qrCode->getBarcodePNGPath($text, 'C128A');
+//                echo "<br />";
+//                echo $qrCode->getBarcodePNGPath($text, 'C128B');
+//                echo "<br />";
+////                
+//                echo $qrCode->getBarcodePNGPath($text, 'CODE11');
+////                echo "<br />";
+//                echo $qrCode->getBarcodePNGPath($text, 'PHARMA');
+//                echo "<br />";
+//                echo $qrCode->getBarcodePNGPath($text, 'PHARMA2T');
+//                echo "<br />";
+                die;
+            }
+        }
+    }
     
     public function actionGetdata() {
         if (!$_POST) {

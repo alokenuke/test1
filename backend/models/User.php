@@ -77,9 +77,13 @@ class User extends ActiveRecord implements IdentityInterface
             [['rec_notification', 'photo', 'contact_number', 'designation'], 'safe']
         ];
     }
-    
-	public function beforeSave($insert)
+   
+    public function beforeSave($insert)
     {	
+        $this->first_name = ucwords($this->first_name);
+        $this->last_name = ucwords($this->last_name);
+        $this->designation = ucwords($this->designation);
+        
         if(!$insert)
         {
             $company_id = \yii::$app->user->identity->company_id;
@@ -155,6 +159,8 @@ class User extends ActiveRecord implements IdentityInterface
                 }
             }
         }
+        else
+            \Yii::$app->user->logout();
     }
     
     // default scope to check company_id

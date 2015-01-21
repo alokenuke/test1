@@ -17,7 +17,7 @@
                         </ol>
                     </div>
                     <div class="col-sm-6 text-right">
-                        <h3 class="mt-0 mb-0">{{page_title}}</h3>
+                        <h3 class="mt-0 mb-0" ng-bind-html="(head_title?head_title:page_title)"></h3>
                     </div>              
                 </div><!--/row-->
                 <div class="row mt-15">

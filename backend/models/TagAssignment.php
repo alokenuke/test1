@@ -34,10 +34,23 @@ class TagAssignment extends \yii\db\ActiveRecord
         return [
             [['tag_id', 'user_id', 'process_stage_from', 'process_stage_to', 'mandatory', 'status'], 'required'],
             [['tag_id', 'user_id', 'process_stage_from', 'process_stage_to', 'mandatory', 'status'], 'integer'],
-            [['created_on'], 'safe']
+            [['notification_status', 'notification_frequency', 'created_on'], 'safe']
         ];
     }
-
+    
+	public function fields() { 
+        return [
+            'tag_id',
+            'user_id',
+            'process_stage_from',
+            'process_stage_to',
+            'mandatory',
+            'status',
+            'notification_frequency',
+            'userDetails'
+            
+        ];
+    }
     /**
      * @inheritdoc
      */
@@ -59,4 +72,14 @@ class TagAssignment extends \yii\db\ActiveRecord
         $this->status = 2;
         return $this->save();
     }
+    
+    public function getTagNotificationStatus() {
+        return $this->hasMany(TagUserNotificationStatus::className(), ['tag_assignment_id' => 'id']);
+    }
+
+	public function getUserDetails() {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        
+        //return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }   
 }

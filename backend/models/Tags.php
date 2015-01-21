@@ -45,7 +45,7 @@ class Tags extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['project_id', 'tag_name', 'tag_description', 'project_level_id', 'user_group_id'], 'required'],
+            [['uid', 'project_id', 'tag_name', 'tag_description', 'project_level_id', 'user_group_id'], 'required'],
             [['project_id', 'project_level_id', 'user_group_id', 'company_id', 'tag_status', 'created_by'], 'integer'],
             [['created_date', 'modified_date'], 'safe'],
             
@@ -61,6 +61,27 @@ class Tags extends \yii\db\ActiveRecord
             ['created_by', 'default', 'value' => \yii::$app->user->identity->id],
             ['created_date', 'default', 'value' => date("Y-m-d H:i:s")],
         ];
+    }
+    
+    public function afterSave($insert, $changedAttributes) {
+        
+        $qrCodePath = "userUploads/".\yii::$app->user->identity->company_id . "/tagsImages/qrCode/";
+        $barCodePath = "userUploads/".\yii::$app->user->identity->company_id . "/tagsImages/barCode/";
+        
+        if(!file_exists($qrCodePath.$this->uid.".png")) {
+            error_reporting(0);
+            $qrCode= new BarCodeGenerator\DNS2DBarcode();
+            $qrCode->save_path= $qrCodePath;
+            $qrCode->getBarcodePNGPath($this->uid, 'qrcode',10, 10);
+        }
+        if(!file_exists($barCodePath.$this->uid.".png")) {
+            error_reporting(0);
+            $barCode= new BarCodeGenerator\DNS1DBarcode();
+            $barCode->save_path= $barCodePath;
+            $barCode->getBarcodePNGPath($this->uid, 'C39', 5, 200);
+        }
+        
+        parent::afterSave($insert, $changedAttributes);
     }
     
     static public function generateUID($length)
@@ -115,13 +136,17 @@ class Tags extends \yii\db\ActiveRecord
             'id',
             'type',
             'uid',
+            'project_id',
             'project_name' => function() {
                 return $this->project->project_name;
             },
             'tag_name',
+            'tag_item_id',
+            'tag_process_flow_id',
+            'user_group_id',
+            'project_level_id',
             'tag_description',
             'product_code',
-            'company_id',
             'created_date',
         ];
     }
@@ -138,8 +163,72 @@ class Tags extends \yii\db\ActiveRecord
                 }
                 return array_reverse($projectLevel);
             },
+            'projectLevelObj' => function() {
+                $projectLevel = [];
+                $projectLevel[] = $this->projectLevel;
+                $parent = $this->projectLevel->parent_id;
+                while($parentLevelDetails = $this->getLevelDetails($parent, ['id', 'level_name', 'parent_id'])) {
+                    $projectLevel[] = $parentLevelDetails;
+                    $parent = $parentLevelDetails->parent_id;
+                }
+                return array_reverse($projectLevel);
+            },
+            'itemObj' => function() {
+                $items = [];
+                $items[] = $this->itemDetails;
+                $parent = $this->itemDetails->parent_id;
+                
+                while($parentDetails = $this->getItemParentDetails($parent, ['id', 'item_name', 'parent_id'])) {
+                    $items[] = $parentDetails;
+                    $parent = $parentDetails->parent_id;
+                }
+                return array_reverse($items);
+            },
+            'processObj' => function() {
+                $process = [];
+                $process[] = $this->processDetails;
+                $parent = $this->processDetails->parent_id;
+                
+                while($parentDetails = $this->getProcessParentDetails($parent, ['id', 'process_name', 'parent_id'])) {
+                    $process[] = $parentDetails;
+                    $parent = $parentDetails->parent_id;
+                }
+                return array_reverse($process);
+            },
+            'tagAssignmentObj' => function() {
+                $tagAssignment = [];
+                
+                foreach($this->tagAssignment as $v) {
+                    
+                    $v['process_stage_from'] = TagProcess::find()->select(["id", 'process_name', 'status'])->andWhere(['id' => $v['process_stage_from']])->one();
+                    $v['process_stage_to'] = TagProcess::find()->select(["id", 'process_name', 'status'])->andWhere(['id' => $v['process_stage_to']])->one();
+                    
+                    $noti_status = [];
+                    if($v['notification_status']=='all')
+                        $noti_status[] = ['id' => 'all', 'name' => 'All process'];
+                    if($v['notification_status']=='assigned')
+                        $noti_status[] = ['id' => 'assigned', 'name' => 'Assigned process'];
+                    else if($notification_statuses = TagUserNotificationStatus::findAll(['tag_id' => $this->id, 'tag_assignment_id' => $v['id']])) {
+                        $statusid = [];
+                        
+                        foreach($notification_statuses as $status) {
+                            $statusid[] = $status['process_stage_id'];
+                        }
+                        $process_stages = TagProcess::find()->select(['id', 'process_name'])->andWhere(['id' => $statusid])->all();
+                        foreach($process_stages as $stage)
+                            $noti_status[] = ['id' => $stage['id'], 'name' => $stage['process_name']];
+                    }
+                    
+                    $v['notification_status'] = $noti_status;
+                    
+                    $tagAssignment["$v[user_id]"] = $v;
+                }
+
+                return $tagAssignment;
+            },
             'itemDetails',
             'userGroup',
+            'tagAssignment'
         ];
     }
     
@@ -172,8 +261,22 @@ class Tags extends \yii\db\ActiveRecord
         return ProjectLevel::find()->select($field)->where(['id' => $id])->one();
     }
     
-    public function getitemDetails() {
+    public function getItemDetails() {
         return $this->hasOne(Items::className(), ['id' => 'tag_item_id']);
+    }
+    
+    public function getItemParentDetails($parentId, $fields)
+    {
+        return Items::find()->select($fields)->where(['id' => $parentId])->one();
+    }
+    
+    public function getProcessDetails() {
+        return $this->hasOne(TagProcess::className(), ['id' => 'tag_process_flow_id']);
+    }
+    
+    public function getProcessParentDetails($parentId, $fields)
+    {
+        return TagProcess::find()->select($fields)->where(['id' => $parentId])->one();
     }
 
     /**

@@ -47,6 +47,15 @@ class ProjectLevel extends \yii\db\ActiveRecord
         
         return $query;
     }
+    
+    public function fields()
+    {
+        return [
+            'id',
+            'level_name',
+            'parent_id',
+        ];
+    }
 
     /**
      * @inheritdoc

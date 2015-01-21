@@ -50,7 +50,7 @@ class Items extends \yii\db\ActiveRecord
         
         if(isset($post['select']))
            return $post['select'];
-        
+                
         return [
             'id',
             'item_name',
