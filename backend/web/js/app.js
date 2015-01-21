@@ -51,6 +51,11 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
             controller: 'SiteIndex',
         })
         
+        .when('/labeltemplates', {
+            templateUrl: path+'labeltemplates/manage.html',
+            controller: 'ManageLabelTemplates',
+        })
+        
         .when('/roles', {
             templateUrl: path+'roles/index.html',
             controller: 'RolesIndex'
@@ -135,19 +140,24 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
             controller: 'TagsCreate'
         })
         
+        .when('/tags/update/:id/:project_id', {
+            templateUrl: path+'tags/update-simple-tag.html',
+            controller: 'TagsUpdate'
+        })
+        
         .when('/tags/createmaster', {
             templateUrl: path+'tags/create-master-tag.html',
             controller: 'TagsCreateMaster'
         })
         
+        .when('/tags/updatemaster/:id/:project_id', {
+            templateUrl: path+'tags/update-master-tag.html',
+            controller: 'TagsUpdateMaster'
+        })
+        
         .when('/tags/:id', {
             templateUrl: path+'tags/view-tag.html',
             controller: 'TagsView'
-        })
-        
-        .when('/tag/update/:id', {
-            templateUrl: path+'tag/form.html',
-            controller: 'TagUpdate'
         })
         
         .when('/r-:mod', {

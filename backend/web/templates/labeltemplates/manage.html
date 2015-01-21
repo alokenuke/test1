@@ -1,0 +1,198 @@
+<script type="text/javascript">
+//    var _validFileExtensions = [".jpg", ".jpeg", ".bmp", ".gif", ".png"];
+//    function Validate(oForm) {
+//        var arrInputs = oForm.getElementsByTagName("input");
+//        for (var i = 0; i < arrInputs.length; i++) {
+//            var oInput = arrInputs[i];
+//            if (oInput.type == "file") {
+//                var sFileName = oInput.value;
+//                if (sFileName.length > 0) {
+//                    var blnValid = false;
+//                    for (var j = 0; j < _validFileExtensions.length; j++) {
+//                        var sCurExtension = _validFileExtensions[j];
+//                        if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+//                            blnValid = true;
+//                            break;
+//                        }
+//                    }
+//
+//                    if (!blnValid) {
+//                        alert("Sorry, " + sFileName + " is invalid, allowed extensions are: " + _validFileExtensions.join(", "));
+//                        return false;
+//                    }
+//                }
+//            }
+//        }
+//
+//        return true;
+//    }
+</script>
+
+<div role="tabpanel" class="tab-pane col-xs-12 active" id="List_Tags">
+     <div class="row">
+        <div class="col-xs-12 search-box mb-sm-large">
+            <form ng-submit="saveTemplate()" id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form">
+                <div class='row'>
+                    <div class="col-md-2 col-lg-2">
+                        <button type="button" class="btn btn-primary" ng-click="label_template = undefined">Add New Template</button>
+                    </div>
+                    <div class="col-md-3 col-lg-2">
+                        <select class="form-control" ng-model="label_template" ng-options="label_template.template_name for label_template in templates"
+                                ng-change="paper_size=(label_template.page_width==216 && label_template.page_height==279?'letter':(label_template.page_width==210 && label_template.page_height==297?'a4':'custom'))">
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-primary" ng-show='selectedTemplate' ng-click="deleteTemplate()">Delete Template</button>
+                    </div>
+                </div>
+                <div class="row mt-20">
+                    <div class="col-md-6 col-lg-5">
+                        <h2 class="col-xs-12 search-title mb-20">Paper Format</h2>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Template Name :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" ng-model="label_template.template_name" placeholder="Template Name" ng-required="true" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Paper Size :</label>
+                            <div class="col-sm-4">
+                                <select class='form-control' ng-model="paper_size" ng-change="calculateLabelHeightWidth()" >
+                                    <option value="letter">Letter</option>
+                                    <option value='a4'>A4</option>
+                                    <option value='custom'>Custom</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Page Width (mm) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" ng-model='label_template.page_width' ng-init="label_template.page_width=0" ng-disabled="paper_size=='letter' || paper_size=='a4'" ng-change="calculateLabelHeightWidth()" numbers-only ng-required="true">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Page Height (mm) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" ng-model='label_template.page_height' ng-init="label_template.page_height=0" ng-disabled="paper_size=='letter' || paper_size=='a4'" ng-change="calculateLabelHeightWidth()" numbers-only ng-required="true" />
+                            </div>
+                        </div>
+                    </div><!--/.col-md-->
+                     <div class="col-md-6 col-lg-5">
+                        <h2 class="col-xs-12 search-title mb-20">Labels Parameters</h2>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">No of labels Horizontally :</label>
+                            <div class="col-sm-4">
+                                <input type="number" class="form-control"  ng-model='label_template.num_label_horizontal' ng-change="calculateLabelHeightWidth()" ng-required="true" min="1" max="10" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">No of labels Vertically :</label>
+                            <div class="col-sm-4">
+                                <input type="number" class="form-control"  ng-model='label_template.num_label_vertical' ng-change="calculateLabelHeightWidth()" ng-required="true" min="1" max="30" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Horizontal labels Spacing (mm) :</label>
+                            <div class="col-sm-4">
+                                 <input type="text" class="form-control"  ng-model='label_template.hor_label_spacing' ng-change="calculateLabelHeightWidth()" numbers-only />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Vertical labels Spacing (mm) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control"  ng-model='label_template.ver_label_spacing' ng-change="calculateLabelHeightWidth()" numbers-only />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Calculated label Width (mm) :</label>
+                            <div class="col-sm-4">
+                                 <input type="text" class="form-control"  ng-model='label_template.cal_label_width' ng-disabled="true" numbers-only />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Calculated label Height (mm) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control"  ng-model='label_template.cal_label_height' ng-disabled="true" numbers-only />
+                            </div>
+                        </div>
+                    </div><!--/.col-md-->
+                </div><!--/row-->
+                <div class="row mt-20">
+                    <div class="col-md-6 col-lg-5">
+                        <h2 class="col-xs-12 search-title mb-20"> Paper Margin</h2>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Top Margin (mm) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control"  ng-model='label_template.top_margin' ng-change="calculateLabelHeightWidth()" numbers-only />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Bottom Margin (mm) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control"  ng-model='label_template.bottom_margin' ng-change="calculateLabelHeightWidth()" numbers-only />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Right Margin (mm) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control"  ng-model='label_template.right_margin' ng-change="calculateLabelHeightWidth()" numbers-only />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Left Margin (mm) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control"  ng-model='label_template.left_margin' ng-change="calculateLabelHeightWidth()" numbers-only />
+                            </div>
+                        </div>
+                    </div><!--/.col-md-->
+                     <div class="col-md-6 col-lg-5">
+                        <h2 class="col-xs-12 search-title mb-20">Inputs</h2>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">QR code/Logo width (mm) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control"  ng-model='label_template.logo_width' />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Font Size :</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" ng-options="font for font in range(1, 30, 1)" ng-model='label_template.font_size' ng-required="true">
+                                    <option value="">-- Select Font --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Print Type :</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" ng-model="label_template.print_type">
+                                    <option value="">-- Print Type --</option>
+                                    <option value="qr">QR Code</option>
+                                    <option value="bar">Bar Code</option>
+                                    <!--<option value="nfc">NFC Code</option>-->
+                                </select>
+                            </div>
+                        </div>
+<!--                    <div class="form-group" ng-show="label_template.print_type=='nfc'">
+                            <label class="col-sm-7 control-label text-right">Upload NFC Logo :</label>
+                            <div class="col-sm-4">
+                                <input type="file" />
+                            </div>
+                        </div>-->
+                    </div><!--/.col-md-->
+                </div><!--/row-->
+                <div class="row mt-20">
+                   <div class="col-sm-10 text-center">
+                       <button class="btn btn-primary mb-sm-5 mr-10" ng-click="previewTemplate()" type="button">Preview</button>
+                       <button class="btn btn-primary mb-sm-5" type="submit">Save</button>
+                       <button class="btn btn-primary mb-sm-5" type='reset'>Reset</button>
+                   </div> 
+                </div>
+            </form>
+        </div><!--/search-tag-box-->
+    </div><!--/row-->
+</div>
+<style>
+    input[type=number] {-moz-appearance: textfield;}
+    ::-webkit-inner-spin-button { -webkit-appearance: none;}
+    ::-webkit-outer-spin-button { -webkit-appearance: none;}
+</style>

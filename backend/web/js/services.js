@@ -37,6 +37,9 @@ appServices.factory('breadcrumbsService', function($rootScope) {
     breadcrumbsService.setTitle = function(title) {
         $rootScope.page_title = title;
     }
+    breadcrumbsService.headTitle = function(title) {
+        $rootScope.head_title = title;
+    }
     
     breadcrumbsService.add = function(link, label) {
         $rootScope.breadcrumbs.push({'link': link, 'label': label});
@@ -132,3 +135,82 @@ appServices.filter('titlecase', function() {
         });
     };
 });
+appServices.directive('openlightbox', 
+   function() {
+      var openLightBox = {
+         link :   function(scope, element, attrs) {
+             element.bind("click", function() {
+                
+                var title = $(this).attr("image-title");
+                var imageUrl = $(this).attr("imageUrl");
+                var imageType = $(this).attr("type");
+                
+                var element = angular.element('\
+                    <div class="modal fade">\n\
+                        <div class="modal-dialog" style="top: 10%;">\n\
+                            <div class="modal-content">\n\
+                                <div class="modal-header">\n\
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n\
+                                    <h4 class="modal-title">Tag - '+title+'</h4>\n\
+                                </div>\n\
+                                <div class="modal-body text-center">\n\
+                                    <img src="/userUploads/1/tagsImages/'+imageType+'/'+imageUrl+'" style="max-height: 200px;" />\n\
+                                </div>\n\
+                            </div>\n\
+                        </div>\n\
+                    </div>').on('hidden.bs.modal', function (e) {
+                        element.remove();
+                    });
+
+                var body = $('body');
+                body.append(element);
+                element.modal('show');
+            });
+       }
+   }
+   return openLightBox;
+});
+
+appServices.directive("modalShow", function ($parse) {
+    return {
+        restrict: "A",
+        link: function (scope, element, attrs) {
+
+            //Hide or show the modal
+            scope.showModal = function (visible, elem) {
+                if (!elem)
+                    elem = element;
+
+                if (visible)
+                    $(elem).modal("show");                     
+                else
+                    $(elem).modal("hide");
+            }
+
+            //Watch for changes to the modal-visible attribute
+            scope.$watch(attrs.modalShow, function (newValue, oldValue) {
+                scope.showModal(newValue, attrs.$$element);
+            });
+
+            //Update the visible value when the dialog is closed through UI actions (Ok, cancel, etc.)
+            $(element).bind("hide.bs.modal", function () {
+                $parse(attrs.modalShow).assign(scope, false);
+                if (!scope.$$phase && !scope.$root.$$phase)
+                    scope.$apply();
+            });
+        }
+
+    };
+});
+
+
+appServices.directive('preloadable', function () {        
+    return {
+       link: function(scope, element) {
+          element.addClass("empty");
+          element.bind("load" , function(e){
+             element.removeClass("empty");
+          });
+       }
+    }
+ });

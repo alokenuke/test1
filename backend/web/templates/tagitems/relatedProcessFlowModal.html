@@ -1,0 +1,80 @@
+<div class=" modal-lg col-xs-12 secondary-bg">
+    <!--/shadow-box-->
+    
+    <div class="table-responsive table-responsive-cust mt-20">
+        <div class="col-xs-12 search-box mb-sm-large mb-10">
+            <div class="row">
+                <h2 class="col-xs-12"> Related process flow for Item - {{itemScope.item_name}}
+                    <button type="button" class="pull-right btn icon-btn" ng-click="showSearchBox=!showSearchBox;">
+                        <i ng-class="{'fa fa-sort-desc fa-2x': !showSearchBox,'fa fa-sort-asc fa-2x': showSearchBox}"></i>
+                    </button>
+                </h2>
+            </div><!--/row-->
+            <form ng-submit="assignItems()" role="form" class="form-horizontal form-horizontal-typ1 form-wrapper mt-15 slide" id="form" ng-hide="showSearchBox">
+                <div class="row">
+                    <div class="col-md-10 col-lg-9">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">Select Process Type</label>
+                            <div class="col-sm-6">
+                                <select ng-model="item_type_id" class="form-control" ng-options="process.id as process.process_name for process in process_type" ng-change="getProcessFlow()" ng-required="true">
+                                    <option value="">-- Select Process type--</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div><!--/row-->
+
+                <div class="row">
+                    <div class="col-md-10 col-lg-9">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">Flow :</label>
+                            <div class="col-sm-6" ng-class="{'has-error': serverError}">
+                                <select ng-model="process.process_flow_id" class="form-control" ng-options="process.id as process.process_name for process in process_flow" ng-required="true">
+                                    <option value="">-- Select Process Type First--</option>
+                                </select>
+                                <span style="color: red">{{serverError}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div><!--/row-->
+
+                
+                <div class="row mt-45">
+                   <div class="col-sm-10 text-center">
+                        <button class="btn btn-primary mb-sm-5" type="submit">Assign</button>
+                        <button class="btn btn-primary mb-sm-5" type="reset">Clear</button>
+                   </div>
+                </div>
+                
+                <div class="clearfix table-responsive table-responsive-cust mt-15">
+                    
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center"></th>
+                                <th class="text-center">
+                                    Process Type</th>
+                                <th class="text-center">Process Flow</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="p in processes">
+                                <td class="text-center"><button type="button" ng-click="unassignProcess(itemScope.id,p.id)" class="btn btn-primary mb-sm-5">Unassign</button></td>
+                                <td class="text-center">{{p.parentProcess.process_name}}</td>
+                                <td class="text-center">{{p.process_name}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div><!--/search-tag-box-->
+        <div class="clearfix">
+            <div class="pull-right">
+                <div align="right">
+                    <button class="btn btn-danger mb-sm-5" ng-click="close()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!--/secondary-bg-->

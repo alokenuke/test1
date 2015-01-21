@@ -1,7 +1,8 @@
-app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService',
-                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService) {
+app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'page_dropdown', 
+                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, page_dropdown) {
         $scope.tagsNum = 1;
         rest.path = "tags";
+        $scope.page_dropdown = page_dropdown;
         
         breadcrumbsService.setTitle("Manage Tags");
         breadcrumbsService.clearAll();
@@ -73,7 +74,16 @@ app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParam
         }
         
         $scope.pageChanged = function() {
-            $location.search("page", $scope.currentPage);
+            updateTagList();
+        }
+        
+        $scope.setPageLimit = function(){
+            updateTagList();
+        }
+        
+        $scope.removeUser =  function(model, $index) {
+            rest.deleteById(model);
+            $scope.data.splice($index, 1);
         }
                 
         $scope.updateSelectBox = function(variable, projectId, level, parent) {
@@ -91,7 +101,7 @@ app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParam
                 });
 
                 if(level==0) {
-                    $http.post("usergroups/getall", {'search': {'project_id': projectId}, 'select': {'UserGroups': ['id', 'group_name']}}).success(function(data) {$scope.usergroups = data.items;});
+                    $http.post("usergroups/getall", {'search': {'project_id': projectId}}).success(function(data) {$scope.usergroups = data.items;});
                     rest.setData("items/getall", ['id', 'item_name'], {'parent_id': 0, 'tag_items_projects.project_id': projectId}).success(function(data) {
                         $scope['items'] = [];
                         if(data.items.length>0)
@@ -126,7 +136,7 @@ app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParam
         }
         
         var updateTagList = function() {
-            var params = {'search': $scope.search, 'sort': $scope.sortBy};
+            var params = {'search': $scope.search, 'sort': $scope.sortBy, 'limit': $scope.numPerPage, 'page':$scope.currentPage, };
             rest.models(params).success(function (data) {
                 $scope.data = data.items;
                 $scope.totalCount = data._meta.totalCount;
@@ -174,16 +184,20 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
         $scope.processes = [];
         $scope.tagDetails = {};
         $scope.tagDetails.tags = [{id:'',pre:'',tagName:'',post:'',productCode:'',tagDescription:''}];
+        $scope.tagDetails.tagAssignment = {};
         $scope.levels = [];
         $scope.process_stages = [];
         $scope.working = false;
         
         $scope.noti_frequency = [
+            {id: 'onupdate', name:'On update'},
             {id: 'daily', name:'Daily'},
             {id: 'weekly', name:'Weekly'},
             {id: 'monthly', name:'Monthly'},
             {id: 'yearly', name:'Yearly'},
         ];
+        
+        $scope.noti_status = [];
         
         $scope.selectAllLevels = function($event) {
             var parts = "levels";
@@ -197,23 +211,110 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
                 });
             });
         }
+        
+        $scope.copyLastTag = function() {
+            if(!$scope.tagDetails.project_id)
+            {
+                alert("Please select a project first.");
+                return false;
+            }
+            $http.post("/tags/get-last-tag", {'search': {'project_id': $scope.tagDetails.project_id}}).success(function(data) {
+                if(data>0) {
+                    $scope.tagLoading = true;
+                    $scope.loadTagById(data);
+                }
+                else
+                    alert("No last tag found or Error in loading last tag.");
+            });
+        }
                
         $scope.createSimilarTagModal = function() {
             
+            if(!$scope.tagDetails.project_id)
+            {
+                alert("Please select a project first.");
+                return false;
+            }
+            
             var modalInstance = $modal.open({
-              templateUrl: '/templates/tags/create_similar_tag.html',
-              controller: 'createSimilarTagModalController',
-              size: 'lg'
+                templateUrl: '/templates/tags/create_similar_tag.html',
+                controller: 'createSimilarTagModalController',
+                size: 'lg',
+                resolve: {
+                    itemScope: function () {
+                        return {'project_id': $scope.tagDetails.project_id};
+                    }
+                }
             });
 
             modalInstance.result.then(function (selectedItem) {
-                $scope.copyTagId = selectedItem;
                 
-                $http.get("/tags/"+selectedItem).success(function(data) {
-                    $scope.tagDetails.project_id = selectedItem;
-                });
+                $scope.tagLoading = true;
+                
+                $scope.loadTagById(selectedItem);
+                
             }, function () {
                 $log.info('Modal dismissed at: ' + new Date());
+            });
+        }
+        
+        $scope.loadTagById = function(selectedItem) {
+            
+            $http.get("/tags/"+selectedItem+"?expand=projectLevelObj,itemObj,processObj,userGroup,tagAssignmentObj").success(function(data) {
+                $scope.tagDetails.tag_item_id = data.tag_item_id;
+                $scope.search.item = data.itemObj;
+                $scope.items.splice(1, ($scope.items.length-1));
+                angular.forEach(data.itemObj, function(v, k){
+                    if(k!=0) { 
+                       rest.setData("items/getall", ['id', 'item_name'], {'parent_id': v['parent_id'], 'project_id': $scope.tagDetails.project_id}).success(function(data) {
+                            if(data.items.length)
+                                $scope.items.push(data.items);
+                            else
+                                $scope.items.push([v]);
+                        });
+                    }
+                });
+
+                $scope.tagDetails.tag_process_flow_id = data.tag_process_flow_id;
+                $scope.search.process = data.processObj;
+                $scope.processes.splice(1, ($scope.processes.length-1));
+                angular.forEach(data.processObj, function(v, k){
+                    if(k!=0) {
+                        rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': v['parent_id'], 'project_id': $scope.tagDetails.project_id}).success(function(data) {
+                            if(data.items.length)
+                                $scope.processes.push(data.items);
+                            else
+                                $scope.processes.push([v]);
+                        });
+                    }
+                });
+
+                rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': $scope.tagDetails.tag_process_flow_id}).success(function(data) {
+                    $scope.process_stages = data.items;
+                });
+
+                $scope.tagDetails.project_level_id = data.project_level_id;
+                $scope.search.childlevels = data.projectLevelObj;
+                $scope.projectlevels.splice(1, ($scope.projectlevels.length-1));
+                angular.forEach(data.projectLevelObj, function(v, k){
+                    if(k!=0) {
+                        $http.post("/projectlevel/getall", {'search': {'project_id': $scope.tagDetails.project_id, 'parent_id': v['parent_id']}, 'select': ['id', 'level_name']}).success(function(data) {
+                            if(data.items.length>0)
+                                $scope.projectlevels.push(data.items);
+                            else
+                                $scope.projectlevels.push([v]);
+                        });
+                    }
+                });
+
+                $scope.tagDetails.user_group_id = data.user_group_id;
+                $scope.search.usergroup = data.userGroup;
+                $scope.getUserLevel();
+                $scope.tagDetails.tagAssignment = data.tagAssignmentObj;
+                $scope.tagLoading = false;
+            }).error(function(data) {
+                errorCallback();
+                $scope.tagLoading = false;
             });
         }
                 
@@ -253,6 +354,503 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
             for(var i=0;i<tagsNum;i++) {
                 $scope.tagDetails.tags.push({id:'',pre:parseInt(temp.pre)+i+1,tagName:temp.tagName,post:parseInt(temp.post)+i+1,productCode:'',tagDescription:''});
              }
+        }
+        
+        $scope.updateSelectBox = function(variable, projectId, level, parent) {
+            
+            $scope.tagDetails['project_id'] = projectId;
+            
+            if(variable=="projectlevels") {
+                
+                $scope[variable].splice(level, ($scope[variable].length-level));
+                
+                $http.post("/projectlevel/getall", {'search': {'project_id': projectId, 'parent_id': parent}, 'select': ['id', 'level_name']}).success(function(data) {
+                    if(data.items.length>0)
+                        $scope[variable].push(data.items);
+                });
+
+                if(level==0) {
+                    $scope.items = [];
+                    $scope.processes = [];
+                    rest.setData("usergroups/getall", [], {'project_id': projectId}).success(function(data) {
+                        if(data.items.length)
+                            $scope.usergroups = data.items;
+                    });
+                    rest.setData("items/getall", ['id', 'item_name'], {'parent_id': 0, 'project_id': projectId}).success(function(data) {
+                        if(data.items.length)
+                            $scope.items.push(data.items);
+                    });
+                    rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': 0, 'project_id': projectId}).success(function(data) {
+                        if(data.items.length)
+                            $scope.processes.push(data.items);
+                    });
+                }
+                else
+                {
+                    $scope.tagDetails['project_level_id'] = parent;
+                }
+            }
+            else if(variable=='items') {
+                if(level > 0)
+                    $scope.tagDetails['tag_item_id'] = parent;
+                
+                $scope[variable].splice(level, ($scope[variable].length-level-1));
+                
+                rest.setData("items/getall", ['id', 'item_name'], {'parent_id': parent}).success(function(data) {
+                    if(data.items.length>0)
+                        $scope[variable].push(data.items);
+                });
+                
+                if($scope.search['process'] && $scope.search.process[0] && level==1) {
+                    $scope['processes'].splice(0, ($scope['processes'].length-1));
+
+                    rest.setData("items/getrelatedprocess/"+parent, ['id', 'process_name'], {'process_parent_id': $scope.search.process[0], 'tag_item_id': $scope.search.item[1]}).success(function(data) {
+                        if(data.items.length>0)
+                            $scope['processes'].push(data.items);
+                    });
+                }
+            }
+            else if(variable=='processes') {
+                
+                if(level==1)
+                    $scope.tagDetails['tag_process_flow_id'] = parent;
+                
+                if($scope.search['item'] && $scope.search.item[1]) {
+                    $scope[variable].splice(level, ($scope[variable].length-level-1));
+                    
+                    if(level < 1) {   
+                        rest.setData("items/getrelatedprocess/"+$scope.search.item[1].id, ['id', 'process_name'], {'process_parent_id': parent}).success(function(data) {
+                            if(data.items.length>0)
+                                $scope[variable].push(data.items);
+                        });
+                    }
+                    else if(level==1) {
+                        rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': parent}).success(function(data) {
+                            $scope.process_stages = data.items;
+                        });
+                    }
+                }
+            }
+        }
+        
+        $scope.saveTagDetails = function() {
+            $scope.working = true;
+            $scope.tagDetails.tag_assignment = [];
+            $scope.tagDetails.tagAssignment = null;
+            
+            angular.forEach($scope.levels, function(level) {
+                angular.forEach(level.relateUsers, function(value) {
+                    if(value['isSelected']) {
+                        $scope.tagDetails.tag_assignment.push({'user_id': value['user_id'], 'process_stage_from': $scope.search.stage_from[value['user_id']], 'process_stage_to': $scope.search.stage_to[value['user_id']], 'mandatory': $scope.search.mandatory[value['user_id']], 'notification_status': $scope.search.notification_status[value['user_id']], 'notification_frequency': $scope.search.notification_frequency[value['user_id']]});
+                    }
+                });
+            });
+            
+            $http.post("/tags/create-simple-tags",{'tagDetails': $scope.tagDetails}).success(function(data) {
+                alertService.clearAll();
+                if(data=='Success') {
+                    alertService.add('success', "Tag(s) Created Successfully.");
+                    $location.path('/tags').replace();
+                }
+                $scope.working = false;
+            }).error(function(data) {
+                alertService.clearAll();
+                alert("Error in tag creation");
+                alertService.add('error', data);
+                $scope.working = false;
+            });
+        }
+        
+        var errorCallback = function (data) {
+            if(data.status!=401) {
+                alertService.add('error', "Error in processing your request. Please try again.");
+            }
+        };
+        
+        rest.setData("projects/getall", ['id', 'project_name'], {'project_status': null}).success(function(data) {$scope.projects = data.items;});
+        
+        $scope.$watch('process_stages', function (newVal) {
+            $scope.noti_status = [
+                {id: 'all', name:'All process'},
+                {id: 'assigned', name:'Assigned process'},
+            ];
+            angular.forEach($scope.process_stages, function(v) {
+                $scope.noti_status.push({'id': v['id'], 'name': v['process_name']});
+            });
+        }, true);
+        
+    }])
+
+app.controller('TagsUpdate', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'tooltip', '$modal', '$log', 'alertService',
+                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, tooltip, $modal, $log, alertService) {
+        
+        rest.path = "tags";
+        
+        $scope.tooltip = tooltip;
+        
+        breadcrumbsService.setTitle("Update Tag - sT");
+        breadcrumbsService.headTitle("Update Tag - <span class='sT'>sT</span>");
+        breadcrumbsService.clearAll();
+        breadcrumbsService.add("", "Home");
+        breadcrumbsService.add("/#/tags", "Tags");
+        breadcrumbsService.add("/#/tags", "Update Tag");
+        
+        alertService.clearAll();
+        
+        $scope.search = {};
+        $scope.projectlevels = [];
+        $scope.predicate = "";
+        $scope.projects = [];
+        $scope.usergroups = [];
+        $scope.itemList = [];
+        $scope.items = [];
+        $scope.processes = [];
+        $scope.tagDetails = {};
+        $scope.tagDetails.tagAssignment = {};
+        $scope.levels = [];
+        $scope.process_stages = [];
+        $scope.working = false;
+        
+        $scope.noti_frequency = [
+            {id: 'onupdate', name:'On update'},
+            {id: 'daily', name:'Daily'},
+            {id: 'weekly', name:'Weekly'},
+            {id: 'monthly', name:'Monthly'},
+            {id: 'yearly', name:'Yearly'},
+        ];
+        
+        $scope.noti_status = [];
+        
+        $scope.selectAllLevels = function($event) {
+            var parts = "levels";
+            var selectedVar = "isSelected";
+            var element = angular.element($event.currentTarget);
+            var setValue = $scope.selectAllLevelUsers;
+            angular.forEach($scope.$eval(parts), function (v) {
+                v[selectedVar] = setValue;
+                angular.forEach(v.relateUsers, function (v) {
+                    v[selectedVar] = setValue;
+                });
+            });
+        }
+        
+        $scope.loadTagById = function(selectedItem) {
+            $scope.tagLoading = true;
+            $http.get("/tags/"+selectedItem+"?expand=projectLevelObj,itemObj,processObj,userGroup,tagAssignmentObj").success(function(data) {
+                
+                $scope.search.project = {'id': $routeParams.project_id, 'project_name': data.project_name};
+                
+                $scope.tagDetails.tag_name = data.tag_name;
+                $scope.tagDetails.pre = data.pre;
+                $scope.tagDetails.post = data.post;
+                $scope.tagDetails.tag_description = data.tag_description;
+                $scope.tagDetails.product_code = data.product_code;
+                
+                $scope.tagDetails.tag_item_id = data.tag_item_id;
+                $scope.search.item = data.itemObj;
+                $scope.items.splice(1, ($scope.items.length-1));
+                angular.forEach(data.itemObj, function(v, k){
+                    if(k!=0)
+                        $scope.items.push([v]);
+                });
+
+                $scope.tagDetails.tag_process_flow_id = data.tag_process_flow_id;
+                $scope.search.process = data.processObj;
+                $scope.processes.splice(1, ($scope.processes.length-1));
+                angular.forEach(data.processObj, function(v, k){
+                    if(k!=0)
+                        $scope.processes.push([v]);
+                });
+
+                rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': $scope.tagDetails.tag_process_flow_id}).success(function(data) {
+                        $scope.process_stages = data.items;
+                });
+
+                $scope.tagDetails.project_level_id = data.project_level_id;
+                $scope.search.childlevels = data.projectLevelObj;
+                $scope.projectlevels.splice(1, ($scope.projectlevels.length-1));
+                angular.forEach(data.projectLevelObj, function(v, k){
+                    $scope.projectlevels.push([v]);
+                });
+
+                $scope.tagDetails.user_group_id = data.user_group_id;
+                $scope.search.usergroup = data.userGroup;
+                $scope.getUserLevel();
+                $scope.tagDetails.tagAssignment = data.tagAssignmentObj;
+                $scope.tagLoading = false;
+            }).error(function(data) {
+                errorCallback();
+                $scope.tagLoading = false;
+            });
+        }
+                
+        $scope.getUserLevel = function() {
+            
+            if(!$scope.tagDetails['project_level_id'])
+            {
+                alert("Please select a project level before moving ahead.");
+                $scope.search.usergroup = null;
+                return;
+            }
+            else if(!$scope.tagDetails['tag_item_id'])
+            {
+                alert("Please select an item type before moving ahead.");
+                $scope.search.usergroup = null;
+                return;
+            }
+            else if(!$scope.tagDetails['tag_process_flow_id'])
+            {
+                alert("Please select a process flow before moving ahead.");
+                $scope.search.usergroup = null;
+                return;
+            }
+            
+            $scope.tagDetails['user_group_id'] = $scope.search.usergroup.id;
+            $http.post("/userlevels/getall", {'search': {user_group_id:$scope.search.usergroup.id}}).success(function(data) {
+                $scope.levels = data.items;
+            });
+        }
+        
+        $scope.updateSelectBox = function(variable, projectId, level, parent) {
+            
+            $scope.tagDetails['project_id'] = projectId;
+            
+            if(variable=="projectlevels") {
+                
+                $scope[variable].splice(level, ($scope[variable].length-level));
+                
+                $http.post("/projectlevel/getall", {'search': {'project_id': projectId, 'parent_id': parent}, 'select': ['id', 'level_name']}).success(function(data) {
+                    if(data.items.length>0)
+                        $scope[variable].push(data.items);
+                });
+
+                if(level==0) {
+                    $scope.items = [];
+                    $scope.processes = [];
+                    rest.setData("usergroups/getall", [], {'project_id': projectId}).success(function(data) {
+                        if(data.items.length)
+                            $scope.usergroups = data.items;
+                    });
+                    rest.setData("items/getall", ['id', 'item_name'], {'parent_id': 0, 'project_id': projectId}).success(function(data) {
+                        if(data.items.length)
+                            $scope.items.push(data.items);
+                    });
+                    rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': 0, 'project_id': projectId}).success(function(data) {
+                        if(data.items.length)
+                            $scope.processes.push(data.items);
+                        
+                        $scope.loadTagById($routeParams.id);
+                    });
+                }
+                else
+                {
+                    $scope.tagDetails['project_level_id'] = parent;
+                }
+            }
+            else if(variable=='items') {
+                if(level > 0)
+                    $scope.tagDetails['tag_item_id'] = parent;
+                
+                $scope[variable].splice(level, ($scope[variable].length-level-1));
+                
+                rest.setData("items/getall", ['id', 'item_name'], {'parent_id': parent}).success(function(data) {
+                    if(data.items.length>0)
+                        $scope[variable].push(data.items);
+                });
+                
+                if($scope.search['process'] && $scope.search.process[0] && level==1) {
+                    $scope['processes'].splice(0, ($scope['processes'].length-1));
+
+                    rest.setData("items/getrelatedprocess/"+parent, ['id', 'process_name'], {'process_parent_id': $scope.search.process[0], 'tag_item_id': $scope.search.item[1]}).success(function(data) {
+                        if(data.items.length>0)
+                            $scope['processes'].push(data.items);
+                    });
+                }
+            }
+            else if(variable=='processes') {
+                
+                if(level==1)
+                    $scope.tagDetails['tag_process_flow_id'] = parent;
+                
+                if($scope.search['item'] && $scope.search.item[1]) {
+                    $scope[variable].splice(level, ($scope[variable].length-level-1));
+                    
+                    if(level < 1) {   
+                        rest.setData("items/getrelatedprocess/"+$scope.search.item[1].id, ['id', 'process_name'], {'process_parent_id': parent}).success(function(data) {
+                            if(data.items.length>0)
+                                $scope[variable].push(data.items);
+                        });
+                    }
+                    else if(level==1) {
+                        rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': parent}).success(function(data) {
+                            $scope.process_stages = data.items;
+                        });
+                    }
+                }
+            }
+        }
+        
+        $scope.updateSelectBox("projectlevels", $routeParams.project_id, 0, 0);
+        
+        $scope.saveTagDetails = function() {
+            $scope.working = true;
+            $scope.tagDetails.tag_assignment = [];
+            $scope.tagDetails.tagAssignment = null;
+            
+            angular.forEach($scope.levels, function(level) {
+                angular.forEach(level.relateUsers, function(value) {
+                    if(value['isSelected']) {
+                        $scope.tagDetails.tag_assignment.push({'user_id': value['user_id'], 'process_stage_from': $scope.search.stage_from[value['user_id']], 'process_stage_to': $scope.search.stage_to[value['user_id']], 'mandatory': $scope.search.mandatory[value['user_id']], 'notification_status': $scope.search.notification_status[value['user_id']], 'notification_frequency': $scope.search.notification_frequency[value['user_id']]});
+                    }
+                });
+            });
+            
+            $http.post("/tags/updatesimpletags/"+$routeParams.id,{'tagDetails': $scope.tagDetails}).success(function(data) {
+                alertService.clearAll();
+                if(data=='Success') {
+                    alertService.add('success', "Tag(s) Created Successfully.");
+                    $location.path('/tags').replace();
+                }
+                $scope.working = false;
+            }).error(function(data) {
+                alertService.clearAll();
+                alert("Error in tag creation");
+                alertService.add('error', data);
+                $scope.working = false;
+            });
+        }
+        
+        var errorCallback = function (data) {
+            if(data.status!=401) {
+                alertService.add('error', "Error in processing your request. Please try again.");
+            }
+        };
+        
+        $scope.$watch('process_stages', function (newVal) {
+            $scope.noti_status = [
+                {id: 'all', name:'All process'},
+                {id: 'assigned', name:'Assigned process'},
+            ];
+            angular.forEach($scope.process_stages, function(v) {
+                $scope.noti_status.push({'id': v['id'], 'name': v['process_name']});
+            });
+        }, true);
+        
+    }])
+
+app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'tooltip','$modal','$log',
+                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, tooltip,$modal,$log) {
+        
+        rest.path = "tags";
+        $scope.tooltip = tooltip;
+        
+        breadcrumbsService.setTitle("Create Simple Tag");        
+        breadcrumbsService.clearAll();
+        breadcrumbsService.add("", "Home");
+        breadcrumbsService.add("/#/tags", "Tags");
+        breadcrumbsService.add("/#/tags", "Create Tag");
+        
+        $scope.search = {};
+        $scope.projectlevels = [];
+        $scope.predicate = "";
+        $scope.projects = [];
+        $scope.usergroups = [];
+        $scope.itemList = [];
+        $scope.items = [];
+        $scope.processes = [];
+        $scope.tagDetails = {};
+        $scope.tagDetails.tags = [];
+        $scope.tagDetails.tagAssignment = {};
+        $scope.levels = [];
+        $scope.process_stages = [];
+        $scope.working = false;
+        
+        $scope.noti_frequency = [
+            {id: 'onupdate', name:'On update'},
+            {id: 'daily', name:'Daily'},
+            {id: 'weekly', name:'Weekly'},
+            {id: 'monthly', name:'Monthly'},
+            {id: 'yearly', name:'Yearly'},
+        ];
+        
+        $scope.noti_status = [];
+        
+        $scope.$delItems  = [];  
+        
+        $scope.deleteTags = function() {
+            
+            $scope.$delItems = $scope.$delItems.filter(function(e){return e});
+
+            for(var i = 0; i < $scope.selectedTags.length; i++) {
+                 var obj = $scope.selectedTags[i];
+
+                 if($scope.$delItems.indexOf(obj.id) !== -1) {
+                     $scope.selectedTags.splice(i, 1);
+                     i--;
+                 }
+             }
+             $scope.$delItems  = [];
+             $scope.selectedTags = $scope.selectedTags.filter(function(e){return e});
+        }
+        
+        $scope.openModel = function () {
+        
+            var modalInstance = $modal.open({
+              templateUrl: '/templates/tags/add_more_tag.html',
+              controller: 'SelectTagsPopup',
+              size: 'lg',
+               resolve: {
+                  items: function () {
+                    return $scope.tags;
+                   }
+               }
+            });
+
+          modalInstance.result.then(function (selectedItem) {
+            $scope.selectedTags = selectedItem.filter(function(e){return e});
+          }, function () {
+          $log.info('Modal dismissed at: ' + new Date());
+          });
+        };
+        
+        $scope.selectAllLevels = function($event) {
+            var parts = "levels";
+            var selectedVar = "isSelected";
+            var element = angular.element($event.currentTarget);
+            var setValue = $scope.selectAllLevelUsers;
+            angular.forEach($scope.$eval(parts), function (v) {
+                v[selectedVar] = setValue;
+                angular.forEach(v.relateUsers, function (v) {
+                    v[selectedVar] = setValue;
+                });
+            });
+        }
+          
+        $scope.getUserLevel = function() {
+            
+            if(!$scope.tagDetails['project_level_id'])
+            {
+                alert("Please select a project level before moving ahead.");
+                $scope.search.usergroup = null;
+                return;
+            }
+            else if(!$scope.tagDetails['tag_item_id'])
+            {
+                alert("Please select an item type before moving ahead.");
+                $scope.search.usergroup = null;
+                return;
+            }
+            else if(!$scope.tagDetails['tag_process_flow_id'])
+            {
+                alert("Please select a process flow before moving ahead.");
+                $scope.search.usergroup = null;
+                return;
+            }
+            
+            $scope.tagDetails['user_group_id'] = $scope.search.usergroup.id;
+            $http.post("/userlevels/getall", {'search': {user_group_id:$scope.search.usergroup.id}}).success(function(data) {
+                $scope.levels = data.items;
+            });
         }
         
         $scope.updateSelectBox = function(variable, projectId, level, parent) {
@@ -333,10 +931,20 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
         }
         
         $scope.saveTagDetails = function() {
+            
+            if($scope.$delItems.length == 0){
+                
+                alertService.clearAll();
+                alertService.add('error', "Please add tags.");
+                return;
+            }
+            
             $scope.working = true;
             $scope.tagDetails.tag_assignment = [];
+            $scope.tagDetails.tagAssignment = undefined;
             
             angular.forEach($scope.levels, function(level) {
+                
                 angular.forEach(level.relateUsers, function(value) {
                     if(value['isSelected']) {
                         $scope.tagDetails.tag_assignment.push({'user_id': value['user_id'], 'process_stage_from': $scope.search.stage_from[value['user_id']], 'process_stage_to': $scope.search.stage_to[value['user_id']], 'mandatory': $scope.search.mandatory[value['user_id']], 'notification_status': $scope.search.notification_status[value['user_id']], 'notification_frequency': $scope.search.notification_frequency[value['user_id']]});
@@ -344,9 +952,12 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
                 });
             });
             
-            $http.post("/tags/create-simple-tags",{'tagDetails': $scope.tagDetails}).success(function(data) {
+            $http.post("/tags/create-master-tags",{'tagDetails': $scope.tagDetails,'relatedTags':$scope.selectedTags}).success(function(data) {
                 alertService.clearAll();
-                alertService.add('success', "Tag(s) Created Successfully.");
+                if(data=='Success') {
+                    alertService.add('success', "Tag(s) Created Successfully.");
+                    $location.path('/tags').replace();
+                }
                 $scope.working = false;
             }).error(function(data) {
                 alertService.clearAll();
@@ -364,9 +975,18 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
         
         rest.setData("projects/getall", ['id', 'project_name'], {'project_status': null}).success(function(data) {$scope.projects = data.items;});
         
+        $scope.$watch('process_stages', function (newVal) {
+            $scope.noti_status = [
+                {id: 'all', name:'All process'},
+                {id: 'assigned', name:'Assigned process'},
+            ];
+            angular.forEach($scope.process_stages, function(v) {
+                $scope.noti_status.push({'id': v['id'], 'name': v['process_name']});
+            });
+        }, true);
     }])
 
-app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'tooltip','$modal','$log',
+app.controller('TagsUpdateMaster', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'tooltip','$modal','$log',
                 function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, tooltip,$modal,$log) {
         
         rest.path = "tags";
@@ -466,7 +1086,7 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
                 if(level==0) {
                     $scope.items = [];
                     $scope.processes = [];
-                    rest.setData("usergroups/getall", {'UserGroups': ['user_group_id', 'group_name']}, {}).success(function(data) {$scope.usergroups = data.items;});
+                    rest.setData("usergroups/getall", {}, {}).success(function(data) {$scope.usergroups = data.items;});
                     rest.setData("items/getall", ['id', 'item_name'], {'parent_id': 0}).success(function(data) {$scope.items.push(data.items);});
                     rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': 0}).success(function(data) {$scope.processes.push(data.items);});
                 }
@@ -530,6 +1150,7 @@ app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParam
         $scope.predicate = "";
         $scope.projects = [];
         $scope.usergroups = [];
+		$scope.activity = [];
         
         $scope.updateLevel = function(projectId, level, parent) {
             $scope.search.project_id = projectId;
@@ -542,7 +1163,7 @@ app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParam
             });
             
             if(level==0)
-                $http.post("usergroups/getall", {'search': {'project_id': projectId}, 'select': {'UserGroups': ['id', 'group_name']}}).success(function(data) {
+                $http.post("usergroups/getall", {'search': {'project_id': projectId}}).success(function(data) {
                     $scope.usergroups = data.items;
                 });
         }
@@ -602,6 +1223,15 @@ app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParam
             });
             
         }).error(errorCallback);
+
+		
+        $http.post("/tag-activity-log/search?expand=attachments",{'search': {'tag_id':$routeParams.id}}).success(function(data) {
+            $scope.activity = data.items;
+        });
+        
+        $http.get("/tags/"+$routeParams.id+"?expand=projectLevelObj,userGroup,processObj,itemObj").success(function(data) {
+            $scope.tagAnalytic = data;
+        });
     }])
 
 app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 
@@ -912,12 +1542,13 @@ app.controller('TagItems', function($scope, rest, $location, $route, $routeParam
     $scope.loadItemGroup();
 });
 
-app.controller('createSimilarTagModalController', function ($scope, $modalInstance, $http) {
+app.controller('createSimilarTagModalController', function ($scope, $modalInstance, $http, itemScope) {
 
     $scope.search = {};
     $scope.popupTags = {};
     $scope.temp = [];
     $scope.popupTags.selectedTagId = 0;
+    $scope.search.project_id = itemScope.project_id;
     
     $scope.searchTags = function(){
         $http.post("/tags/search",{search:$scope.search}).success(function(data) {
@@ -944,16 +1575,20 @@ app.controller('createSimilarTagModalController', function ($scope, $modalInstan
     }, true);
 
     $scope.ok = function () {
+        if(!$scope.popupTags.selectedTagId)
+        {
+            alert("No tag selected.");
+            return false;
+        }
         $modalInstance.close($scope.popupTags.selectedTagId);
     };
-
-    $http.post("/tags/getall").success(function(data) {
-        $scope.popupTags = data.items;
-    });
 
     $scope.cancel = function () {
         $modalInstance.dismiss('cancel');
     };
+    
+    $scope.searchTags();
+    
 });
 
 app.controller('SelectTagsPopup', function ($scope, $modalInstance, $http, items) {

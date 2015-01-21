@@ -8,23 +8,17 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="col-sm-4 control-label text-right">Project Name :</label>
-                                <div class="col-sm-8">
-                                    <ui-select ng-model="search.project.selected"
-                                   theme="bootstrap" ng-disabled="disabled" >
-                                        <ui-select-match placeholder="Construction work at Abc hospital">Construction work at Abc hospital</ui-select-match>
-                                        <ui-select-choices repeat="project in projects | filter: $select.search"
-                                                 refresh-delay="0">
-                                            <div ng-bind-html="project.project_name" ng-click="updateLevel(project.id, 0, 0)"></div>
-                                        </ui-select-choices>
-                                      </ui-select>
+                                <div class="col-sm-8 multi-level">
+                                    <div class="item-group">{{tagAnalytic.project_name}}</div>
+                                    
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="col-sm-4 control-label text-right">UNIQUE ID :</label>
-                                <div class="col-sm-8">
-                                    <div class="item-group">20971F00245</div>
+                                <div class="col-sm-8 multi-level">
+                                    <div class="item-group">{{tagAnalytic.uid}}</div>
 
                                 </div>
                             </div>
@@ -34,38 +28,29 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="col-sm-4 control-label text-right">Project Level:</label>
-                                <div class="col-sm-8">
-                                    <ui-select ng-model="search.project.selected"
-                                   theme="bootstrap" ng-disabled="disabled" >
-                                        <ui-select-match placeholder="Level 1">Level 1</ui-select-match>
-                                        <ui-select-choices repeat="project in projects | filter: $select.search"
-                                                 refresh-delay="0">
-                                            <div ng-bind-html="project.project_name" ng-click="updateLevel(project.id, 0, 0)"></div>
-                                        </ui-select-choices>
-                                      </ui-select>
+                                <div class="col-sm-8 multi-level">
+                                    <span ng-repeat="level in tagAnalytic.projectLevelObj" class="{{$last?'':'level-item'}}"> 
+                                        {{level.level_name}}
+                                    </span>
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="col-sm-4 control-label text-right">User Group :</label>
-                                <div class="col-sm-8">
-                                    <ui-select ng-model="search.project.selected"
-                                   theme="bootstrap" ng-disabled="disabled" >
-                                        <ui-select-match placeholder="User Group A">Level 1</ui-select-match>
-                                        <ui-select-choices repeat="project in projects | filter: $select.search"
-                                                 refresh-delay="0">
-                                            <div ng-bind-html="project.project_name" ng-click="updateLevel(project.id, 0, 0)"></div>
-                                        </ui-select-choices>
-                                      </ui-select>
+                                <div class="col-sm-8 multi-level">
+                                        <span class="ng-scope">{{tagAnalytic.userGroup['group_name']}}</span>
                                 </div>
                             </div>
                         </div>
+                    </div><!--/row-->
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="col-sm-4 control-label text-right">Tag  Name :</label>
                                 <div class="col-sm-8 multi-level">
-                                    <div>Engineering </div>
+                                    <div class="item-group"> {{tagAnalytic.tag_name}}</div>
                                 </div>
                             </div>
                         </div>
@@ -73,7 +58,7 @@
                             <div class="form-group">
                                 <label class="col-sm-4 control-label text-right">Tag Description :</label>
                                 <div class="col-sm-8 multi-level">
-                                    <div class="item-group">Tag process at work</div>
+                                    <div class="item-group">{{tagAnalytic.tag_description}}</div>
                                 </div>
                             </div>
                         </div>
@@ -82,9 +67,11 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="col-sm-4 control-label text-right">Tag Process:</label>
+                                <label class="col-sm-4 control-label text-right">Items:</label>
                                 <div class="col-sm-8 multi-level">
-                                    Site Construction
+                                   <span ng-repeat="level in tagAnalytic.itemObj" class="{{$last?'':'level-item'}}">
+                                       {{level.item_name}}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -92,14 +79,9 @@
                             <div class="form-group">
                                 <label class="col-sm-4 control-label text-right">Process Level :</label>
                                 <div class="col-sm-8 multi-level">
-                                    <ui-select ng-model="search.project.selected"
-                                   theme="bootstrap" ng-disabled="disabled" >
-                                        <ui-select-match placeholder="Process Level">Level 1</ui-select-match>
-                                        <ui-select-choices repeat="project in projects | filter: $select.search"
-                                                 refresh-delay="0">
-                                            <div ng-bind-html="project.project_name" ng-click="updateLevel(project.id, 0, 0)"></div>
-                                        </ui-select-choices>
-                                      </ui-select>
+                                    <span ng-repeat="level in tagAnalytic.processObj" class="{{$last?'':'level-item'}}"> 
+                                        {{level.process_name}}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -107,7 +89,7 @@
                             <div class="form-group">
                                 <label class="col-sm-4 control-label text-right">Product Code :</label>
                                 <div class="col-sm-8 multi-level">
-                                    <div class="item-group">700124F0012</div>
+                                    <div class="item-group">{{tagAnalytic.product_code}}</div>
                                 </div>
                             </div>
                         </div>
@@ -125,19 +107,19 @@
                 </div>
                 <div class='col-sm-3'>
                     <div class="col-sm-5 col-md-6 bar-code-container2">
-                        <div class="bar-code text-center">
+                        
+                        <button openlightbox="" imageurl="JHH22JD322N.png" type="barCode" image-title="Test Tag 1" class="bar-code text-center">
                             <i class="fa fa-barcode fa-5x"></i>
-                        </div>
-
+                        </button>
                         <div class="bar-code-text text-center">
                             Bar Code 
                         </div>
                     </div>
                     <div class="col-sm-5 col-md-6 bar-code-container2">
-                        <div class="bar-code text-center">
+                        
+                        <button openlightbox="" imageurl="JHH22JD322N.png" type="qrCode" image-title="Test Tag 1" class="bar-code text-center">
                             <i class="fa fa-qrcode fa-5x"></i>
-                        </div>
-
+                        </button>
                         <div class="bar-code-text text-center">
                             QR Code
                         </div>
@@ -175,8 +157,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="text-center">1</td>
+                            <tr ng-repeat="userProcess in userProcesses.tagAssignmentObj">
+                                <td class="text-center">{{$index+1}}</td>
                                 <td class="text-center">Admin One</td>
                                 <td class="text-center"></td>
                                 <td class="text-center">
@@ -194,93 +176,23 @@
                             <tr>
                                 <td class="text-center"></td>
                                 <td class="text-center"></td>
-                                <td class="text-center">User 1</td>
+                                <td class="text-center">{{userProcess[3].userDetails.username}}</td>
                                 <td class="text-center">
-                                   Sample Text
+                                   {{userProcess[3].process_stage_from.process_name}}
                                 </td>
                                 <td class="text-center">
-                                    Sample Text
+                                     {{userProcess.process_stage_to.process_name}}
                                 </td>
                                 <td class="text-center">
-                                    No
+                                    {{userProcess.mandatory}}
                                 </td>
                                 <td class="text-center">
-                                    <a href="#" class="links">All , On Update</a>
+                                    <a href="#" class="links">{{userProcess[3].status}}</a>
                                 </td>
                                 <td class="text-center">
-                                    <a href="#" class="links">Daily</a>
+                                    <a href="#" class="links">{{userProcess.notification_frequency}}</a>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center"></td>
-                                <td class="text-center"></td>
-                                <td class="text-center">User 1</td>
-                                <td class="text-center">
-                                   Sample Text
-                                </td>
-                                <td class="text-center">
-                                    Sample Text
-                                </td>
-                                <td class="text-center">
-                                    No
-                                </td>
-                                <td class="text-center">
-                                    <a href="#" class="links">All , On Update</a>
-                                </td>
-                                <td class="text-center">
-                                    <a href="#" class="links">Weekly</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">2</td>
-                                <td class="text-center">Admin Two</td>
-                                <td class="text-center"></td>
-                                <td class="text-center"></td>
-                                <td class="text-center"></td>
-                                <td class="text-center"></td>
-                                <td class="text-center"></td>
-                                <td class="text-center"></td>
-                            </tr>
-                            <tr>
-                                <td class="text-center"></td>
-                                <td class="text-center"></td>
-                                <td class="text-center">User 1</td>
-                                <td class="text-center">
-                                   Sample Text
-                                </td>
-                                <td class="text-center">
-                                    Sample Text
-                                </td>
-                                <td class="text-center">
-                                    No
-                                </td>
-                                <td class="text-center">
-                                    <a href="#" class="links">All , On Update</a>
-                                </td>
-                                <td class="text-center">
-                                    <a href="#" class="links">Weekly</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center"></td>
-                                <td class="text-center"></td>
-                                <td class="text-center">User 1</td>
-                                <td class="text-center">
-                                   Sample Text
-                                </td>
-                                <td class="text-center">
-                                    Sample Text
-                                </td>
-                                <td class="text-center">
-                                    Yes
-                                </td>
-                                <td class="text-center">
-                                    <a href="#" class="links">All , On Update</a>
-                                </td>
-                                <td class="text-center">
-                                    <a href="#" class="links">Weekly</a>
-                                </td>
-                            </tr>
+                            </tr>                 
                         </tbody>
                     </table>
                     </div><!--/row-->
@@ -303,7 +215,7 @@
                         <th class="text-center">Status</th>
                         <th class="text-center">Comments</th>
                         <th class="text-center">Attachments<br />
-                            <small>(click to download)</small>
+                            <small>(click to view)</small>
                         </th>
                         <th class="text-center">
                             Activity Location<br />
@@ -314,21 +226,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="item in range(5) track by $index">
-                        <td class="text-center">1</td>
+                    <tr ng-repeat="act in activity">
+                        <td class="text-center">{{$index+1}}</td>
+                        <td class="text-center">{{act.status}}
+                        </td>
+                        <td class="text-center">{{act.comments}}</td>
                         <td class="text-center">
-                            Material Received - No
+                            
+                            <span  ng-repeat="attch in act.attachments" >
+                                <a href="">{{attch.filename}}&nbsp;&nbsp;<i class="fa fa-file-word-o"></i></a>,
+                            </span>
+                            <span ng-hide="act.attachments.length>0">No attachments available</span>
                         </td>
                         <td class="text-center">
-                            Material still not received
-                        </td>
-                        <td class="text-center">
-                            <a href="">Attachment 1 <i class="fa fa-file-word-o"></i></a>, &nbsp;
-                            <a href="">Attachment 2 <i class="fa fa-file-image-o"></i></a>, &nbsp;
-                            <a href="">Attachment 3 <i class="fa fa-file-pdf-o"></i></a>
-                        </td>
-                        <td class="text-center">
-                            <a>test location</a><br /><small>from Mobile</small>
+                            <a>{{act.location}}</a><br /><small>{{act.device}}</small>
                         </td>
                         <td class="text-center">
                             Mr. Ankur Sharma <br/>

@@ -1,0 +1,422 @@
+<div class="col-xs-12 secondary-bg mt-20">
+    <div class="col-xs-12 shadow-box">
+        <form id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form" ng-class="{'ng-hide':showSearchBox}">
+        
+        <div class="row">
+            <div class="col-md-6 col-lg-5">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label text-right">Project Name :</label>
+                    <div class="col-sm-6 multi-level">
+                        <ui-select ng-model="search.project"
+                                   theme="bootstrap" class='last-child'>
+                          <ui-select-match placeholder="Select a project...">{{$select.selected.project_name}}</ui-select-match>
+                          <ui-select-choices repeat="project in projects | filter: $select.search"
+                                   refresh-delay="0">
+                              <div ng-bind-html="project.project_name" ng-click="updateSelectBox('projectlevels', project.id, 0, 0)"></div>
+                          </ui-select-choices>
+                        </ui-select>
+                        <input ng-model="search.project.id" name="search.project_id" type="hidden" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-7">
+                <div class="form-group">
+                    <label class="col-sm-4 col-lg-3 control-label text-right">Project Level :</label>
+                    <div class="col-sm-8 col-lg-9 multi-level">
+                        <ui-select ng-repeat="childlevels in projectlevels" ng-model="search.childlevels[$index]"
+                                   theme="bootstrap" class="{{((projectlevels.length-1)===$index?'last-child ':'')}}">
+                          <ui-select-match placeholder="Select a level...">{{$select.selected.level_name}}</ui-select-match>
+                          <ui-select-choices repeat="level in childlevels | filter: $select.search"
+                                   refresh-delay="0">
+                              <div ng-bind-html="level.level_name" ng-click="updateSelectBox('projectlevels', search.project.id, ($parent.$index+1), level.id)"></div>
+                          </ui-select-choices>
+                        </ui-select>
+                        <div ng-hide="projectlevels.length && search.project.id">
+                            <a ng-href="/#/projects/levels/{{search.project.id}}" ng-hide="(projectlevels.length && search.project.id) || !search.project.id">Click to manage project levels.</a>
+                            <span ng-hide="search.project.id">Select a project first</span>
+                        </div>
+                        <input ng-model="search.childlevels[$index].id" name="search.project_level_id" type="hidden" />
+                    </div>
+                </div>
+            </div>
+        </div><!--/row-->
+        
+        <div class="row">
+            <div class="col-md-6 col-lg-5">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label text-right">Item:</label>
+                    <div class="col-sm-6 multi-level">
+                        <ui-select ng-repeat="item in items"  ng-model="search.item[$index]"
+                                   theme="bootstrap" ng-disabled="disabled" class="{{((items.length-1)===$index?'last-child ':'')}}">
+                          <ui-select-match placeholder="Select item">{{$select.selected.item_name}}</ui-select-match>
+                          <ui-select-choices repeat="i in item | filter: $select.search"
+                                   refresh-delay="0">
+                              <div ng-bind-html="i.item_name" ng-click="updateSelectBox('items', search.project.id, $parent.$index, i.id)"></div>
+                          </ui-select-choices>
+                        </ui-select>
+                        <div ng-hide="items.length && search.project.id">
+                            <a ng-href="/#/tagitems/project/{{search.project.id}}" ng-hide="(items.length && search.project.id) || !search.project.id">Click to manage project items.</a>
+                            <span ng-hide="search.project.id">Select a project first</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-7">
+                <div class="form-group">
+                    <label class="col-sm-4 col-lg-3 control-label text-right">Process Flow:</label>
+                    <div class="col-sm-6 multi-level">
+                        <ui-select ng-repeat="process in processes"  ng-model="search.process[$index]"
+                                   theme="bootstrap" ng-disabled="disabled" class="{{((processes.length-1)===$index?'last-child ':'')}}">
+                          <ui-select-match placeholder="Select process">{{$select.selected.process_name}}</ui-select-match>
+                          <ui-select-choices repeat="p in process | filter: $select.search"
+                                   refresh-delay="0">
+                              <div ng-bind-html="p.process_name" ng-click="updateSelectBox('processes', search.project.id, $parent.$index, p.id)"></div>
+                          </ui-select-choices>
+                        </ui-select>
+                        <div ng-hide="processes.length && search.project.id">
+                            <a ng-href="/#/tag-process-flow/project/{{search.project.id}}" ng-hide="(processes.length && search.project.id) || !search.project.id">Click to manage process.</a>
+                            <span ng-hide="search.project.id">Select a project first</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!--/row-->
+        
+        <div class="row">
+            <div class="col-md-6 col-lg-5">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label text-right">User Group :</label>
+                    <div class="col-sm-6 multi-level">
+                        <ui-select ng-model="search.usergroup"
+                                   theme="bootstrap" class="last-child" ng-change="getUserLevel()" ng-hide="!usergroups.length">
+                          <ui-select-match placeholder="Select a group...">{{$select.selected.group_name}}</ui-select-match>
+                          <ui-select-choices repeat="usergroup in usergroups | filter: $select.search"
+                                   refresh-delay="0">
+                              <div ng-bind-html="usergroup.group_name"></div>
+                          </ui-select-choices>
+                          <a ng-href="/#/userGroups/project/{{search.project.id}}" ng-hide="(usergroups.length && search.project.id) || !search.project.id">Click to manage project levels.</a>
+                        </ui-select>
+                        <div ng-hide="usergroups.length && search.project.id">
+                            <a ng-href="/#/user-groups/project/{{search.project.id}}" ng-hide="(usergroups.length && search.project.id) || !search.project.id">Click to manage user groups.</a>
+                            <span ng-hide="search.project.id">Select a project first</span>
+                        </div>
+                        <input ng-model="search.usergroup.id" name="search.user_group_id" type="hidden" />
+                    </div>
+                </div>
+            </div>
+        </div><!--/row-->
+    </form>
+    <div>
+        <script type="text/ng-template" id="myModalContent.html">
+        <div class="modal-header">
+            <h3 class="modal-title">I'm a modal!</h3>
+        </div>
+        <div class="modal-body">
+            <ul>
+                <li ng-repeat="item in items">
+                    <a ng-click="selected.item = item">{{ item }}</a>
+                </li>
+            </ul>
+            Selected: <b>{{ selected.item }}</b>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="ok()">OK</button>
+            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        </div>
+    </script>
+
+        <button class='btn btn-primary' ng-click="openModel()">Add more tags</button>
+    </div>
+    <div class="table-responsive table-responsive-cust mt-10">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th class="text-center"><i class='fa fa-trash' ng-click="deleteTags()"></i></th>
+                    <th class="text-center"><a href=''>Type <i class='fa fa-sort'></i></a></th>
+                    <th class="text-center"><a>UID <i class='fa fa-sort'></i></a></th>
+                    <th class="text-center">Project Level</th>
+                    <th class="text-center">Item Type</th>
+                    <th class="text-center" ><a>Tag Name <i class='fa fa-sort'></i></a></th> 
+                    <th class="text-center" >Description</th> 
+                    <th class="text-center" ><a>Product Code <i class='fa fa-sort'></i></a></th>
+                    <th class="text-center" ><a>Last updated by</th>
+                    <th class="text-center" >Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat='dat in selectedTags track by $index'>
+                    <td class="text-center">
+                        <input type="checkbox" ng-model="$delItems[dat.id]" ng-true-value="{{dat.id}}"></td>
+                                <td class="text-center {{dat.type}}">{{dat.type}}</td>
+                                
+                                <td class="text-center">{{dat.uid}}</td>
+                                <td class="text-center multi-level">
+                                    <div class="level-item">{{dat.project_name}}</div>
+                                    <div class="level-item" ng-repeat="project_level in dat.project_level" ng-class="{'last-child': dat.project_level.length===($index+1)}">
+                                        {{project_level}}
+                                    </div>
+                                </td>
+                                <td class="text-center">{{dat.itemDetails.item_name}}</td>
+                                <td class="text-center">{{dat.tag_name}}</td>
+                                <td class="text-center">{{dat.tag_description}}</td>
+                                <td class="text-center">{{dat.product_code}}</td>
+                                <td class="text-center">
+                                    Material Received - No<br/>
+                                    <small>(A.R. Hussain Nov 11, 2014 13:10:11)</small>
+                                </td>
+                                <td class="text-center">
+                                    <a ng-href="/#/tags/{{dat.id}}">Task analysis</a>
+
+                                </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="pull-right">                    
+            <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
+            <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px"><option>20</option></select>
+        </div>
+        
+    </div>
+    </div><!--/shadow-box-->
+    
+     <div class="wrapper mt-35">
+        <div class="table-responsive table-responsive-cust">
+              <div class="col-xs-12 search-tag-box mb-sm-large" ng-hide="true">
+                        <div class="row">
+                            <h2 class="col-xs-12 search-title">Search Tags<button class="pull-right btn icon-btn"><i class="fa fa-sort-desc fa-2x" id="down-arrow"></i><i class="fa fa-sort-asc fa-2x" id="up-arrow" style="display: none"></i></button>
+                            </h2>
+                        </div><!--/row-->
+                        <form id="form" class="form-horizontal form-horizontal-typ1 form-wrapper" role="form">
+                            <div class="row">
+                                <div class="col-md-6 col-lg-5">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label text-right">Tag Name :</label>
+                                        <div class="col-sm-6">
+                                            <input type="text" class="form-control" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-5">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label text-right">Tag UID :</label>
+                                        <div class="col-sm-6">
+
+                  <input type="text" class="form-control" /> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!--/row-->
+                            <div class="row">
+                                <div class="col-md-6 col-lg-5">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label text-right">Tag Description :</label>
+                                        <div class="col-sm-6">
+                                            <input type="text" class="form-control" /> 
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-5">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label text-right">Project Level :</label>
+                                        <div class="col-sm-6">
+                                            <input type="text" class="form-control" /> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!--/row-->
+                            <div class="row mt-20">
+                               <div class="col-sm-10 text-center">
+                                    <button class="btn btn-primary mb-sm-5">Search</button>
+                                    <button class="btn btn-primary mb-sm-5">Clear Search</button>
+                               </div> 
+                            </div>
+                        </form>
+
+            <form class="form-horizontal-typ1">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center" rowspan="2">
+                                <input type="checkbox"></th>
+                            <th class="text-center">Type</th>
+                            <th class="text-center">UID</th>
+                            <th class="text-center">Project Level</th>
+                            <th class="text-center">Item Type</th>
+                            <th class="text-center" >Tag Name</th>
+                            <th class="text-center" >Description</th>
+                            <th class="text-center" >Product Code</th>
+                            <th class="text-center" >Status</th>                                                 
+                            <th class="text-center" >Last Updated By</th>
+                            <th class="text-center" >Action</th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center"><input type="checkbox"></td>
+                            <td class="text-center">Sample Tag
+                            </td>
+                            <td class="text-center">1234
+                            </td>
+                            <td class="text-center">Villa>Floor1
+                            </td>
+                            <td class="text-center">Material Items</td>
+                            <td class="text-center">A12</td>
+                            <td class="text-center">AXA224</td>
+                            <td class="text-center">Not Started</td>
+                            <td class="text-center">Hussain R (5 Nov 2014)
+                            </td>
+                            <td class="text-center"><a href="#">Task Analysis</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-center"><input type="checkbox"></td>
+                            <td class="text-center">Sample Tag
+                            </td>
+                            <td class="text-center">1234
+                            </td>
+                            <td class="text-center">Villa>Floor1
+                            </td>
+                            <td class="text-center">Material Items</td>
+                            <td class="text-center">A12</td>
+                            <td class="text-center">AXA224</td>
+                            <td class="text-center">Not Started</td>
+                            <td class="text-center">Hussain R (5 Nov 2014)
+                            </td>
+                            <td class="text-center"><a href="#">Task Analysis</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-center"><input type="checkbox"></td>
+                            <td class="text-center">Sample Tag
+                            </td>
+                            <td class="text-center">1234
+                            </td>
+                            <td class="text-center">Villa>Floor1
+                            </td>
+                            <td class="text-center">Material Items</td>
+                            <td class="text-center">A12</td>
+                            <td class="text-center">AXA224</td>
+                            <td class="text-center">Not Started</td>
+                            <td class="text-center">Hussain R (5 Nov 2014)
+                            </td>
+                            <td class="text-center"><a href="#">Task Analysis</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+            </div><!--/search-tag-box-->
+
+
+        </div>
+    </div><!--/row-->
+    <div class="wrapper mt-35" class="slide" ng-class="{'ng-hide':levels.length<=0}">
+           <div class="table-responsive table-responsive-cust">
+               <form class="form-horizontal-typ1">
+                   <table class="table table-bordered">
+                       <thead>
+                           <tr>
+                               <th class="text-center" rowspan="2">S.No</th>
+                               <th class="text-center" rowspan="2">User Level</th>
+                               <th class="text-center" rowspan="2">
+                                   <input type="checkbox" checkbox-all="levels">
+                               </th>
+                               <th class="text-center" rowspan="2">From Task Process <a tooltip-html-unsafe="{{tooltip.from_task_process}}" class="fa fa-question-circle"></a></th>
+                               <th class="text-center" rowspan="2">To Task Process <a tooltip-html-unsafe="{{tooltip.to_task_process}}" class="fa fa-question-circle"></a></th>
+                               <th class="text-center" rowspan="2">Mandatory <a tooltip-html-unsafe="{{tooltip.mandatory}}" class="fa fa-question-circle"></a></th>
+                               <th class="text-center"colspan="2">Email Notification <a tooltip-html-unsafe="{{tooltip.email_notification}}" class="fa fa-question-circle"></a></th> 
+                           </tr>
+                           <tr>
+                               <th class="text-center">Status</th>
+                               <th class="text-center">Frequency</th> 
+                           </tr>
+                       </thead>
+                       <tbody ng-repeat="level in levels">
+                           <tr>
+                               <td class="text-center">{{$index+1}}</td>
+                               <td class="text-center">{{level.level_name}}</td>
+                               <td class="text-center">
+                                       <input type="checkbox" checkbox-all="level.relateUsers.users">
+                               </td>
+                               <td class="text-center">
+                               </td>
+                               <td class="text-center">
+                               </td>
+                               <td class="text-center">
+                               </td>
+                               <td class="text-center">
+
+                               </td>
+                               <td class="text-center">
+                               </td>
+                           </tr>
+                          <tr ng-repeat="userDetail in level.relateUsers.users">
+                               <td class="text-center"></td>
+                               <td class="text-center"></td>
+                               <td class="text-center">
+                                   <div class="checkbox">
+                                       <label>
+                                           <input type="checkbox" ng-model="userDetail.isSelected"> {{userDetail.first_name}} {{userDetail.last_name}}<br /><small>({{userDetail.designation}})</small>
+                                       </label>
+                                   </div>
+                               </td>
+                               <td class="text-center">
+                                   <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="stage_from[userDetail.id]">
+                                       <ui-select-match placeholder="Select task process">{{$select.selected.process_name}}</ui-select-match>
+                                       <ui-select-choices repeat="stage in process_stages | filter: $select.search"
+                                                refresh-delay="0">
+                                           <div ng-bind-html="stage.process_name"></div>
+                                       </ui-select-choices>
+                                     </ui-select>
+                               </td>
+                               <td class="text-center">
+                                   <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="stage_to[userDetail.id]">
+                                       <ui-select-match placeholder="Select task process">{{$select.selected.process_name}}</ui-select-match>
+                                       <ui-select-choices repeat="stage in process_stages | filter: $select.search"
+                                                refresh-delay="0">
+                                           <div ng-bind-html="stage.process_name"></div>
+                                       </ui-select-choices>
+                                     </ui-select>
+                               </td>
+                               <td class="text-center">
+                                   <div class="checkbox">
+                                       <label>
+                                           <input type="checkbox"> &nbsp;
+                                       </label>
+                                   </div>
+                               </td>
+                               <td class="text-center">
+                                   <button class="btn icon-btn" type="button"><i class="fa fa-plus-circle fa-lg"></i>
+                                   </button>
+                               </td>
+                               <td class="text-center">
+                                   <button class="btn icon-btn" type="button"><i class="fa fa-plus-circle fa-lg"></i>
+                                   </button>
+                               </td>
+                           </tr> 
+                       </tbody>
+                   </table>
+               </form>
+           </div>
+           <div class="tag-btn-wrapper row">
+               <div class="col-sm-5 pull-right ">
+                    <div class="text-left">
+                         <table class="table no-border">
+                                 <tr><th class="text-right">Master Tag Name: </th>
+                                     <td class="text-right" style="padding-right:0;"><input type="text" value="Enter Master Tag Name" class="form-control"/>
+                                         </td></tr>
+                                 <tr><th class="text-right">Master Tag Description: </th>
+                                     <td class="text-right" style="padding-right:0;"><textarea class="form-control">Enter Master Tag Description</textarea>
+                                         </td></tr>
+                         </table>
+                         <div class="pull-right">
+                             <button class="btn btn-primary btn-lg mr-10 plr-large mb-sm-5">Save</button>
+                             <button class="btn btn-danger btn-lg plr-large">Cancel</button>
+                         </div>
+                     </div>
+               </div>
+           </div>      
+       </div><!--/row-->
+</div><!--/secondary-bg-->
