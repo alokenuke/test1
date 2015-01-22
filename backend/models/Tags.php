@@ -199,9 +199,10 @@ class Tags extends \yii\db\ActiveRecord
                 $tagAssignment = [];
                 
                 foreach($this->tagAssignment as $v) {
+                    $temp = [];
                     
-                    $v['process_stage_from'] = TagProcess::find()->select(["id", 'process_name', 'status'])->andWhere(['id' => $v['process_stage_from']])->one();
-                    $v['process_stage_to'] = TagProcess::find()->select(["id", 'process_name', 'status'])->andWhere(['id' => $v['process_stage_to']])->one();
+                    $temp['process_stage_from'] = TagProcess::find()->select(["id", 'process_name', 'status'])->andWhere(['id' => $v['process_stage_from']])->one();
+                    $temp['process_stage_to'] = TagProcess::find()->select(["id", 'process_name', 'status'])->andWhere(['id' => $v['process_stage_to']])->one();
                     
                     $noti_status = [];
                     if($v['notification_status']=='all')
@@ -219,9 +220,17 @@ class Tags extends \yii\db\ActiveRecord
                             $noti_status[] = ['id' => $stage['id'], 'name' => $stage['process_name']];
                     }
                     
-                    $v['notification_status'] = $noti_status;
+                    $temp['notification_status'] = $noti_status;
+                    $temp['mandatory'] = $v['mandatory'];
+                    $temp['notification_frequency'] = $v['notification_frequency'];
                     
-                    $tagAssignment["$v[user_id]"] = $v;
+                    $tagAssignment["$v[user_id]"] = $temp;
+                    
+                    $tagAssignment["$v[user_id]"]['userDetails'] = User::findOne(['id' => $v['user_id']]);
+                    $userLevel = RelUserLevelsUsers::findOne(['user_group_id' => $this->user_group_id, 'user_id' => $v['user_id']]);
+                    if($userLevel) {
+                        $tagAssignment["$v[user_id]"]['user_level'] = UserLevels::findOne(['id' => $userLevel->user_level_id]);
+                    }
                 }
 
                 return $tagAssignment;

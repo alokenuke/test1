@@ -6,6 +6,7 @@ use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
+use yii\helpers\ArrayHelper;
 
 /**
  * User model
@@ -235,7 +236,7 @@ class User extends ActiveRecord implements IdentityInterface
             'first_name',
             'last_name',
             'email',
-			'role',
+            'role',
             'role_name' => function() {
                 $role = $this->roles;
                 if($role)
@@ -249,6 +250,30 @@ class User extends ActiveRecord implements IdentityInterface
             'allow_be',
             'status',
             'photo',        ];
+    }
+    
+    public function extraFields() {
+        return [
+            'assignedProjects' => function() {
+                $userGroups = RelUserLevelsUsers::find()->andWhere(['user_id' => $this->id, 'company_id' => \yii::$app->user->identity->company_id])->groupBy('user_group_id')->all();
+                $groupIds = [];
+                foreach($userGroups as $group) {
+                    $groupIds[] = $group['user_group_id'];
+                }
+                                                
+                if(count($groupIds)) {
+                    $groupProjects = UserGroupProjects::find()->andWhere(['user_group_id' => $groupIds])->groupBy("project_id")->all();
+                    
+                    $projectIds = [];
+                    foreach($groupProjects as $val) {
+                        $projectIds[] = $val['project_id'];
+                    }
+                    
+                    if(count($projectIds))
+                        return Projects::find()->select(['id', 'project_name'])->andWhere(['id' => $projectIds])->all();
+                }
+            }
+        ];
     }
 
     /**

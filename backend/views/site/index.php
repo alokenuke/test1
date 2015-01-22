@@ -29,3 +29,12 @@
         </div>
     </div><!--/row-->
 </section>
+<style>
+    .ui-select-bootstrap .ui-select-choices-row > a
+    {
+        padding: 0;
+    }
+    .ui-select-bootstrap .ui-select-choices-row > a div.ng-binding {
+        padding: 3px 20px
+    }
+</style>

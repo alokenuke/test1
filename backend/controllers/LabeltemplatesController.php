@@ -31,13 +31,6 @@ class LabeltemplatesController extends ApiController
         return $provider;
     }
     
-    public function actionPreview() {
-        
-        return $this->renderPartial('_preview', [
-            'template_param' => \Yii::$app->request->post(),
-        ]);
-    }
-    
     public function actionGetall() {
         return parent::actionGetall();
     }

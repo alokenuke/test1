@@ -37,8 +37,8 @@ class TagAssignment extends \yii\db\ActiveRecord
             [['notification_status', 'notification_frequency', 'created_on'], 'safe']
         ];
     }
-    
-	public function fields() { 
+   
+    public function fields() { 
         return [
             'tag_id',
             'user_id',
@@ -47,8 +47,6 @@ class TagAssignment extends \yii\db\ActiveRecord
             'mandatory',
             'status',
             'notification_frequency',
-            'userDetails'
-            
         ];
     }
     /**

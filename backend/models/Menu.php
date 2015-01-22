@@ -47,6 +47,8 @@ class Menu extends \yii\db\ActiveRecord
 
         $items = static::find()
             ->where(['parent_id' => $parent])
+            ->andWhere(['status' => 1])
+            ->orderBy("position")
             ->all();
 
         $result = []; 

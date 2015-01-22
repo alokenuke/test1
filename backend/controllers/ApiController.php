@@ -86,6 +86,7 @@ class ApiController extends ActiveController
     }
 
     public function actionGenCode() {
+        
         $text = $_GET['text']; 
         $type = $_GET['type'];
         if($_GET) {           
