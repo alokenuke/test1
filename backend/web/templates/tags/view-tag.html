@@ -2,7 +2,7 @@
         <div class="row">
             <div class="col-xs-12 search-box mb-sm-large">
         <form role="form" class="form-wrapper form-horizontal form-horizontal-type1" id="form">
-            <div class="row">
+            <div class="">
                 <div class="col-sm-9">
                     <div class="row">
                         <div class="col-md-6">
@@ -138,14 +138,13 @@
                 </div><!--/row-->
             <div style="padding:10px;" class="table-responsive table-responsive-cust form-wrapper">
                 <form id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form" ng-class="{'ng-hide':showSearchBox}">
-                    <div class="row">
+                    <div class="">
                         <table class="table table-bordered table-striped">
                         <thead>
                             <tr>
                                 <th rowspan="2" class="text-center">S.No</th>
                                 <th rowspan="2" class="text-center">User Level</th>
-                                <th rowspan="2" class="text-center">
-                                </th>
+                                <th rowspan="2" class="text-center">User</th>
                                 <th rowspan="2" class="text-center">From Task Process</th>
                                 <th rowspan="2" class="text-center">To Task Process</th>
                                 <th rowspan="2" class="text-center">Mandatory</th>
@@ -157,7 +156,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="userProcess in userProcesses.tagAssignmentObj">
+<!--                            <tr>
                                 <td class="text-center">{{$index+1}}</td>
                                 <td class="text-center">Admin One</td>
                                 <td class="text-center"></td>
@@ -172,25 +171,30 @@
                                 </td>
                                 <td class="text-center">
                                 </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center"></td>
-                                <td class="text-center"></td>
-                                <td class="text-center">{{userProcess[3].userDetails.username}}</td>
+                            </tr>-->
+                            <tr ng-repeat="level in tagAnalytic.tagAssignmentObj" ng-if="level.user_level!=null">
+                                <td class="text-center" ng-init="serial=serial+1">{{serial}}</td>
+                                <td class="text-center">{{level.user_level.level_name}}</td>
                                 <td class="text-center">
-                                   {{userProcess[3].process_stage_from.process_name}}
+                                    {{level.userDetails.first_name}} {{level.userDetails.last_name}}<br />
+                                    <small>{{level.userDetails.designation?'('+level.userDetails.designation+')':''}}</small>
                                 </td>
                                 <td class="text-center">
-                                     {{userProcess.process_stage_to.process_name}}
+                                   {{level.process_stage_from.process_name}}
                                 </td>
                                 <td class="text-center">
-                                    {{userProcess.mandatory}}
+                                     {{level.process_stage_to.process_name}}
                                 </td>
                                 <td class="text-center">
-                                    <a href="#" class="links">{{userProcess[3].status}}</a>
+                                    {{(level.mandatory?"Yes":"No")}}
                                 </td>
                                 <td class="text-center">
-                                    <a href="#" class="links">{{userProcess.notification_frequency}}</a>
+                                    <span ng-repeat="status in level.notification_status">
+                                        <span class="mr-5">{{status.name}}</span>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    {{level.notification_frequency}}
                                 </td>
                             </tr>                 
                         </tbody>
@@ -203,8 +207,8 @@
     </div><!--/shadow-box-->
     <div class="wrapper mt-10 mt-xs-large">
         <button class="btn icon-btn btn-lg pull-left activity-btn"><i class="fa fa-list-alt fa-lg mr-10 "></i>Activity Log List</button>
-        <button class="btn btn-primary btn-lg pull-right"><i class="fa fa-download mr-10 fa-lg"></i>Download Report</button>
-        <button class="btn btn-primary btn-lg pull-right mr-10"><i class="fa fa-print mr-10 fa-lg"></i>Print Report</button>
+<!--        <button class="btn btn-primary btn-lg pull-right"><i class="fa fa-download mr-10 fa-lg"></i>Download Report</button>
+        <button class="btn btn-primary btn-lg pull-right mr-10"><i class="fa fa-print mr-10 fa-lg"></i>Print Report</button>-->
     </div> 
     <div class="wrapper mt-20">
         <div class="table-responsive table-responsive-cust">

@@ -226,7 +226,7 @@
                                     <th class="text-center">
                                         <a ng-href="" ng-click="sortUser(item, 'designation')">Designation <i class="fa fa-sort{{item.sort.designation}}"></i></a>
                                     </th>
-                                    <th class="text-center">Projects</th>
+                                    <th class="text-center" width="30%">Projects</th>
                                     <th class="text-center">Contact</th>
                                 </tr>
                             </thead>
@@ -236,7 +236,10 @@
                                     <td class="text-center">{{user.id}}</td>
                                     <td class="text-center">{{user.first_name}} {{user.last_name}}</td>
                                     <td class="text-center">{{user.designation}}</td>
-                                    <td class="text-center">{{user.projects}}</td>
+                                    <td class="text-center">
+                                        <span ng-repeat="project in user.assignedProjects" class="mr-10"><a href="/#/projects/{{project.id}}" target="_blank" ng-bind-html="project.project_name"></a>,</span>
+                                        <span ng-hide="user.assignedProjects.length>0">No projects assigned.</span>
+                                    </td>
                                     <td class="text-center"><a href="mailto: {{user.email}}">{{user.email}}</a><br /><small>{{user.contact_number}}</small></td>
                                 </tr>
                                 <tr ng-hide="item.users.length">

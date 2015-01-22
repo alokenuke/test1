@@ -60,7 +60,7 @@
                         </thead>
                         <tbody>
                             <tr ng-repeat="p in processes">
-                                <td class="text-center"><button type="button" ng-click="unassignProcess(itemScope.id,p.id)" class="btn btn-primary mb-sm-5">Unassign</button></td>
+                                <td class="text-center"><button type="button" ng-click="unassignProcess(itemScope.id,p.id)" class="btn btn-primary mb-sm-5" ng-confirm-click="Are you sure?"><i class="fa fa-trash"></i>  Unassign</button></td>
                                 <td class="text-center">{{p.parentProcess.process_name}}</td>
                                 <td class="text-center">{{p.process_name}}</td>
                             </tr>

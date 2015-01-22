@@ -151,7 +151,7 @@ app.controller('ManageLabelTemplates', function($scope, rest, $location, alertSe
     });
     
     $scope.previewTemplate = function() {        
-        $http.post("/labeltemplates/preview", $scope.label_template).success(function(data) {
+        $http.post("/reportsdownload/previewtemplate", $scope.label_template).success(function(data) {
             
         }).error(errorCallback);
     }

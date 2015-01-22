@@ -129,7 +129,7 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
     $scope.loadUsers = function(scope) {
         if(!scope['users']) {
             scope.loading = true;
-            rest.setData("users/levelusers/"+scope.id, ['users'], {}).success(function(data) {
+            rest.setData("users/levelusers/"+scope.id+"?expand=assignedProjects", null, {}).success(function(data) {
                 scope['users'] = data.items;
                 scope.users_totalCount = data._meta.totalCount;
                 scope.users_pageCount = data._meta.pageCount;

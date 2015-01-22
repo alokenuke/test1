@@ -1137,7 +1137,7 @@ app.controller('TagsUpdateMaster', ['$scope', 'rest', '$location', '$route','$ro
 app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 
                 function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService) {
         
-        rest.path = "tags";
+        rest.path = "tag-activity-log";
         
         breadcrumbsService.setTitle("Tag Analytics: Construction work Tag");
         breadcrumbsService.clearAll();
@@ -1150,7 +1150,7 @@ app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParam
         $scope.predicate = "";
         $scope.projects = [];
         $scope.usergroups = [];
-		$scope.activity = [];
+        $scope.activity = [];
         
         $scope.updateLevel = function(projectId, level, parent) {
             $scope.search.project_id = projectId;
@@ -1174,17 +1174,6 @@ app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParam
             }
         };
                 
-        if($location.$$search.sort!=undefined) {
-            $scope.predicate = $location.$$search.sort;
-            $scope.reverse = ($scope.predicate.search("-")==-1?false:true);
-        }
-        
-        $scope.order = function(predicate, reverse) {
-            $scope.predicate = (reverse?"-"+predicate:predicate);
-            $scope.reverse = !reverse;
-            $location.search("sort", $scope.predicate);
-        };
-        
         $scope.delete = function (id) {
             rest.deleteById({id: id}).success(function () {
                 $location.path('/post');
@@ -1199,37 +1188,12 @@ app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParam
         $scope.status = {
             isopen: false
         };
-        
-        $scope.toggleDropdown = function($event) {
-            $event.preventDefault();
-            $event.stopPropagation();
-            $scope.status.isopen = !$scope.status.isopen;
-        };
-                
-        rest.models().success(function (data) {
-            $scope.data = data.items;
-                        
-            $scope.totalCount = data._meta.totalCount;
-            $scope.pageCount = data._meta.pageCount;
-            $scope.currentPage = (data._meta.currentPage);
-            $scope.numPerPage = data._meta.perPage;
-            
-            $http.get("/projects/getall").success(function(data) {
-                $scope.projects = data.items;
-            });
-            
-            $http.get("/usergroups/getall").success(function(data) {
-                $scope.usergroups = data.items;
-            });
-            
-        }).error(errorCallback);
-
 		
         $http.post("/tag-activity-log/search?expand=attachments",{'search': {'tag_id':$routeParams.id}}).success(function(data) {
             $scope.activity = data.items;
         });
         
-        $http.get("/tags/"+$routeParams.id+"?expand=projectLevelObj,userGroup,processObj,itemObj").success(function(data) {
+        $http.get("/tags/"+$routeParams.id+"?expand=projectLevelObj,userGroup,processObj,itemObj,tagAssignmentObj").success(function(data) {
             $scope.tagAnalytic = data;
         });
     }])
@@ -1413,16 +1377,9 @@ app.controller('TagItems', function($scope, rest, $location, $route, $routeParam
     
     $scope.removeItem = function(item) {
         var scope = item.$modelValue;
-        if(scope.user_group_id) {
-            $http.delete("/userlevels/"+scope.id).success(function(data) {
-                console.log("Level removed-"+scope.id);
-            });
-        }
-        else {
-            $http.delete("/usergroups/"+scope.id).success(function(data) {
-                console.log("Group removed-"+scope.id);
-            });
-        }
+        $http.delete("/items/"+scope.id).success(function(data) {
+            console.log("Removed -"+scope.id);
+        });
         item.remove();
     }
     
@@ -1478,6 +1435,8 @@ app.controller('TagItems', function($scope, rest, $location, $route, $routeParam
     
     $scope.loadItems = function(scope) {
         
+        rest.path = "items";
+        
         if(!scope['items']) {
             var parent_id = parseInt(scope.id);
             scope.loading = true;
@@ -1490,7 +1449,7 @@ app.controller('TagItems', function($scope, rest, $location, $route, $routeParam
                 scope.currentPage = (data._meta.currentPage);
                 scope.numPerPage = data._meta.perPage;
                 scope.loading = false;
-                scope.collapsed = !scope.collapsed;
+                scope.collapsed = true;
             }).error(function() {
                 errorCallback();
                 scope.loading = false;

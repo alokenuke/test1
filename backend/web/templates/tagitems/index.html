@@ -74,7 +74,7 @@
                                             <a class="btn btn-success btn-xs" data-nodrag ng-click="loadItems(item)"><span class="fa" ng-class="{'fa-chevron-right': !item.collapsed, 'fa-chevron-down': item.collapsed}"></span></a>
                                             {{item.item_name}}
                                             &nbsp;&nbsp; <a class="btn-info" ng-show="item.loading"><i class="fa fa-refresh"></i> Loading items..</a>
-                                            <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="remove(this)"><span class="fa fa-trash"></span></a>
+                                            <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeItem(this)" ng-confirm-click="Are you sure to delete this group? All items and sub-items will be removed."><span class="fa fa-trash"></span></a>
                                             <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newSubItem(item, 'item_'+item.parent_id)" style="margin-right: 8px;"><span class="fa fa-plus"></span></a>
                                             <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(item)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
                                             <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="showProjectsModal(item)" style="margin-right: 8px;">Projects</a>
@@ -90,14 +90,14 @@
                                             </form>
                                         </div>
                                      </div>
-                                     <ol ui-tree-nodes="options" ng-model="item.items" ng-class="{hidden: collapsed}">
+                                     <ol class="slide" ui-tree-nodes="options" ng-model="item.items" ng-show="item.collapsed">
                                         <li ng-repeat="item in item.items" ui-tree-node>
                                             <div ui-tree-handle ng-class="'item_'+item.parent_id">
                                                 <div ng-hide="item.editing">
                                                     <a class="btn btn-success btn-xs" data-nodrag ng-click="loadItems(item)"><span class="fa" ng-class="{'fa-chevron-right': !item.collapsed, 'fa-chevron-down': item.collapsed}"></span></a>
                                                     {{item.item_name}}
                                                     &nbsp;&nbsp; <a class="btn-info" ng-show="item.loading"><i class="fa fa-refresh"></i> Loading items..</a>
-                                                    <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="remove(this)"><span class="fa fa-trash"></span></a>
+                                                    <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeItem(this)" ng-confirm-click="Are you sure to delete this item? All related sub items will be removed."><span class="fa fa-trash"></span></a>
                                                     <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newSubItem(item, 'item_'+item.parent_id)" style="margin-right: 8px;"><span class="fa fa-plus"></span></a>
                                                     <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(item)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
                                                     <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="linkProcess(item)" style="margin-right: 8px;">Assign Process Flow</a>
@@ -113,12 +113,12 @@
                                                     </form>
                                                 </div>
                                             </div>
-                                            <ol ui-tree-nodes="options" ng-model="item.items" ng-class="{hidden: collapsed}">
+                                            <ol class="slide" ui-tree-nodes="options" ng-model="item.items" ng-show="item.collapsed">
                                                 <li ng-repeat="item in item.items" ui-tree-node>
                                                     <div ui-tree-handle ng-class="'item_'+item.parent_id">
                                                         <div ng-hide="item.editing">
                                                             {{item.item_name}}
-                                                            <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="remove(this)"><span class="fa fa-trash"></span></a>
+                                                            <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeItem(this)" ng-confirm-click="Are you sure to delete this group? This action can not be undone."><span class="fa fa-trash"></span></a>
 
                                                             <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(item)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
                                                         </div>
