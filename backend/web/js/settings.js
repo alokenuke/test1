@@ -6,7 +6,7 @@ app.controller('RolesIndex', ['$scope', 'rest', '$location', '$route','$routePar
         breadcrumbsService.setTitle("Manage Roles");
         breadcrumbsService.clearAll();
         breadcrumbsService.add("", "Home");
-        breadcrumbsService.add("/#/user/roles", "Roles manage");
+        breadcrumbsService.add("/#/roles", "Roles manage");
         
         $scope.pageChanged = function() {
             updateUserList();
@@ -52,18 +52,22 @@ app.controller('RolesAdd', ['$scope', 'rest', '$location', '$route','$routeParam
         breadcrumbsService.setTitle("Manage Roles");
         breadcrumbsService.clearAll();
         breadcrumbsService.add("", "Home");
-        breadcrumbsService.add("/#/user/roles/create", "Add Roles");
+        breadcrumbsService.add("/#/roles/create", "Add Roles");
+        $scope.moduleactions = {};
         
         $scope.role = {};
         
-        $scope.addRoles = function(){ 
-            
-            $scope.role['type'] = 'Client';    
+        $scope.addRoles = function(){
+            $scope.role['type'] = 'Client';
+            $scope.role['moduleactions'] = $scope.moduleactions;
             rest.postModel($scope.role).success(function(data) {
-                $location.path("/user/roles");
+                $location.path("/roles");
             });
         }
         
+        $http.post("roles/loadactions").success(function(data) {
+            $scope.moduleactions = data;
+        });
     }])
 
 app.controller('RolesUpdate', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService','page_dropdown','$location',
@@ -75,16 +79,17 @@ app.controller('RolesUpdate', ['$scope', 'rest', '$location', '$route','$routePa
         breadcrumbsService.clearAll();
         breadcrumbsService.add("", "Home");
         breadcrumbsService.add("/#/user/roles/update", "Update Roles");
+        $scope.moduleactions = {};
         
         $scope.role = {};
         
-        rest.model({'id': $routeParams.id}).success(function(data) {
+        $http.get("/roles/"+$routeParams.id+"?expand=roleSettings", {'id': $routeParams.id}).success(function(data) {
                 $scope.role = data;
         });
         
-        $scope.addRoles = function(){ 
-            
+        $scope.addRoles = function(){
             $scope.role['type'] = 'Client';
+            $scope.role['moduleactions'] = $scope.moduleactions;
             rest.putModel($scope.role).success(function(data) {
                 alertService.clearAll();
                 alertService.add("success", "Role updated.");
@@ -93,10 +98,11 @@ app.controller('RolesUpdate', ['$scope', 'rest', '$location', '$route','$routePa
                 alertService.clearAll();
                 alertService.add("error", "Validation Error");
             });
-            
         }
         
-        
+        $http.post("roles/loadactions", {'id': $routeParams.id}).success(function(data) {
+            $scope.moduleactions = data;
+        });
     }])
 
 app.controller('ManageLabelTemplates', function($scope, rest, $location, alertService, $http, breadcrumbsService, $window) {
@@ -150,13 +156,33 @@ app.controller('ManageLabelTemplates', function($scope, rest, $location, alertSe
         }
     });
     
-    $scope.previewTemplate = function() {        
-        $http.post("/reportsdownload/previewtemplate", $scope.label_template).success(function(data) {
-            
+    $scope.deleteTemplate = function() {
+        if(typeof $scope.label_template == 'undefined' || $scope.label_template.length <= 0) {
+            alertService.clearAll();
+            alertService.add('error', "No template selected.");
+        }
+        else {
+            $scope.$apply(function(){
+                var index = $scope.templates.indexOf($scope.label_template);
+                $scope.templates.splice(index,1);
+                alertService.clearAll();
+                alertService.add('success', "Template ("+$scope.label_template.template_name+") removed.");
+                $scope.label_template = $scope.templates[0];
+            });
+        }
+    }
+    
+    $scope.previewTemplate = function() {
+        var tabWindowId = window.open('about:blank', '_blank');
+
+        $http.post("/reportsdownload/previewtemplate", $scope.label_template).success(function(response) {
+            tabWindowId.location.href = response;
         }).error(errorCallback);
     }
     
-    $scope.saveTemplate = function() {
+    $scope.saveTemplate = function($e) {
+        if($scope.returnAction==false)
+            $e.preventDefault();
         if($scope.label_template.id)
             $http.put("/labeltemplates/"+$scope.label_template.id, $scope.label_template).success(function() {
                 alertService.add('success', "Template updated successfully.");
