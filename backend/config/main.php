@@ -6,6 +6,8 @@ $params = array_merge(
     require(__DIR__ . '/params-local.php')
 );
 
+use kartik\mpdf\Pdf;
+
 return [
     'id' => 'app-backend',
     'basePath' => dirname(__DIR__),
@@ -30,6 +32,11 @@ return [
         'user' => [
             'identityClass' => 'backend\models\User',
             'enableAutoLogin' => true,
+        ],
+        'pdf' => [
+            'class' => Pdf::classname(),
+            'destination' => Pdf::DEST_BROWSER,
+            // refer settings section for all configuration options
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,

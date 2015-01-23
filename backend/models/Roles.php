@@ -61,6 +61,31 @@ $query = parent::find()->where(['company_id' => \yii::$app->user->identity->comp
         return $query;
     }
     
+    public function afterSave($insert, $changedAttributes) {
+        $moduleactions = \Yii::$app->request->post("moduleactions");
+        if(isset($moduleactions)) {
+            foreach($moduleactions as $module => $action) {
+                $roleSettingsModel = RoleSettings::findOne(['role_id' => $this->id, 'module' => $module]);
+                if(!$roleSettingsModel)
+                    $roleSettingsModel = new RoleSettings();
+                
+                $roleSettingsModel->role_id = $this->id;
+                $roleSettingsModel->module = $module;
+                $roleSettingsModel->updated_by = \yii::$app->user->identity->id;
+                
+                $params = [];
+                
+                foreach($action as $act)
+                    $params[$act['action']] = (isset ($act['isSelected']) && $act['isSelected']?$act['isSelected']:0);
+                
+                $roleSettingsModel->role_params = json_encode($params);
+                
+                $roleSettingsModel->save();
+            }
+        }
+        parent::afterSave($insert, $changedAttributes);
+    }
+    
     /**
      * @inheritdoc
      */
@@ -87,6 +112,21 @@ $query = parent::find()->where(['company_id' => \yii::$app->user->identity->comp
             'company',
             'status',
             'created_date',
+        ];
+    }
+    
+    public function extraFields() {
+        return [
+            'roleSettings' => function() {
+                $actions = [];
+                $model = new \backend\models\RoleSettings();
+                
+                foreach($model->findAll(['role_id' => $this->id]) as $data) {
+                    $actions[$data->module] = json_decode($data->role_params);
+                }
+                if(count($actions))
+                    return $actions;
+            }
         ];
     }
     

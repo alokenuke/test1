@@ -32,7 +32,7 @@ class TagAssignment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['tag_id', 'user_id', 'process_stage_from', 'process_stage_to', 'mandatory', 'status'], 'required'],
+            [['tag_id', 'user_id', 'mandatory', 'status'], 'required'],
             [['tag_id', 'user_id', 'process_stage_from', 'process_stage_to', 'mandatory', 'status'], 'integer'],
             [['notification_status', 'notification_frequency', 'created_on'], 'safe']
         ];

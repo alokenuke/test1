@@ -62,7 +62,15 @@ class TagsController extends ApiController
                             $query->where([$key => $val]);
                     }
             }
-            $pageLimit = 20;
+
+            if(isset($post['excludeTags'])) {
+                $tagIds = [];
+                foreach($post['excludeTags'] as $tag)
+                    $tagIds[] = $tag['id'];
+                
+                $query->andWhere(['not in', 'id', $tagIds]);
+            }
+                        $pageLimit = 20;
             if(isset($post['sort']))
                 $_GET['sort'] = $post['sort'];
             if(isset($post['page']))
@@ -150,27 +158,30 @@ class TagsController extends ApiController
                             $temp['notification_frequency'] = $v['notification_frequency']['id'];
 
                             $tagAssignmentModel = new \backend\models\TagAssignment();
-
+                            
+                            if($this->in_array_r('id', 'all', $v['notification_status'])) {
+                                $temp['notification_status'] = "all";
+                            }
+                            else if($this->in_array_r('id', 'assigned', $v['notification_status'])) {
+                                $temp['notification_status'] = "assigned";
+                            }
+                            else
+                                $tagAssignmentModel->notification_status = "";
+                            
                             $tagAssignmentModel->setAttributes($temp);
 
                             $tag->link("tagAssignment", $tagAssignmentModel);
                             
-                            foreach($v['notification_status'] as $status) {
-                                if($status['id']=='all') {
-                                    $temp['notification_status'] = "all";
-                                    break;
-                                }
-                                else if($status['id']=='assigned') {
-                                    $temp['notification_status'] = "assigned";
-                                    break;
-                                }
-                                else {
-                                    unset($tagNotificationStatus);
-                                    $tagNotificationStatus = new \backend\models\TagUserNotificationStatus();
-                                    $tagNotificationStatus->tag_id = $tag->id;
-                                    $tagNotificationStatus->process_stage_id = $status['id'];
-                                    
-                                    $tagAssignmentModel->link("tagNotificationStatus", $tagNotificationStatus);
+                            if(!$tagAssignmentModel->notification_status) {
+                                foreach($v['notification_status'] as $status) {
+                                    if(!in_array($status['id'], ['all', 'assigned'])) {
+                                        unset($tagNotificationStatus);
+                                        $tagNotificationStatus = new \backend\models\TagUserNotificationStatus();
+                                        $tagNotificationStatus->tag_id = $tag->id;
+                                        $tagNotificationStatus->process_stage_id = $status['id'];
+
+                                        $tagAssignmentModel->link("tagNotificationStatus", $tagNotificationStatus);
+                                    }
                                 }
                             }
                         }
@@ -240,10 +251,23 @@ class TagsController extends ApiController
                         
                         $tagAssignmentModel->status = 1;
                         
-                        $tagAssignmentModel->process_stage_from = (int) $v['process_stage_from']['id'];
-                        $tagAssignmentModel->process_stage_to = (int) $v['process_stage_to']['id'];
+                        if(isset($v['process_stage_from']['id']))
+                            $tagAssignmentModel->process_stage_from = (int) $v['process_stage_from']['id'];
+                        
+                        if(isset($v['process_stage_to']['id']))
+                            $tagAssignmentModel->process_stage_to = (int) $v['process_stage_to']['id'];
+                        
                         $tagAssignmentModel->mandatory = (int) $v['mandatory'];
                         $tagAssignmentModel->notification_frequency = $v['notification_frequency']['id'];
+                        
+                        if($this->in_array_r('id', 'all', $v['notification_status'])) {
+                            $tagAssignmentModel->notification_status = "all";
+                        }
+                        else if($this->in_array_r('id', 'assigned', $v['notification_status'])) {
+                            $tagAssignmentModel->notification_status = "assigned";
+                        }
+                        else
+                            $tagAssignmentModel->notification_status = "";
                         
                         if(!$tagAssignmentModel->save()) {
                             $hasError = true;
@@ -253,28 +277,21 @@ class TagsController extends ApiController
                         
                         \backend\models\TagUserNotificationStatus::deleteAll(['tag_id' => $model->id, 'tag_assignment_id' => $tagAssignmentModel->id]);
                         
-                        foreach($v['notification_status'] as $status) {
-                            if($status['id']=='all') {
-                                $tagAssignmentModel->notification_status = "all";
-                                break;
-                            }
-                            else if($status['id']=='assigned') {
-                                $tagAssignmentModel->notification_status = "assigned";
-                                break;
-                            }
-                            else {
-                                unset($tagNotificationStatus);
-                                $tagNotificationStatus = new \backend\models\TagUserNotificationStatus();
-                                $tagNotificationStatus->tag_id = $model->id;
-                                $tagNotificationStatus->process_stage_id = $status['id'];
-                                $tagNotificationStatus->tag_assignment_id = $tagAssignmentModel->id;
+                        if(!$tagAssignmentModel->notification_status) {
+                            foreach($v['notification_status'] as $status) {
+                                if(!in_array($status['id'], ['all', 'assigned'])) {
+                                    unset($tagNotificationStatus);
+                                    $tagNotificationStatus = new \backend\models\TagUserNotificationStatus();
+                                    $tagNotificationStatus->tag_id = $model->id;
+                                    $tagNotificationStatus->process_stage_id = $status['id'];
+                                    $tagNotificationStatus->tag_assignment_id = $tagAssignmentModel->id;
 
-                                if(!$tagNotificationStatus->save()) {
-                                    $hasError = true;
+                                    if(!$tagNotificationStatus->save()) {
+                                        $hasError = true;
+                                    }
                                 }
                             }
                         }
-                        
                     }
                 }
                 else {
@@ -314,6 +331,8 @@ class TagsController extends ApiController
             $model->user_group_id = $post['user_group_id'];
             $model->tag_name = $post['tag_name'];
             $model->tag_description = $post['tag_description'];
+			$model->tag_item_id = $post['tag_item_id'];
+            $model->tag_process_flow_id = $post['tag_process_flow_id'];
                         
             $company_id = \yii::$app->user->identity->company_id;
 
@@ -346,26 +365,29 @@ class TagsController extends ApiController
                         $temp['notification_frequency'] = $v['notification_frequency']['id'];
                             
                         $tagAssignmentModel = new \backend\models\TagAssignment();
+                        
+                        if($this->in_array_r('id', 'all', $v['notification_status'])) {
+                            $temp['notification_status'] = "all";
+                        }
+                        else if($this->in_array_r('id', 'assigned', $v['notification_status'])) {
+                            $temp['notification_status'] = "assigned";
+                        }
+                        else
+                            $tagAssignmentModel->notification_status = "";
 
                         $tagAssignmentModel->setAttributes($temp);
                         $model->link("tagAssignment", $tagAssignmentModel);
 
-                        foreach($v['notification_status'] as $status) {
-                            if($status['id']=='all') {
-                                $temp['notification_status'] = "all";
-                                break;
-                            }
-                            else if($status['id']=='assigned') {
-                                $temp['notification_status'] = "assigned";
-                                break;
-                            }
-                            else {
-                                unset($tagNotificationStatus);
-                                $tagNotificationStatus = new \backend\models\TagUserNotificationStatus();
-                                $tagNotificationStatus->tag_id = $model->id;
-                                $tagNotificationStatus->process_stage_id = $status['id'];
+                        if(!$tagAssignmentModel->notification_status) {
+                            foreach($v['notification_status'] as $status) {
+                                if(!in_array($status['id'], ['all', 'assigned'])) {
+                                    unset($tagNotificationStatus);
+                                    $tagNotificationStatus = new \backend\models\TagUserNotificationStatus();
+                                    $tagNotificationStatus->tag_id = $model->id;
+                                    $tagNotificationStatus->process_stage_id = $status['id'];
 
-                                $tagAssignmentModel->link("tagNotificationStatus", $tagNotificationStatus);
+                                    $tagAssignmentModel->link("tagNotificationStatus", $tagNotificationStatus);
+                                }
                             }
                         }
                     }
@@ -395,6 +417,119 @@ class TagsController extends ApiController
         }
     }
     
+    public function actionUpdatemastertags($id) {
+
+     if (!$_POST) {
+
+        $post = \yii::$app->request->post('tagDetails');
+        $relatedTag = $post['relatedTags'];
+
+            $model = $model = \backend\models\Tags::findOne(['id' => $id]);
+            $connection = \Yii::$app->db;
+            $transaction = $connection->beginTransaction();
+            $model->type = "mT";
+            $model->project_id = $post['project_id'];
+            $model->uid = $model->generateUID(10);
+            $model->project_level_id = $post['project_level_id'];
+            $model->user_group_id = $post['user_group_id'];
+            $model->tag_name = $post['tag_name'];
+            $model->tag_description = $post['tag_description'];
+            $model->tag_item_id = $post['tag_item_id'];
+            $model->tag_process_flow_id = $post['tag_process_flow_id'];
+
+            $company_id = \yii::$app->user->identity->company_id;
+
+        try {
+
+            $hasError = false;
+
+            if ($model->save()) { 
+                \backend\models\RelatedTags::deleteAll(['master_tag_id' => $model->id]);
+                foreach($relatedTag as $rTag)
+                {
+                    $relatedTagModel = new \backend\models\RelatedTags();
+                    $relatedTagModel->tag_id = $rTag['id'];
+                    $relatedTagModel->master_tag_id = $model->id;
+                    $relatedTagModel->save();
+                }
+
+                $validate[$key]['id'] = $model->id;
+
+                foreach($post['tag_assignment'] as $i => $v) {
+                        $tagAssignmentModel = \backend\models\TagAssignment::findOne(['user_id' => (int) $v['user_id'], 'tag_id' => $id]);
+                        
+                        if(!$tagAssignmentModel) {
+                            $tagAssignmentModel = new \backend\models\TagAssignment();
+                            $tagAssignmentModel->user_id = (int) $v['user_id'];
+                            $tagAssignmentModel->tag_id = $id;
+                        }
+                        
+                        $tagAssignmentModel->status = 1;
+                        
+                        $tagAssignmentModel->process_stage_from = (int) $v['process_stage_from']['id'];
+                        $tagAssignmentModel->process_stage_to = (int) $v['process_stage_to']['id'];
+                        $tagAssignmentModel->mandatory = (int) $v['mandatory'];
+                        $tagAssignmentModel->notification_frequency = $v['notification_frequency']['id'];
+                        
+                        if($this->in_array_r('id', 'all', $v['notification_status'])) {
+                            $tagAssignmentModel->notification_status = "all";
+                        }
+                        else if($this->in_array_r('id', 'assigned', $v['notification_status'])) {
+                            $tagAssignmentModel->notification_status = "assigned";
+                        }
+                        else
+                            $tagAssignmentModel->notification_status = "";
+                        
+                        if(!$tagAssignmentModel->save()) {
+                            $hasError = true;
+                        }
+
+                        $notification_status = [];
+                        
+                        \backend\models\TagUserNotificationStatus::deleteAll(['tag_id' => $model->id, 'tag_assignment_id' => $tagAssignmentModel->id]);
+                        
+                        if(!$tagAssignmentModel->notification_status) {
+                            foreach($v['notification_status'] as $status) {
+                                if(!in_array($status['id'], ['all', 'assigned'])) {
+                                    unset($tagNotificationStatus);
+                                    $tagNotificationStatus = new \backend\models\TagUserNotificationStatus();
+                                    $tagNotificationStatus->tag_id = $model->id;
+                                    $tagNotificationStatus->process_stage_id = $status['id'];
+                                    $tagNotificationStatus->tag_assignment_id = $tagAssignmentModel->id;
+
+                                    if(!$tagNotificationStatus->save()) {
+                                        $hasError = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+            }
+            else {
+                $hasError = true;
+                \yii::$app->getResponse()->setStatusCode(422, 'Data Validation Failed.');   
+
+                foreach ($model->getErrors() as $attribute => $errors) {
+                    $validate[$attribute] = $errors;
+                }
+            }
+            if(!$hasError) {
+                $transaction->commit();
+                return "Success";
+            }
+
+        \yii::$app->getResponse()->setStatusCode(422, 'Data Validation Failed.');
+        $transaction->rollBack();
+        return $validate;
+
+        } catch (Exception $e) {
+            $transaction->rollBack();
+        }
+
+    } else {
+        throw new \yii\web\HttpException(404, 'Invalid Request');
+    }
+}
     public static function validateMultiple($models, $attributes = null)
     {
         $result = [];

@@ -56,4 +56,16 @@ class RolesController extends ApiController
             throw new \yii\web\HttpException(404, 'Invalid Request');
         }
     }
+    
+    public function actionLoadactions() {
+        if (!$_POST) {
+            $post = \Yii::$app->request->post();
+            
+            $model = new \backend\models\ModulesActions();
+            return $model->getModuleActions();
+            
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }    
 }

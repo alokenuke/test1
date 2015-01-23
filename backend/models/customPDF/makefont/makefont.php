@@ -7,10 +7,7 @@
 * Author:  Olivier PLATHEY                                                     *
 *******************************************************************************/
 
-namespace backend\models\pdf\font;
-
 require('ttfparser.php');
-
 function Message($txt, $severity='')
 {
 	if(PHP_SAPI=='cli')

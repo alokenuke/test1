@@ -237,7 +237,8 @@ class Tags extends \yii\db\ActiveRecord
             },
             'itemDetails',
             'userGroup',
-            'tagAssignment'
+            'tagAssignment',
+            'relatedTags'
         ];
     }
     
@@ -308,4 +309,10 @@ class Tags extends \yii\db\ActiveRecord
     {
         return $this->hasMany(TagAssignment::className(), ['tag_id' => 'id']);
     }
-}
+
+    
+    public function getRelatedTags()
+    {
+        return $this->hasMany(Tags::className(), ['id'=>'tag_id'])
+                ->viaTable('related_tags', ['master_tag_id'=>'id']);
+    }}

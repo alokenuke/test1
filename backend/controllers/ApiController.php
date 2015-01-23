@@ -242,4 +242,14 @@ class ApiController extends ActiveController
             '_fields' => $fields
         ];
     }
+    
+    public function in_array_r($key, $needle, $haystack, $strict=false) {
+        foreach ($haystack as $item) {
+            if (($strict ? $item[$key] === $needle : $item[$key] == $needle) || (is_array($item[$key]) && $this->in_array_r($needle, $item[$key], $strict))) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
 }

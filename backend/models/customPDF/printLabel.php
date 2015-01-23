@@ -10,7 +10,7 @@
  *
  * @author himanshu.maheshwari
  */
-namespace backend\models\pdf;
+namespace backend\models\customPDF;
 
 class printLabel extends FPDF {
 
@@ -31,7 +31,7 @@ class printLabel extends FPDF {
 
     function __construct($orientation = 'P', $unit = 'mm', $format = 'A4', $data) {
         //Call parent constructor
-        $this->FPDF($orientation, $unit, $format);
+        parent::__construct($orientation, $unit, $format);
         //Initialization
         $this->B = 0;
         $this->I = 0;

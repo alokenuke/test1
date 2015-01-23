@@ -7,8 +7,6 @@
 * Author:  Olivier PLATHEY                                                     *
 *******************************************************************************/
 
-namespace backend\models\pdf\font;
-
 class TTFParser
 {
 	var $f;

@@ -4,7 +4,7 @@
 //webmaster@streetpc.tk
 //http://www.streetpc.tk
 
-namespace backend\models\pdf;
+namespace backend\models\customPDF;
 
 //function hex2dec
 //returns an associative array (keys: R,G,B) from
@@ -49,10 +49,10 @@ var $issetcolor;
 function px2mm($px){
     return $px*25.4/72;
 }
-function PDF_HTML($orientation='P', $unit='mm', $format='A4')
+function __construct($orientation='P', $unit='mm', $format='A4')
 {
     //Call parent constructor
-    $this->FPDF($orientation,$unit,$format);
+    parent::__construct($orientation,$unit,$format);
     //Initialization
     $this->B=0;
     $this->I=0;
