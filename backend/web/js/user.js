@@ -218,10 +218,10 @@ app.controller('UserIndex', ['$scope', 'rest', '$location', '$route','$routePara
       
         rest.path = "users";
         
-        breadcrumbsService.setTitle("Manage User Groups");
+        breadcrumbsService.setTitle("Manage Users");
         breadcrumbsService.clearAll();
         breadcrumbsService.add("", "Home");
-        breadcrumbsService.add("/#/user-groups", "User Groups");
+        breadcrumbsService.add("/#/user-groups", "List Users");
         
         $scope.page_dropdown = page_dropdown;
         $scope.$search = {};
@@ -292,12 +292,11 @@ app.controller('UserCreate',
         rest.path = "users";
         
         $scope.tooltip = tooltip;
-        breadcrumbsService.setTitle("Create New Users");
+        breadcrumbsService.setTitle("Create Users");
         breadcrumbsService.clearAll();
         breadcrumbsService.add("", "Home");
-        breadcrumbsService.add("", "Manage");
-        breadcrumbsService.add("", "Users");
-        breadcrumbsService.add("/#/users/create", "Create");
+        breadcrumbsService.add("/#/users", "Users");
+        breadcrumbsService.add("/#/users/create", "Create Users");
         
 	$scope.EMAIL_REGEXP = /^[a-z0-9!#$%&'*+/=?^_`{|}~.-]+@[a-z0-9-]+(\.[a-z0-9-]+)*$/i;
             

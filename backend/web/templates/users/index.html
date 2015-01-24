@@ -60,6 +60,16 @@
                     </div>
                     <div class="col-md-6 col-lg-5">
                         <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">Designation :</label>
+                            <div class="col-sm-6">
+                                <input class="form-control" ng-model="$search.designation" />
+                            </div>
+                        </div>
+                    </div>
+                </div><!--/row-->
+                <div class="row">
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
                             <label class="col-sm-4 control-label text-right">User Group :</label>
                             <div class="col-sm-6">
                                 <select class="form-control" ng-model="$search.usergroups.id" ng-init="$search.usergroups.id = ''" ng-options=" usergroup.id as usergroup.group_name for usergroup in usergroups">
@@ -79,7 +89,7 @@
         </div><!--/search-tag-box-->
     </div><!--/row-->
     <div class="row mt-20">
-        <a href="/#/users/create" class="btn btn-default add-new-btn"><i class="fa fa-plus-circle fa-1x"></i>Add New Users</a>
+        <a href="/#/users/create" class="btn btn-default add-new-btn"><i class="fa fa-plus-circle fa-1x"></i>Create Users</a>
     </div><!--/row-->
     <div class="row mt-15">
         <div class="">

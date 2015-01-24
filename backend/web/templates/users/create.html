@@ -23,12 +23,10 @@
                             <thead>
                                 <tr>
                                     <th class="text-center"></th>
-                                    <th class="text-center">First Name</th>
-                                    <th class="text-center">Last Name</th>
+                                    <th class="text-center">Name</th>
                                     <th class="text-center">Username<br />(Login Name)</th>
-                                    <th class="text-center">Email</th>
                                     <th class="text-center">Designation</th>
-                                    <th class="text-center">Phone Number</th>
+                                    <th class="text-center">Contact</th>
                                     <th class="text-center">User Role</th>
                                     <th class="text-center">User Status</th>
                                     <th class="text-center">Notification</th>
@@ -41,33 +39,38 @@
                                     <td class="text-center">
                                         <button type="button" title="Click to remove." ng-click="removeUser($index)"><i class="fa fa-trash"></i></button>
                                     </td>
-                                    <td class="text-center form-group" ng-class="{ 'has-error': serverError[$index].first_name}">
-                                        <input type="text" placeholder="First Name" class="form-control form-control-small" ng-model="user.first_name" name="first_name" ng-required="true" />
-                                        <div class="help-block help-block-error">{{serverError[$index].first_name}}</div>
-                                    </td>
-                                    <td class="text-center" ng-class="{ 'has-error': serverError[$index].last_name}">
-                                        <input type="text" class="form-control form-control-small" placeholder="Last Name" ng-model="user.last_name" ng-required="true"/>
-                                        <div class="help-block help-block-error">{{serverError[$index].last_name}}</div>
+                                    <td class="text-center form-group">
+                                        <div  ng-class="{ 'has-error': serverError[$index].first_name}">
+                                            <input type="text" placeholder="First Name" class="form-control form-control-small" ng-model="user.first_name" name="first_name" ng-required="true" />
+                                            <div class="help-block help-block-error">{{serverError[$index].first_name}}</div>
+                                        </div>
+                                        <div ng-class="{ 'has-error': serverError[$index].last_name}">
+                                            <input type="text" class="form-control form-control-small" placeholder="Last Name" ng-model="user.last_name" ng-required="true"/>
+                                            
+                                            <div class="help-block help-block-error">{{serverError[$index].last_name}}</div>
+                                        </div>
                                     </td>
                                     <td ng-class="{ 'has-error': serverError[$index].username}">
                                         <input type="text" placeholder="Username" class="form-control form-control-small" ng-model="user.username" ng-required="true"/>
                                         <div class="help-block help-block-error">{{serverError[$index].username}}</div>
                                     </td>
-                                    <td ng-class="{ 'has-error': serverError[$index].email}">
-                                        <input type="email" placeholder="Email" class="form-control form-control-small" ng-model="user.email" ng-required="true" />
-                                        <div class="help-block help-block-error">{{serverError[$index].email}}</div>
-                                    </td>
                                     <td ng-class="{ 'has-error': serverError[$index].designation}">
                                         <input type="text" placeholder="Designation" class="form-control form-control-small" ng-model="user.designation"/>
                                         <div class="help-block help-block-error">{{serverError[$index].designation}}</div>
                                     </td>
-                                    <td class="text-right" ng-class="{ 'has-error': serverError[$index].contact_number}">
-                                        <input type="text" placeholder="Phone number" class="form-control form-control-small" ng-model="user.contact_number" numbers-only max="10"/>
-                                        <div class="help-block help-block-error">{{serverError[$index].contact_number}}</div>
+                                    <td>
+                                        <div ng-class="{ 'has-error': serverError[$index].email}">
+                                            <input type="email" placeholder="Email" class="form-control form-control-small" ng-model="user.email" ng-required="true" />
+                                            <div class="help-block help-block-error">{{serverError[$index].email}}</div>
+                                        </div>
+                                        <div class="text-right" ng-class="{ 'has-error': serverError[$index].contact_number}">
+                                            <input type="text" placeholder="Phone number" class="form-control form-control-small" ng-model="user.contact_number" numbers-only max="10"/>
+                                            <div class="help-block help-block-error">{{serverError[$index].contact_number}}</div>
+                                        </div>
                                     </td>
                                     <td class="text-center multi-level" ng-class="{ 'has-error': serverError[$index].role}">
                                         <select class="form-control form-control-small" ng-model="user.role" ng-options="rol.id as rol.role_name for rol in roles" ng-init="user.role = roles[0].role_name" ng-required="true" >
-                                            <option value="">-- Select Role--</option>
+                                            <option value="">-Select Role-</option>
                                         </select>
                                         <div class="help-block help-block-error">{{serverError[$index].role}}</div>
                                     </td>
@@ -109,6 +112,7 @@
             <div class="pull-right mt-45 mb-30">
                 <div class="col-sm-12 text-center">
                     <button class="btn btn-primary btn-lg mr-10 mb-sm-5 btn-plr-medium" type="submit">Save</button>
+                    <a href="/#/users" class="btn btn-primary btn-lg mr-10 mb-sm-5 btn-plr-medium">Cancel</a>
                 </div>
             </div>
         </form> 

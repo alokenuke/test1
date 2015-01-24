@@ -225,7 +225,7 @@
                                     <a href="" ng-click="order('product_code')">Products Code <i class="fa fa-sort{{sort.product_code}}"></i></a>
                                 </th>
                                 <th class="text-center">
-                                    Last updated by
+                                    Last status updated
                                 </th>
                                 <th class="text-center">Actions</th>
                                 <!-- <th class="text-center"></th> -->
@@ -252,8 +252,8 @@
                                 </td>
                                 <td class="text-center">
                                     <a href="/#/tags/{{dat.id}}" class="btn icon-btn"><i class="fa fa-list-alt fa-lg"></i></a>
-                                    <button class="btn icon-btn" image-title="{{dat.tag_name}}" type="barCode" imageUrl="{{dat.uid}}.png" openlightbox><i class="fa fa-barcode fa-lg"></i></button>
-                                    <button class="btn icon-btn"  image-title="{{dat.tag_name}}" type="qrCode" imageUrl="{{dat.uid}}.png" openlightbox><i class="fa fa-qrcode fa-lg"></i></button><br />
+                                    <button class="btn icon-btn" image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}}" type="barCode" imageUrl="{{dat.uid}}.png" openlightbox><i class="fa fa-barcode fa-lg"></i></button>
+                                    <button class="btn icon-btn"  image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}} " type="qrCode" imageUrl="{{dat.uid}}.png" openlightbox><i class="fa fa-qrcode fa-lg"></i></button><br />
 <!--                                    <button class="btn icon-btn"><i class="fa fa-print fa-lg"></i></button>-->
                                     <a class="btn icon-btn" href="/#/tags/update{{dat.type=='mT'?'master':''}}/{{dat.id}}/{{dat.project_id}}" ><i class="fa fa-pencil-square-o fa-lg"></i></a>
                                     <button ng-click="deleteTag(dat, $index)" class="btn icon-btn" ng-confirm-click="Are you sure to delete this tag."><i class="fa fa-trash fa-lg"></i></button>

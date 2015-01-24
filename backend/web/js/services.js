@@ -141,7 +141,8 @@ appServices.directive('openlightbox',
          link :   function(scope, element, attrs) {
              element.bind("click", function() {
                 
-                var title = $(this).attr("image-title");
+                var header = $(this).attr("image-header");
+                var footer = $(this).attr("image-footer");
                 var imageUrl = $(this).attr("imageUrl");
                 var imageType = $(this).attr("type");
                 
@@ -151,10 +152,13 @@ appServices.directive('openlightbox',
                             <div class="modal-content">\n\
                                 <div class="modal-header">\n\
                                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n\
-                                    <h4 class="modal-title">Tag - '+title+'</h4>\n\
+                                    <h4 class="modal-title">'+header+'</h4>\n\
                                 </div>\n\
                                 <div class="modal-body text-center">\n\
                                     <img src="/userUploads/1/tagsImages/'+imageType+'/'+imageUrl+'" style="max-height: 200px;" />\n\
+                                </div>\n\
+                                <div class="modal-footer">\n\
+                                    <h4 class="text-center">'+footer+'</h4>\n\
                                 </div>\n\
                             </div>\n\
                         </div>\n\

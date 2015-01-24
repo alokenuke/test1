@@ -108,21 +108,17 @@
                 <div class='col-sm-3'>
                     <div class="col-sm-5 col-md-6 bar-code-container2">
                         
-                        <button openlightbox="" imageurl="JHH22JD322N.png" type="barCode" image-title="Test Tag 1" class="bar-code text-center">
-                            <i class="fa fa-barcode fa-5x"></i>
+                        <button openlightbox="" imageurl="{{tagAnalytic.uid}}.png" type="barCode" image-header="Tag - {{tagAnalytic.tag_name}}" image-footer="UID - {{tagAnalytic.uid}}" class="bar-code text-center">
+                            <i class="fa fa-barcode fa-5x"></i><br />
+                            Bar Code
                         </button>
-                        <div class="bar-code-text text-center">
-                            Bar Code 
-                        </div>
                     </div>
                     <div class="col-sm-5 col-md-6 bar-code-container2">
                         
-                        <button openlightbox="" imageurl="JHH22JD322N.png" type="qrCode" image-title="Test Tag 1" class="bar-code text-center">
-                            <i class="fa fa-qrcode fa-5x"></i>
-                        </button>
-                        <div class="bar-code-text text-center">
+                        <button openlightbox="" imageurl="{{tagAnalytic.uid}}.png" type="qrCode"  image-header="Tag - {{tagAnalytic.tag_name}}" image-footer="UID - {{tagAnalytic.uid}}" class="bar-code text-center">
+                            <i class="fa fa-qrcode fa-5x"></i><br />
                             QR Code
-                        </div>
+                        </button>
                     </div>
                 </div>
             </div><!--/row-->

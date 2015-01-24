@@ -36,7 +36,7 @@
                     <h3 class="text-center">Role Settings</h3>
                     <div class="row">
                         <accordion close-others="oneAtATime">
-                            <accordion-group is-open="status.open" ng-repeat="(module, actions) in moduleactions">
+                            <accordion-group is-open="true" ng-repeat="(module, actions) in moduleactions">
                                 <accordion-heading>
                                     {{module | titlecase}} <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
                                 </accordion-heading>

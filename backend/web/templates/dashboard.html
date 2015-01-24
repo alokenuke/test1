@@ -22,7 +22,7 @@
                     <div class="wrapper">
                         <div class="col-sm-7 col-md-8 col-lg-9 cust-col">
                             <div class="row cust-row">
-                                <div ng-repeat="project in projects" class="col-md-6 col-lg-4 cust-col">
+                                <div ng-repeat="project in projects" class="projectbox col-md-6 col-lg-4 cust-col">
                                     <div class="box">
                                         <h5 class="project-title mt-0">
                                             <strong>Project: <span class="project-name">{{project.project_name}}</span></strong><br />
@@ -141,5 +141,8 @@
     ul.showfull {
         overflow: auto;
         height: 192px;
+    }
+    .projectbox:nth-child(3n+1) {
+        clear:both;
     }
 </style>
