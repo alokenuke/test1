@@ -53,7 +53,7 @@ class ReportsdownloadController extends Controller
         //    $nfcLogo = 'http://' . $_SERVER['HTTP_HOST'] . $this->Html->assetUrl('app/webroot/img') . '/nfc.png';
         //}
         
-        if($data['type']=='bar')
+        //if($data['type']=='bar')
             $nfcLogo = 'images/bar.png';
 //        else if($data['type']=='nfc')
 //            $nfcLogo = 'images/' . $data['logo'];
