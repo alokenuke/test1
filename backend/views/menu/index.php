@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?= Html::a('Create Menu', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
-
+    <div class="clearfix table-responsive table-responsive-cust">
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [
@@ -37,8 +37,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $model['status'] ? "Enabled" : 'Disabled';
                 },
             ],
+            'position',
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
-
+    </div>
 </div>

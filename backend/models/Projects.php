@@ -10,7 +10,7 @@ use Yii;
  * @property integer $id
  * @property string $project_name
  * @property string $client_name
- * @property string $main_contractor
+ * @property string $contractor
  * @property string $consultant
  * @property string $project_manager
  * @property string $project_location
@@ -19,7 +19,7 @@ use Yii;
  * @property string $head_office_address
  * @property string $project_director
  * @property integer $project_status
- * @property string $project_note
+ * @property string $about
  * @property string $address
  * @property string $telephone
  * @property string $logo
@@ -45,12 +45,12 @@ class Projects extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['project_name', 'client_name', 'main_contractor', 'consultant', 'project_manager', 'project_location', 'city', 'country', 'head_office_address', 'project_director', 'company_id', 'created_by', 'created_date'], 'required'],
+            [['project_name', 'client_name', 'contractor', 'consultant', 'project_manager', 'project_location', 'city', 'country', 'head_office_address', 'project_director', 'company_id', 'created_by', 'created_date'], 'required'],
             [['project_status', 'company_id', 'created_by', 'timezone_id'], 'integer'],
-            [['project_note'], 'string'],
+            [['about'], 'string'],
             [['created_date', 'modified_date'], 'safe'],
             [['project_name', 'address', 'telephone'], 'string', 'max' => 200],
-            [['client_name', 'main_contractor', 'consultant', 'project_manager', 'project_location', 'country', 'head_office_address', 'project_director'], 'string', 'max' => 255],
+            [['client_name', 'contractor', 'consultant', 'project_manager', 'project_location', 'country', 'head_office_address', 'project_director'], 'string', 'max' => 255],
             [['city'], 'string', 'max' => 127],
             [['logo'], 'string', 'max' => 150]
         ];
@@ -74,8 +74,9 @@ class Projects extends \yii\db\ActiveRecord
             'id',
             'project_name',
             'client_name',
-            'main_contractor',
+            'contractor',
             'consultant',
+            'about',
             'address',
             'project_location',
             'project_manager',
@@ -92,7 +93,7 @@ class Projects extends \yii\db\ActiveRecord
         return [
             'project_name',
             'client_name',
-            'main_contractor',
+            'contractor',
             'consultant',
             'project_location',
             'project_manager',
@@ -113,7 +114,7 @@ class Projects extends \yii\db\ActiveRecord
             'id' => 'ID',
             'project_name' => 'Project Name',
             'client_name' => 'Client Name',
-            'main_contractor' => 'Main Contractor',
+            'contractor' => 'Main Contractor',
             'consultant' => 'Consultant',
             'project_manager' => 'Project Manager',
             'project_location' => 'Project Location',
@@ -122,7 +123,7 @@ class Projects extends \yii\db\ActiveRecord
             'head_office_address' => 'Head Office Address',
             'project_director' => 'Project Director',
             'project_status' => 'Project Status',
-            'project_note' => 'Project Note',
+            'about' => 'Project Note',
             'address' => 'Address',
             'telephone' => 'Telephone',
             'logo' => 'Logo',

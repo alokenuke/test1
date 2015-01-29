@@ -16,32 +16,34 @@ use yii\web\AssetBundle;
 class AppAsset extends AssetBundle
 {
 //	public $language;
-	public $basePath = '@webroot';
-	public $baseUrl = '@web';
-	public $css = [
-		'css/site.css',
-		'css/animate.min.css',
-                //'css/main.css',
-                'css/font-awesome.min.css',
-                'css/style.css',
-	];
-	public $js = [
-		'js/services.js',
-		'js/app.js',
-		'js/module.js',
-		'js/tags.js',
-                'js/user.js',
-                'js/settings.js',
-                'js/bootstrap-submenu.js',
-                'js/html5shiv.js',
-                'js/respond.js',
-                'js/site.js',
-	];
-	public $depends = [
-		'yii\web\YiiAsset',
-		'yii\bootstrap\BootstrapAsset',
-		'backend\assets\AngularAsset',
-		'backend\assets\AngularUiAsset',
-	];
+    public $basePath = '@webroot';
+    public $baseUrl = '@web';
+    public $css = [
+        'css/site.css',
+        'css/animate.min.css',
+        //'css/main.css',
+        'css/font-awesome.min.css',
+        'css/style.css',
+    ];
+    public $js = [
+        'js/services.js',
+        'js/app.js',
+        'js/module.js',
+        'js/tags.js',
+        'js/user.js',
+        'js/projects.js',
+        'js/settings.js',
+        'js/bootstrap-submenu.js',
+        'js/html5shiv.js',
+        'js/respond.js',
+        'js/site.js',
+    ];
+    public $depends = [
+//        'yii\web\YiiAsset',
+        'yii\web\JqueryAsset',
+        'yii\bootstrap\BootstrapAsset',
+        'backend\assets\AngularAsset',
+        'backend\assets\AngularUiAsset',
+    ];
 }
 

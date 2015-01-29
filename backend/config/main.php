@@ -6,8 +6,6 @@ $params = array_merge(
     require(__DIR__ . '/params-local.php')
 );
 
-use kartik\mpdf\Pdf;
-
 return [
     'id' => 'app-backend',
     'basePath' => dirname(__DIR__),
@@ -33,26 +31,21 @@ return [
             'identityClass' => 'backend\models\User',
             'enableAutoLogin' => true,
         ],
-        'pdf' => [
-            'class' => Pdf::classname(),
-            'destination' => Pdf::DEST_BROWSER,
-            // refer settings section for all configuration options
-        ],
-        'log' => [
-            'traceLevel' => YII_DEBUG ? 3 : 0,
-            'targets' => [
-                [
-                    'class' => 'yii\log\FileTarget',
-                    'levels' => ['error', 'warning'],
-                ],
-            ],
-        ],
+//        'log' => [
+//            'traceLevel' => YII_DEBUG ? 3 : 0,
+//            'targets' => [
+//                [
+//                    'class' => 'yii\log\FileTarget',
+//                    'levels' => ['error', 'warning'],
+//                ],
+//            ],
+//        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
-		    ['class' => 'yii\rest\UrlRule', 'controller' => ['api', 'users', 'userlevels', 'usergroups', 'roles', 'items', 'tags', 'labeltemplates'], 'pluralize'=>false, 'extraPatterns' => ['GET search' => 'search']],
+		    ['class' => 'yii\rest\UrlRule', 'controller' => ['api', 'users', 'userlevels', 'usergroups', 'roles', 'items', 'tags', 'labeltemplates', 'projects'], 'pluralize'=>false, 'extraPatterns' => ['GET search' => 'search']],
 		    'api/fields' => 'api/fields',
                     'dashboard' => 'site/dashboard',
                     '<controller>/<action>' => '<controller>/<action>',

@@ -32,7 +32,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/#/"><img src="images/logo.png" alt="" /></a>
+            <a class="navbar-brand" href="/#/"><img src="<?php echo \yii::$app->urlManager->createUrl("/images/logo.png")?>" alt="" /></a>
         </div>
     </div>
     <div class="clearfix"></div>

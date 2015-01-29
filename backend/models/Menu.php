@@ -29,7 +29,7 @@ class Menu extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['label', 'url', 'parent_id'], 'required'],
+            [['label', 'url', 'position'], 'required'],
             [['parent_id', 'status'], 'integer'],
             [['label'], 'string', 'max' => 128],
             [['url'], 'string', 'max' => 256]

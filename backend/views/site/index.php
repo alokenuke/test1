@@ -12,7 +12,7 @@
                     <div class="col-sm-6">
                         <ol class="breadcrumb">
                             <li ng-repeat="item in breadcrumbs">
-                                <a href="{{item.link}}">{{item.label}}</a>
+                                <a ng-href="{{item.link}}" ng-class="{'active': !item.link}">{{item.label}}</a>
                             </li>
                         </ol>
                     </div>
