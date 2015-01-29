@@ -3,9 +3,9 @@ app.controller('RolesIndex', ['$scope', 'rest', '$location', '$route','$routePar
         $scope.tagsNum = 1;
         rest.path = "roles";
         $scope.page_dropdown = page_dropdown;
-        breadcrumbsService.setTitle("Manage Roles");
         breadcrumbsService.clearAll();
-        breadcrumbsService.add("", "Home");
+        breadcrumbsService.setTitle("Manage Roles");
+        breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/roles", "Roles manage");
         
         $scope.pageChanged = function() {
@@ -49,10 +49,11 @@ app.controller('RolesAdd', ['$scope', 'rest', '$location', '$route','$routeParam
         $scope.tagsNum = 1;
         rest.path = "roles";
         $scope.page_dropdown = page_dropdown;
-        breadcrumbsService.setTitle("Manage Roles");
         breadcrumbsService.clearAll();
-        breadcrumbsService.add("", "Home");
-        breadcrumbsService.add("/#/roles/create", "Add Roles");
+        breadcrumbsService.setTitle("Create New Role");
+        breadcrumbsService.add("/#/", "Home");
+        breadcrumbsService.add("/#/roles", "Roles");
+        breadcrumbsService.add("/#/roles/create", "Create New Role");
         $scope.moduleactions = {};
         
         $scope.role = {};
@@ -70,15 +71,14 @@ app.controller('RolesAdd', ['$scope', 'rest', '$location', '$route','$routeParam
         });
     }])
 
-app.controller('RolesUpdate', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService','page_dropdown','$location',
-                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService,page_dropdown,$location) {
+app.controller('RolesUpdate', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService','page_dropdown','$location', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService,page_dropdown,$location) {
         $scope.tagsNum = 1;
         rest.path = "roles";
         $scope.page_dropdown = page_dropdown;
-        breadcrumbsService.setTitle("Manage Roles");
         breadcrumbsService.clearAll();
-        breadcrumbsService.add("", "Home");
-        breadcrumbsService.add("/#/user/roles/update", "Update Roles");
+        breadcrumbsService.setTitle("Update Role");
+        breadcrumbsService.add("/#/", "Home");
+        breadcrumbsService.add("/#/user/roles/update", "Update Role");
         $scope.moduleactions = {};
         
         $scope.role = {};
@@ -107,11 +107,11 @@ app.controller('RolesUpdate', ['$scope', 'rest', '$location', '$route','$routePa
 
 app.controller('ManageLabelTemplates', function($scope, rest, $location, alertService, $http, breadcrumbsService, $window) {
     rest.path = "labeltemplates";
-    breadcrumbsService.setTitle("Manage Label Templates");
+    
     breadcrumbsService.clearAll();
-    breadcrumbsService.add("", "Home");
-    breadcrumbsService.add("/#/settings", "Settings");
-    breadcrumbsService.add("/#/labeltemplates", "Label Templates");
+    breadcrumbsService.setTitle("Manage Label Templates");
+    breadcrumbsService.add("/#/", "Home");
+    breadcrumbsService.add("/#/labeltemplates", "Settings - Label Templates");
     $scope.paper_size = 'custom';
     $scope.label_template = {};
     

@@ -641,7 +641,6 @@ table .form-control {
 }
 .multi-level {
     background-color: transparent;
-    padding: 0;
     border: none;
     color: #1f74c3;
     font-size: 1.6rem
@@ -794,6 +793,9 @@ margin-top: -5px
 
 /*------------/footer----------*/
 @media (min-width: 1200px) {
+    .projectbox:nth-child(3n+1) {
+        clear:both;
+    }
     .pl-lg-25 {
         padding-left: 25px;
     }
@@ -903,6 +905,11 @@ margin-top: -5px
 
     }
 }
+ul.showfull {
+    overflow: auto;
+    height: 192px;
+}
+
 @media only screen and (min-width:992px) {
     .pr-md-large {
         padding-right: 80px;
@@ -1027,4 +1034,10 @@ margin-top: -5px
     .rt th:last-child,
     .rt td:last-child { border-bottom: 1px solid #babcbf; }
 
+}
+
+@media (max-width: 1199px) {
+    .projectbox:nth-child(2n+1) {
+        clear:both;
+    }
 }

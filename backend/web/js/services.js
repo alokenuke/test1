@@ -13,6 +13,9 @@ appServices.factory('alertService', function($rootScope) {
     
     alertService.add = function(type, msg) {
         $rootScope.alerts.push({'type': type, 'msg': msg});
+        
+        //$timeout(function(){element.remove();}, 5000);
+        
     };
 
     alertService.closeAlert = function(index) {
@@ -21,7 +24,9 @@ appServices.factory('alertService', function($rootScope) {
     
 	alertService.clearAll = function() {
         $rootScope.alerts = [];
-    };    return alertService;
+    };
+    
+    return alertService;
 });
 
 appServices.factory('breadcrumbsService', function($rootScope) {
@@ -47,6 +52,8 @@ appServices.factory('breadcrumbsService', function($rootScope) {
     
     breadcrumbsService.clearAll = function() {
         $rootScope.breadcrumbs = [];
+        $rootScope.head_title = "";
+        $rootScope.page_title = "";
     };
 
     return breadcrumbsService;
@@ -218,3 +225,40 @@ appServices.directive('preloadable', function () {
        }
     }
  });
+ 
+ appServices.directive("clickToEdit", function() {
+          
+    return {
+        restrict: "A",
+        replace: true,
+        templateUrl: function(elem, attrs) {
+            return attrs.templateUrl || 'defaultEditForm.html'
+        },
+        scope: {
+            view: "=clickToEdit",
+            editableValue: "=editableField"
+        },
+        controller: function($scope) {
+            $scope.view.editableValue = $scope.editableValue                
+            $scope.editorEnabled = false;
+            
+            $scope.enableEditor = function() {
+                $scope.view.editorEnabled = true;
+                $scope.view.editableValue = $scope.editableValue;
+            };
+
+            $scope.disableEditor = function() {
+                $scope.view.editorEnabled = false;
+                
+                if($scope.view.id == null) {
+                    $scope.$parent.remove();
+                }
+            };
+            
+            if($scope.view.editing)
+                $scope.enableEditor();
+            else
+                $scope.disableEditor();
+        }
+    };
+});

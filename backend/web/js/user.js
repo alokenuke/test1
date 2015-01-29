@@ -2,23 +2,41 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
         
     rest.path = "usergroups";
 
-    breadcrumbsService.setTitle("Manage User Groups");
     breadcrumbsService.clearAll();
-    breadcrumbsService.add("", "Home");
-    breadcrumbsService.add("/#/user-groups", "User Groups");
+    breadcrumbsService.setTitle("Manage User Groups");
+    breadcrumbsService.add("/#/", "Home");
+    breadcrumbsService.add("/#/user-groups", "Manage - User Groups");
 
     $scope.list = [];
     $scope.selectedItem = {};
     $scope.page_dropdown = page_dropdown;
-
+    
     $scope.options = {
+    };
+    
+    $scope.callbacks = {
+        accept: function(sourceNodeScope, destNodesScope, destIndex) {
+            var sourceLevel = sourceNodeScope.$modelValue;
+            // Check if item is dragged between siblings.
+            if((typeof destNodesScope.$modelValue[0] != 'undefined')) {
+                if(sourceLevel.user_group_id>0) {
+                    if(angular.equals(destNodesScope.$modelValue[0].user_group_id, sourceLevel.user_group_id)) {
+                        return true;
+                    }
+                }
+                alert("Not allowed");
+                return false;
+            }            
+            return true;
+        },
     };
 
     $scope.updateItem = function(scope) {
-        scope.editing = true;
+        scope.editing = true; 
     }
     
-    $scope.saveItem = function(scope, title) {
+    $scope.saveItem = function(obj, title) {
+        var scope = obj.$modelValue;
         if(scope.user_group_id) {
             scope.level_name = title;
             if(scope.id)
@@ -45,6 +63,7 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
             }
         }
         scope.editing=false
+        scope.editorEnabled = false;
     }
     
     $scope.removeItem = function(item) {
@@ -60,20 +79,6 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
             });
         }
         item.remove();
-    }
-    
-    $scope.cancelEditing = function(item) {
-        var scope = item.$modelValue;
-        if(scope.user_group_id) {
-            scope.tempTitle=scope.level_name;
-            scope.editing=false;
-        }
-        else {
-            scope.tempTitle=scope.group_name;
-            scope.editing=false;
-        }
-        if(scope.id==null)
-            item.remove();
     }
     
     $scope.newSubItem = function(scope, type) {
@@ -94,6 +99,7 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
                 levels: [],
                 editing: true,
             });
+            scope.collapsed = true;
         }
     };
     
@@ -211,17 +217,16 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
         $scope.currentPage = (data._meta.currentPage);
         $scope.numPerPage = data._meta.perPage;
     }).error(errorCallback);
-    
 }])
 
 app.controller('UserIndex', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService','page_dropdown', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService,page_dropdown) {
       
         rest.path = "users";
         
-        breadcrumbsService.setTitle("Manage Users");
         breadcrumbsService.clearAll();
-        breadcrumbsService.add("", "Home");
-        breadcrumbsService.add("/#/user-groups", "List Users");
+        breadcrumbsService.setTitle("Manage Users");
+        breadcrumbsService.add("/#/", "Home");
+        breadcrumbsService.add("/#/users", "Manage - Users");
         
         $scope.page_dropdown = page_dropdown;
         $scope.$search = {};
@@ -292,9 +297,9 @@ app.controller('UserCreate',
         rest.path = "users";
         
         $scope.tooltip = tooltip;
-        breadcrumbsService.setTitle("Create Users");
         breadcrumbsService.clearAll();
-        breadcrumbsService.add("", "Home");
+        breadcrumbsService.setTitle("Create Users");
+        breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/users", "Users");
         breadcrumbsService.add("/#/users/create", "Create Users");
         
@@ -563,12 +568,11 @@ app.controller('UserUpdate',
         $scope.user = [];
         
         $scope.tooltip = tooltip;
-        breadcrumbsService.setTitle("Update User");
         breadcrumbsService.clearAll();
-        breadcrumbsService.add("", "Home");
-        breadcrumbsService.add("", "Manage");
-        breadcrumbsService.add("", "Users");
-        breadcrumbsService.add("/#/users/update", "Update");
+        breadcrumbsService.setTitle("Update User");
+        breadcrumbsService.add("/#/", "Home");
+        breadcrumbsService.add("/#/users", "Manage Users");
+        breadcrumbsService.add("/#/users/update", "Update User");
             
         $scope.rec_noti = [
             {id: 'daily', name:'Daily'},

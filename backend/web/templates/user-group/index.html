@@ -50,6 +50,9 @@
         color: #000;
         border: 1px solid #ccc;
     }
+    .click-to-edit {
+        cursor: default;
+    }
 </style>
 <div role="tabpanel">
     <!-- Tab panes -->
@@ -61,61 +64,26 @@
                         <button class='btn btn-primary' ng-click="newSubItem(list, 'top')">
                             Add New User Group
                         </button>
-                        <div class='row' style='padding:20px;' ng->
-                        <div ui-tree>
-                            <ol ui-tree-nodes="" ng-model="list" data-nodrag="false">
+                        <div class='row' style='padding:20px;'>
+                        <div ui-tree callbacks="callbacks">
+                            <ol ui-tree-nodes ng-model="list">
                               <li ng-repeat="item in list" ui-tree-node>
                                 <div ui-tree-handle class="user_group">
-                                    <div ng-hide="item.editing">
-                                        <a class="btn btn-success btn-xs" data-nodrag ng-click="toggle(this)"><span class="fa" ng-class="{'fa-plus': collapsed, 'fa-minus': !collapsed}"></span></a>
-                                        {{item.group_name}}
-                                        <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeItem(this)" ng-confirm-click="Are you sure to remove this group? On removing this group, all related levels will be removed."><span class="fa fa-trash"></span></a>
-                                        <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newSubItem(item, 'user_group')" style="margin-right: 8px;"><span class="fa fa-plus"></span></a>
-                                        <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(item)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
-                                        <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="showProjectsModal(item)" style="margin-right: 8px;">Projects</a>
-                                    </div>
-                                    <div ng-show="item.editing">
-                                        <form class="form-inline" role="form" ng-submit="saveItem(item, item.tempTitle);">
-                                            <div class="form-group">
-                                                <label class="sr-only" for="groupName">Group name</label>
-                                                <input type="text" class="form-control" placeholder="Group name" ng-model="item.tempTitle" ng-init="item.tempTitle=item.group_name" ng-required="true">
-                                            </div>
-                                            <button type="submit" class="btn btn-primary">Save</button>
-                                            <button type="button" class="btn btn-primary" ng-click="cancelEditing(this)">Cancel</button>
-                                        </form>
-                                    </div>
-                                 </div>
-                                <ol ui-tree-nodes="options" ng-model="item.levels" ng-hide="collapsed" class="slide">
+                                    <div click-to-edit="item" template-url="editGroup.html" editable-field="item.group_name"></div>
+                                </div>
+                                <ol ui-tree-nodes ng-model="item.levels" ng-hide="collapsed" class="slide">
                                     <li ng-repeat="item in item.levels" ui-tree-node>
                                         <div ui-tree-handle class="user_level">
-                                            <div ng-hide="item.editing">
-                                                <a class="btn btn-success btn-xs" data-nodrag ng-click="loadUsers(item)"><span class="fa" ng-class="{'fa-chevron-right': !item.collapsed, 'fa-chevron-down': item.collapsed}"></span></a>
-                                                {{item.level_name}}
-                                                &nbsp;&nbsp; <a class="btn-info" ng-show="item.loading"><i class="fa fa-refresh"></i> Loading users..</a>
-                                                <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeItem(item)" ng-confirm-click="Are you sure to remove this level? This action cannot be undone."><span class="fa fa-trash"></span></a>
-                                                <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(item)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
-                                            </div>
-                                            <div ng-show="item.editing">
-                                                <form class="form-inline" role="form" ng-submit="saveItem(item, item.tempTitle);">
-                                                    <div class="form-group">
-                                                        <label class="sr-only" for="groupName">Level name</label>
-                                                        <input type="text" class="form-control" placeholder="Level Name" ng-model="item.tempTitle" ng-init="item.tempTitle=item.level_name" ng-required="true">
-                                                    </div>
-                                                    <button type="submit" class="btn btn-primary">Save</button>
-                                                    <button type="button" class="btn btn-primary" ng-click="cancelEditing(this)">Cancel</button>
-                                                </form>
-                                            </div>
+                                            <div click-to-edit="item" template-url="editLevel.html" editable-field="item.level_name"></div>
                                         </div>
                                         <div ng-hide="!item.collapsed" style="padding: 20px;border: 1px solid #ccc;" class="slide">
-                                            <div class="row mt-15" ng-include="'levelUsers.html'"></div><!--/tabpanel-->
+                                            <div class="row mt-15" ng-include="'levelUsers.html'"></div>
                                         </div>
                                     </li>
                                  </ol>
                               </li>
                             </ol>
-                          </div>
-
-                      </div>
+                        </div>
                   </div>
               </div>
 
@@ -257,5 +225,50 @@
                     </div>
                 </div>          
             </div><!--/row-->
+    </div>
+</script>
+<script type="text/ng-template" id="editLevel.html">
+    <div class="click-to-edit"><div ng-hide="view.editorEnabled"><a class="btn btn-success btn-xs" ng-click="$parent.loadUsers(view)">
+        <span class="fa" ng-class="{'fa-chevron-right': !view.collapsed, 'fa-chevron-down': view.collapsed}"></span></a>
+        {{view.editableValue}}
+        &nbsp;&nbsp; <a class="btn-info" ng-show="view.loading"><i class="fa fa-refresh"></i> Loading users..</a>
+        <a class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this level? This action cannot be undone."><span class="fa fa-trash"></span></a>
+        <a class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
+            <span class="fa fa-pencil"></span>
+        </a>
+    </div>
+    <div ng-show="view.editorEnabled" class="slide">
+        <form class="form-inline" ng-submit="$parent.saveItem($parent, view.editableValue);">
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="Level Name" ng-required="true" ng-model="view.editableValue" />
+            </div>
+            <button class="btn btn-primary">Save</button>
+            <a ng-click="disableEditor()" class="btn btn-primary">cancel</a>
+        </form>
+    </div>
+</div>
+</script>
+<script type="text/ng-template" id="editGroup.html">
+    <div class="click-to-edit">
+        <div ng-hide="view.editorEnabled"><a class="btn btn-success btn-xs" ng-click="$parent.toggle($parent)">
+            <span class="fa" ng-class="{'fa-plus': $parent.collapsed, 'fa-minus': !$parent.collapsed}"></span></a>
+            {{view.editableValue}}
+            <a class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this group? On removing this group, all related levels will be removed."><span class="fa fa-trash"></span></a>
+            
+            <a class="pull-right btn btn-primary btn-xs" ng-click="$parent.newSubItem(view, 'user_group')" style="margin-right: 8px;"><span class="fa fa-plus"></span></a>
+            <a class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
+                <span class="fa fa-pencil"></span>
+            </a>
+            <a class="pull-right btn btn-primary btn-xs" ng-click="$parent.showProjectsModal(item)" style="margin-right: 8px;">Projects</a>
+        </div>
+        <div ng-show="view.editorEnabled" class="slide">
+            <form class="form-inline" ng-submit="$parent.saveItem($parent, view.editableValue);">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Level Name" ng-required="true" ng-model="view.editableValue" />
+                </div>
+                <button class="btn btn-primary">Save</button>
+                <a ng-click="disableEditor()" class="btn btn-primary">cancel</a>
+            </form>
+        </div>
     </div>
 </script>

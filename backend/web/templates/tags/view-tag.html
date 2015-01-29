@@ -1,7 +1,10 @@
 <div role="tabpanel" class="tab-pane col-xs-12 active" id="List_Tags">
-        <div class="row">
-            <div class="col-xs-12 search-box mb-sm-large">
-        <form role="form" class="form-wrapper form-horizontal form-horizontal-type1" id="form">
+    <div>
+        <a class="btn btn-primary" href="/#/tags"><i class="fa fa-chevron-left fa-1x"></i> List Tags</a>
+        <a class="btn btn-primary" href="/#/tags/update{{tagAnalytic.type=='mT'?'master':''}}/{{tagAnalytic.id}}/{{tagAnalytic.project_id}}"><i class="fa fa-edit fa-1x"></i> Edit Tag</a>
+    </div>
+    <div class="row mt-10">
+        <div class="col-xs-12 search-box mb-sm-large">
             <div class="">
                 <div class="col-sm-9">
                     <div class="row">
@@ -10,7 +13,7 @@
                                 <label class="col-sm-4 control-label text-right">Project Name :</label>
                                 <div class="col-sm-8 multi-level">
                                     <div class="item-group">{{tagAnalytic.project_name}}</div>
-                                    
+
                                 </div>
                             </div>
                         </div>
@@ -35,7 +38,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="col-sm-4 control-label text-right">User Group :</label>
@@ -63,7 +66,7 @@
                             </div>
                         </div>
                     </div><!--/row-->
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
@@ -85,7 +88,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6" ng-hide="tagAnalytic.product_code==''">
                             <div class="form-group">
                                 <label class="col-sm-4 control-label text-right">Product Code :</label>
                                 <div class="col-sm-8 multi-level">
@@ -93,28 +96,20 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="col-sm-4 text-right">&nbsp;</label>
-                                <div class="col-sm-8">
-                                    <div class="item-group">&nbsp;</div>
-                                </div>
-                            </div>
-                        </div>
                     </div><!--/row-->
-                    
-                    
+
+
                 </div>
                 <div class='col-sm-3'>
                     <div class="col-sm-5 col-md-6 bar-code-container2">
-                        
+
                         <button openlightbox="" imageurl="{{tagAnalytic.uid}}.png" type="barCode" image-header="Tag - {{tagAnalytic.tag_name}}" image-footer="UID - {{tagAnalytic.uid}}" class="bar-code text-center">
                             <i class="fa fa-barcode fa-5x"></i><br />
                             Bar Code
                         </button>
                     </div>
                     <div class="col-sm-5 col-md-6 bar-code-container2">
-                        
+
                         <button openlightbox="" imageurl="{{tagAnalytic.uid}}.png" type="qrCode"  image-header="Tag - {{tagAnalytic.tag_name}}" image-footer="UID - {{tagAnalytic.uid}}" class="bar-code text-center">
                             <i class="fa fa-qrcode fa-5x"></i><br />
                             QR Code
@@ -122,145 +117,204 @@
                     </div>
                 </div>
             </div><!--/row-->
-        </form>
-        <div style="padding:10px;" class="row">
-            <div class="col-xs-12 search-box mb-sm-large">
-                <div class="row">
-                    <h2 class="col-xs-12 search-title">Assigned Users and Process
-                        <button class="pull-right btn icon-btn" ng-click="showSearchBox=!showSearchBox;">
-                            <i ng-class="{'fa fa-sort-desc fa-2x': !showSearchBox,'fa fa-sort-asc fa-2x': showSearchBox}"></i>
-                        </button>
-                    </h2>
-                </div><!--/row-->
-            <div style="padding:10px;" class="table-responsive table-responsive-cust form-wrapper">
-                <form id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form" ng-class="{'ng-hide':showSearchBox}">
-                    <div class="">
-                        <table class="table table-bordered table-striped">
-                        <thead>
-                            <tr>
-                                <th rowspan="2" class="text-center">S.No</th>
-                                <th rowspan="2" class="text-center">User Level</th>
-                                <th rowspan="2" class="text-center">User</th>
-                                <th rowspan="2" class="text-center">From Task Process</th>
-                                <th rowspan="2" class="text-center">To Task Process</th>
-                                <th rowspan="2" class="text-center">Mandatory</th>
-                                <th colspan="2" class="text-center">Email Notification</th> 
-                            </tr>
-                            <tr>
-                                <th class="text-center">Status</th>
-                                <th class="text-center">Frequency</th> 
-                            </tr>
-                        </thead>
-                        <tbody>
-<!--                            <tr>
-                                <td class="text-center">{{$index+1}}</td>
-                                <td class="text-center">Admin One</td>
-                                <td class="text-center"></td>
-                                <td class="text-center">
-                                </td>
-                                <td class="text-center">
-                                </td>
-                                <td class="text-center">
-                                </td>
-                                <td class="text-center">
-
-                                </td>
-                                <td class="text-center">
-                                </td>
-                            </tr>-->
-                            <tr ng-repeat="level in tagAnalytic.tagAssignmentObj" ng-if="level.user_level!=null">
-                                <td class="text-center" ng-init="serial=serial+1">{{serial}}</td>
-                                <td class="text-center">{{level.user_level.level_name}}</td>
-                                <td class="text-center">
-                                    {{level.userDetails.first_name}} {{level.userDetails.last_name}}<br />
-                                    <small>{{level.userDetails.designation?'('+level.userDetails.designation+')':''}}</small>
-                                </td>
-                                <td class="text-center">
-                                   {{level.process_stage_from.process_name}}
-                                </td>
-                                <td class="text-center">
-                                     {{level.process_stage_to.process_name}}
-                                </td>
-                                <td class="text-center">
-                                    {{(level.mandatory?"Yes":"No")}}
-                                </td>
-                                <td class="text-center">
-                                    <span ng-repeat="status in level.notification_status">
-                                        <span class="mr-5">{{status.name}}</span>
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    {{level.notification_frequency}}
-                                </td>
-                            </tr>                 
-                        </tbody>
-                    </table>
+            <div class="clearfix"></div>
+            <div class="row" style="padding:10px;">
+                <div class="col-xs-12 search-box mb-sm-large">
+                    <div class="row">
+                        <h2 class="col-xs-12 search-title">Related Tags
+                            <button class="pull-right btn icon-btn" ng-click="showRelatedTagBox=!showRelatedTagBox;">
+                                <i ng-class="{'fa fa-sort-desc fa-2x': !showRelatedTagBox,'fa fa-sort-asc fa-2x': showRelatedTagBox}"></i>
+                            </button>
+                        </h2>
                     </div><!--/row-->
-                </form>     
+                    <div class="table-responsive table-responsive-cust mt-10 slide" ng-show="tagAnalytic.type=='mT' && !showRelatedTagBox">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Type</th>
+                                    <th class="text-center"><a>UID</a></th>
+                                    <th class="text-center">Project Level</th>
+                                    <th class="text-center">Item Type</th>
+                                    <th class="text-center" >Tag Name</th> 
+                                    <th class="text-center" >Description</th> 
+                                    <th class="text-center" >Product Code</th>
+                                    <th class="text-center" >Last updated by</th>
+                                    <th class="text-center" >Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat='dat in tagAnalytic.relatedTags track by $index'>
+                                    <td class="text-center {{dat.type}}">{{dat.type}}</td>
+                                    <td class="text-center">{{dat.uid}}</td>
+                                    <td class="text-center multi-level">
+                                        <div class="level-item">{{dat.project_name}}</div>
+                                        <div class="level-item" ng-repeat="project_level in dat.project_level" ng-class="{'last-child': dat.project_level.length === ($index + 1)}">
+                                            {{project_level}}
+                                        </div>
+                                    </td>
+                                    <td class="text-center">{{dat.itemDetails.item_name}}</td>
+                                    <td class="text-center">{{dat.tag_name}}</td>
+                                    <td class="text-center">{{dat.tag_description}}</td>
+                                    <td class="text-center">{{dat.product_code}}</td>
+                                    <td class="text-center">
+                                        Material Received - No<br/>
+                                        <small>(A.R. Hussain Nov 11, 2014 13:10:11)</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <a ng-href="/#/tags/{{dat.id}}">Task analysis</a>
+                                    </td>
+                                </tr>
+                                <tr ng-hide="tagAnalytic.relatedTags.length>0">
+                                    <td colspan="9">No related tag(s) available</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="pull-right">                    
+                            <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
+                            <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px"><option>20</option></select>
+                        </div>
+                    </div>
+                </div>
             </div>
-            </div><!--/search-tag-box-->
-        </div><!--/row-->
-    </div><!--/shadow-box-->
-    <div class="wrapper mt-10 mt-xs-large">
-        <button class="btn icon-btn btn-lg pull-left activity-btn"><i class="fa fa-list-alt fa-lg mr-10 "></i>Activity Log List</button>
-<!--        <button class="btn btn-primary btn-lg pull-right"><i class="fa fa-download mr-10 fa-lg"></i>Download Report</button>
-        <button class="btn btn-primary btn-lg pull-right mr-10"><i class="fa fa-print mr-10 fa-lg"></i>Print Report</button>-->
-    </div> 
-    <div class="wrapper mt-20">
-        <div class="table-responsive table-responsive-cust">
-            <table class="table table-bordered table-striped form-horizontal-typ1 mb-0">
-                <thead>
-                    <tr>
-                        <th class="text-center">S.No</th>
-                        <th class="text-center">Status</th>
-                        <th class="text-center">Comments</th>
-                        <th class="text-center">Attachments<br />
-                            <small>(click to view)</small>
-                        </th>
-                        <th class="text-center">
-                            Activity Location<br />
-                            <small>(click to download)</small>
-                        </th>
-                        <th class="text-center">Logged By</th>
-                        <th class="text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="act in activity">
-                        <td class="text-center">{{$index+1}}</td>
-                        <td class="text-center">{{act.status}}
-                        </td>
-                        <td class="text-center">{{act.comments}}</td>
-                        <td class="text-center">
-                            
-                            <span  ng-repeat="attch in act.attachments" >
-                                <a href="">{{attch.filename}}&nbsp;&nbsp;<i class="fa fa-file-word-o"></i></a>,
-                            </span>
-                            <span ng-hide="act.attachments.length>0">No attachments available</span>
-                        </td>
-                        <td class="text-center">
-                            <a>{{act.location}}</a><br /><small>{{act.device}}</small>
-                        </td>
-                        <td class="text-center">
-                            Mr. Ankur Sharma <br/>
-                            <small>24 Nov 2014 13:10:11</small>
-                        </td>
-                        <td class="text-center">
-                            <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>
-                            <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <div class="pull-right">                    
-            <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
-            <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px"><option>20</option></select>
-        </div>
-            
-        </div>        
-    </div><!--/wrapper-->
-</div><!--/secondary-bg-->
+
+            <div style="padding:10px;" class="row">
+                <div class="col-xs-12 search-box mb-sm-large">
+                    <div class="row">
+                        <h2 class="col-xs-12 search-title">Assigned Users and Process
+                            <button class="pull-right btn icon-btn" ng-click="showSearchBox=!showSearchBox;">
+                                <i ng-class="{'fa fa-sort-desc fa-2x': !showSearchBox,'fa fa-sort-asc fa-2x': showSearchBox}"></i>
+                            </button>
+                        </h2>
+                    </div><!--/row-->
+                <div style="padding:10px;" class="table-responsive table-responsive-cust form-wrapper slide" ng-class="{'ng-hide':showSearchBox}">
+                    <form id="form" class="form-horizontal form-horizontal-typ1 form-wrapper" role="form">
+                        <div class="">
+                            <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" class="text-center">S.No</th>
+                                    <th rowspan="2" class="text-center">User Level</th>
+                                    <th rowspan="2" class="text-center">User</th>
+                                    <th rowspan="2" class="text-center">From Task Process</th>
+                                    <th rowspan="2" class="text-center">To Task Process</th>
+                                    <th rowspan="2" class="text-center">Mandatory</th>
+                                    <th colspan="2" class="text-center">Email Notification</th> 
+                                </tr>
+                                <tr>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Frequency</th> 
+                                </tr>
+                            </thead>
+                            <tbody>
+    <!--                            <tr>
+                                    <td class="text-center">{{$index+1}}</td>
+                                    <td class="text-center">Admin One</td>
+                                    <td class="text-center"></td>
+                                    <td class="text-center">
+                                    </td>
+                                    <td class="text-center">
+                                    </td>
+                                    <td class="text-center">
+                                    </td>
+                                    <td class="text-center">
+
+                                    </td>
+                                    <td class="text-center">
+                                    </td>
+                                </tr>-->
+                                <tr ng-repeat="level in tagAnalytic.tagAssignmentObj" ng-if="level.user_level!=null">
+                                    <td class="text-center" ng-init="serial=serial+1">{{serial}}</td>
+                                    <td class="text-center">{{level.user_level.level_name}}</td>
+                                    <td class="text-center">
+                                        {{level.userDetails.first_name}} {{level.userDetails.last_name}}<br />
+                                        <small>{{level.userDetails.designation?'('+level.userDetails.designation+')':''}}</small>
+                                    </td>
+                                    <td class="text-center">
+                                       {{level.process_stage_from.process_name}}
+                                    </td>
+                                    <td class="text-center">
+                                         {{level.process_stage_to.process_name}}
+                                    </td>
+                                    <td class="text-center">
+                                        {{(level.mandatory?"Yes":"No")}}
+                                    </td>
+                                    <td class="text-center">
+                                        <span ng-repeat="status in level.notification_status">
+                                            <span class="mr-5">{{status.name}}</span>
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        {{level.notification_frequency}}
+                                    </td>
+                                </tr>                 
+                            </tbody>
+                        </table>
+                        </div><!--/row-->
+                    </form>     
+                </div>
+                </div><!--/search-tag-box-->
+            </div><!--/row-->
+        </div><!--/shadow-box-->
+        <div class="wrapper mt-10 mt-xs-large">
+            <button class="btn icon-btn btn-lg pull-left activity-btn"><i class="fa fa-list-alt fa-lg mr-10 "></i>Activity Log List</button>
+    <!--        <button class="btn btn-primary btn-lg pull-right"><i class="fa fa-download mr-10 fa-lg"></i>Download Report</button>
+            <button class="btn btn-primary btn-lg pull-right mr-10"><i class="fa fa-print mr-10 fa-lg"></i>Print Report</button>-->
+        </div> 
+        <div class="wrapper mt-20">
+            <div class="table-responsive table-responsive-cust">
+                <table class="table table-bordered table-striped form-horizontal-typ1 mb-0">
+                    <thead>
+                        <tr>
+                            <th class="text-center">S.No</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Comments</th>
+                            <th class="text-center">Attachments<br />
+                                <small>(click to view)</small>
+                            </th>
+                            <th class="text-center">
+                                Activity Location<br />
+                                <small>(click to download)</small>
+                            </th>
+                            <th class="text-center">Logged By</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="act in activity">
+                            <td class="text-center">{{$index+1}}</td>
+                            <td class="text-center">{{act.status}}
+                            </td>
+                            <td class="text-center">{{act.comments}}</td>
+                            <td class="text-center">
+
+                                <span  ng-repeat="attch in act.attachments" >
+                                    <a href="">{{attch.filename}}&nbsp;&nbsp;<i class="fa fa-file-word-o"></i></a>,
+                                </span>
+                                <span ng-hide="act.attachments.length>0">No attachments available</span>
+                            </td>
+                            <td class="text-center">
+                                <a>{{act.location}}</a><br /><small>{{act.device}}</small>
+                            </td>
+                            <td class="text-center">
+                                Mr. Ankur Sharma <br/>
+                                <small>24 Nov 2014 13:10:11</small>
+                            </td>
+                            <td class="text-center">
+                                <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>
+                                <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="pull-right">                    
+                <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
+                <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px"><option>20</option></select>
+            </div>
+
+            </div>        
+        </div><!--/wrapper-->
+    </div><!--/secondary-bg-->
 </div>
 <style>
     .bar-code-container2 {width: 50%;}

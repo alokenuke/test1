@@ -43,12 +43,7 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
         
         .when('/change-password', {
             templateUrl: path+'site/change-password.html',
-			controller: 'ChangePassword',
-        })
-        
-        .when('/', {
-            templateUrl: path+'dashboard.html',
-            controller: 'SiteIndex',
+            controller: 'ChangePassword',
         })
         
         .when('/labeltemplates', {
@@ -80,7 +75,7 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
             controller: 'UserCreate'
         })
 
-		.when('/users/update/:id', {
+	.when('/users/update/:id', {
             templateUrl: path+'users/update.html',
             controller: 'UserUpdate',
         })
@@ -95,7 +90,17 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
             controller: 'ProjectIndex'
         })
         
-        .when('/projects/levels/:id', {
+        .when('/projects/create', {
+            templateUrl: path+'projects/form.html',
+            controller: 'ProjectForm'
+        })
+        
+        .when('/projects/update/:id', {
+            templateUrl: path+'projects/form.html',
+            controller: 'ProjectForm'
+        })
+        
+        .when('/project-levels', {
             templateUrl: path+'projects/manage-level.html',
             controller: 'ProjectLevel'
         })
@@ -103,21 +108,6 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
         .when('/user-groups', {
             templateUrl: path+'user-group/index.html',
             controller: 'UserGroup'
-        })
-        
-        .when('/projects/create', {
-            templateUrl: path+'project/create.html',
-            controller: 'ProjectCreate'
-        })
-        
-        .when('/projects/:id', {
-            templateUrl: path+'project/view.html',
-            controller: 'ProjectView'
-        })
-        
-        .when('/projects/update/:id', {
-            templateUrl: path+'project/form.html',
-            controller: 'ProjectUpdate'
         })
         
         .when('/tagitems', {
@@ -211,6 +201,9 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
 app.controller('SiteIndex', ['$scope', 'rest', 'breadcrumbsService', '$http', function ($scope, rest, breadcrumbsService, $http) {
         
     rest.path = "projects";
+    breadcrumbsService.clearAll();
+    breadcrumbsService.setTitle("Site Track - Dashboard");
+    breadcrumbsService.headTitle(" ");
     
     rest.models().success(function (data) {
         $scope.projects = data.items;
@@ -222,11 +215,10 @@ app.controller('ChangePassword', ['$scope', 'rest', 'breadcrumbsService', '$http
         
     rest.path = "site";
     
-    breadcrumbsService.setTitle("Change Password");
     breadcrumbsService.clearAll();
-    breadcrumbsService.add("", "Home");
-    breadcrumbsService.add("", "Settings");
-    breadcrumbsService.add("", "Change Password");
+    breadcrumbsService.setTitle("Change Password");
+    breadcrumbsService.add("/#/", "Home");
+    breadcrumbsService.add("/#/change-password", "Settings - Change Password");
     
     $scope.model = {};
     $scope.serverError = {};

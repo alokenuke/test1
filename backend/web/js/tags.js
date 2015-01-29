@@ -4,9 +4,9 @@ app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParam
         rest.path = "tags";
         $scope.page_dropdown = page_dropdown;
         
-        breadcrumbsService.setTitle("Manage Tags");
         breadcrumbsService.clearAll();
-        breadcrumbsService.add("", "Home");
+        breadcrumbsService.setTitle("Manage Tags");
+        breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/tags", "Tags");
         breadcrumbsService.add("/#/tags", "List Tags");
         
@@ -66,9 +66,9 @@ app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParam
             updateTagList();
         };
         
-        $scope.delete = function (id) {
+        $scope.deleteTag = function (id) {
             rest.deleteById({id: id}).success(function () {
-                $location.path('/post');
+                $location.path('/tags');
                 $route.reload();
             }).error(errorCallback);
         }
@@ -168,9 +168,10 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
         
         $scope.tooltip = tooltip;
         
-        breadcrumbsService.setTitle("Create Simple Tag");        
         breadcrumbsService.clearAll();
-        breadcrumbsService.add("", "Home");
+        breadcrumbsService.setTitle("Create Simple Tag");
+        breadcrumbsService.headTitle("Create Tag - <span class='sT'>sT</span>");
+        breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/tags", "Tags");
         breadcrumbsService.add("/#/tags", "Create Tag");
         
@@ -449,7 +450,7 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
             $http.post("/tags/create-simple-tags",{'tagDetails': $scope.tagDetails}).success(function(data) {
                 alertService.clearAll();
                 if(data=='Success') {
-                    alertService.add('success', "Tag(s) Created Successfully.");
+                    alertService.add('success', "Simple Tag(s) Created Successfully.");
                     $location.path('/tags').replace();
                 }
                 $scope.working = false;
@@ -488,10 +489,10 @@ app.controller('TagsUpdate', ['$scope', 'rest', '$location', '$route','$routePar
         
         $scope.tooltip = tooltip;
         
+        breadcrumbsService.clearAll();
         breadcrumbsService.setTitle("Update Tag - sT");
         breadcrumbsService.headTitle("Update Tag - <span class='sT'>sT</span>");
-        breadcrumbsService.clearAll();
-        breadcrumbsService.add("", "Home");
+        breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/tags", "Tags");
         breadcrumbsService.add("/#/tags", "Update Tag");
         
@@ -708,7 +709,7 @@ app.controller('TagsUpdate', ['$scope', 'rest', '$location', '$route','$routePar
             $http.post("/tags/updatesimpletags/"+$routeParams.id,{'tagDetails': $scope.tagDetails}).success(function(data) {
                 alertService.clearAll();
                 if(data=='Success') {
-                    alertService.add('success', "Tag(s) Created Successfully.");
+                    alertService.add('success', "Simple Tag Updated Successfully.");
                     $location.path('/tags').replace();
                 }
                 $scope.working = false;
@@ -744,9 +745,12 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
         rest.path = "tags";
         $scope.tooltip = tooltip;
         
-        breadcrumbsService.setTitle("Create Master Tag");        
+        alertService.clearAll();
+        
         breadcrumbsService.clearAll();
-        breadcrumbsService.add("", "Home");
+        breadcrumbsService.setTitle("Create Master Tag");      
+        breadcrumbsService.headTitle("Create Tag - <span class='mT'>mT</span>");
+        breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/tags", "Tags");
         breadcrumbsService.add("/#/tags", "Create Master Tag");
         
@@ -939,10 +943,9 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
         $scope.saveTagDetails = function() {
             
             if($scope.$selectedTags.length == 0){
-                
                 alertService.clearAll();
-                alert("Error in tag creation");
-                alertService.add('error', 'Please add tags');
+                alert("Please select related tags.");
+                alertService.add('error', 'Please select related tags.');
                 return;
             }
             
@@ -962,7 +965,7 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
             $http.post("/tags/create-master-tags",{'tagDetails': $scope.tagDetails,'relatedTags':$scope.selectedTags}).success(function(data) {
                 alertService.clearAll();
                 if(data=='Success') {
-                    alertService.add('success', "Tag(s) Created Successfully.");
+                    alertService.add('success', "Master Tag Created Successfully.");
                     $location.path('/tags').replace();
                 }
                 $scope.working = false;
@@ -1002,9 +1005,11 @@ app.controller('TagsUpdateMaster', ['$scope', 'rest', '$location', '$route','$ro
         
         $scope.tooltip = tooltip;
         
-        breadcrumbsService.setTitle("Update Master Tag");        
+        alertService.clearAll();
         breadcrumbsService.clearAll();
-        breadcrumbsService.add("", "Home");
+        breadcrumbsService.setTitle("Update Master Tag");
+        breadcrumbsService.headTitle("Update Tag - <span class='mT'>mT</span>");
+        breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/tags", "Tags");
         breadcrumbsService.add("/#/tags", "Update Master Tag");
         
@@ -1076,7 +1081,7 @@ app.controller('TagsUpdateMaster', ['$scope', 'rest', '$location', '$route','$ro
                 $scope.tagDetails.tag_name = data.tag_name;
                 $scope.tagDetails.pre = data.pre;
                 $scope.tagDetails.post = data.post;
-                $scope.tagDetails.tag_description = data.tag_description;
+                $scope.tagDetails.tag_description = data.tag_desrciption;
                 $scope.tagDetails.product_code = data.product_code;
                 $scope.tagDetails.relatedTags = data.relatedTags;
                 
@@ -1238,7 +1243,6 @@ app.controller('TagsUpdateMaster', ['$scope', 'rest', '$location', '$route','$ro
             });
 
           modalInstance.result.then(function (selectedItem) {
-            
                 if (selectedItem != 'cancel') {
                     selectedItem.filter(function (e) {
                         $scope.tagDetails.relatedTags.push(e);
@@ -1253,6 +1257,14 @@ app.controller('TagsUpdateMaster', ['$scope', 'rest', '$location', '$route','$ro
         
         
         $scope.saveTagDetails = function() {
+            
+            if($scope.tagDetails.relatedTags.length == 0){   
+                alertService.clearAll();
+                alert("Please select related tags.");
+                alertService.add('error', 'Please select related tags.');
+                return;
+            }
+            
             $scope.working = true;
             $scope.tagDetails.tag_assignment = [];
             $scope.tagDetails.tagAssignment = null;
@@ -1268,7 +1280,7 @@ app.controller('TagsUpdateMaster', ['$scope', 'rest', '$location', '$route','$ro
             $http.post("/tags/updatemastertags/"+$routeParams.id,{'tagDetails': $scope.tagDetails}).success(function(data) {
                 alertService.clearAll();
                 if(data=='Success') {
-                    alertService.add('success', "Tag(s) Created Successfully.");
+                    alertService.add('success', "Master Tag Updated Successfully.");
                     $location.path('/tags').replace();
                 }
                 $scope.working = false;
@@ -1304,9 +1316,9 @@ app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParam
         
         rest.path = "tag-activity-log";
         
-        breadcrumbsService.setTitle("Tag Analytics: Construction work Tag");
+        alertService.clearAll();
         breadcrumbsService.clearAll();
-        breadcrumbsService.add("", "Home");
+        breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/tags", "Tags");
         breadcrumbsService.add("/#/tags", "Tag Analytics");
         
@@ -1358,8 +1370,10 @@ app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParam
             $scope.activity = data.items;
         });
         
-        $http.get("/tags/"+$routeParams.id+"?expand=projectLevelObj,userGroup,processObj,itemObj,tagAssignmentObj").success(function(data) {
+        $http.get("/tags/"+$routeParams.id+"?expand=projectLevelObj,userGroup,processObj,itemObj,tagAssignmentObj,relatedTags").success(function(data) {
             $scope.tagAnalytic = data;
+            breadcrumbsService.setTitle("Tag Analytics: "+data.tag_name);
+            breadcrumbsService.headTitle("Tag Analytics - <span class='"+data.type+"'>"+data.type+"</span>");
         });
     }])
 
@@ -1369,9 +1383,10 @@ app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route','$routePa
         
         var ctrl = this;
         
-        breadcrumbsService.setTitle("Manage Tag Process");
+        alertService.clearAll();        
         breadcrumbsService.clearAll();
-        breadcrumbsService.add("", "Home");
+        breadcrumbsService.setTitle("Manage Tag Process");
+        breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/tags", "Tags");
         breadcrumbsService.add("/#/tag-process-flow", "Tag Process");
         
@@ -1486,13 +1501,12 @@ app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route','$routePa
 app.controller('TagItems', function($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, page_dropdown, $modal, $log) {
     
     rest.path = "items";
-        
-    breadcrumbsService.setTitle("Manage Items");
+    
+    alertService.clearAll();
     breadcrumbsService.clearAll();
-    breadcrumbsService.add("", "Home");
-    breadcrumbsService.add("", "Manage");
-    breadcrumbsService.add("", "Tag");
-    breadcrumbsService.add("/#/tagitems", "Items");
+    breadcrumbsService.setTitle("Manage Items");
+    breadcrumbsService.add("/#/", "Home");
+    breadcrumbsService.add("/#/tagitems", "Manage tag Items");
     
     $scope.list = [];
     $scope.selectedItem = {};
@@ -1674,6 +1688,7 @@ app.controller('createSimilarTagModalController', function ($scope, $modalInstan
     $scope.popupTags.selectedTagId = 0;
     $scope.search.project_id = itemScope.project_id;
     
+    alertService.clearAll();
     $scope.searchTags = function(){
         $http.post("/tags/search",{search:$scope.search}).success(function(data) {
             $scope.popupTags = data.items;
