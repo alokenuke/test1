@@ -1,11 +1,18 @@
 var app = angular.module('siteTrackApp', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'ngResource', 'appApp.services', 'ui.select', 'ngSanitize', 'ui.tree', 'angularFileUpload', 'angular-loading-bar']);
 
-app.run(function($http, $window) {
+app.run(function($http, $window, $rootScope, $location, $route) {
     delete $window.sessionStorage.token;
     if(!$window.sessionStorage.token) {
         $http.get("/api/gettoken").success(function(data) {
           $window.sessionStorage.token = data.token; 
         });
+    }
+    
+    $rootScope.searchTags = function(search) {
+        if(search.length>2) {
+            $location.path('/tags');
+            $route.reload();
+        }
     }
 });
 
@@ -15,6 +22,7 @@ app.constant('tooltip', {
     'mandatory': "This tooltip related to 'mandatory'.",
     'email_notification': "This tooltip related to 'email notification'.",
     'allow_be': "This tooltip is related to 'Allow BE'.",
+    'hierarchy_compulsory': "This tooltip is related to 'Hierarchy Compulsory'.",
 });
 
 app.constant('page_dropdown', {
@@ -23,6 +31,14 @@ app.constant('page_dropdown', {
     '30': "30",
     '40': "40",
     '50': "50"
+});
+
+app.constant('process_stage_type', {
+    '1': "Checkbox options",
+    '2': "Radio Options",
+    '3': "Status (%)",
+    '4': "Dropdown",
+    '5': "Textbox"
 });
 
 app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($locationProvider, $routeProvider, $httpProvider) {
@@ -35,7 +51,7 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
             templateUrl: SiteUrl+'/site/login',
             controller: 'SiteIndex',
         })
-        
+                
         .when('/', {
             templateUrl: path+'dashboard.html',
             controller: 'SiteIndex',
@@ -121,7 +137,7 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
         })
         
         .when('/tag-process-flow', {
-            templateUrl: path+'process-flow/index.html',
+            templateUrl: path+'projects/process-flow.html',
             controller: 'ProcessFlow'
         })
         
@@ -198,16 +214,18 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
     //$locationProvider.html5Mode(true).hashPrefix('!');
 }]);
 
-app.controller('SiteIndex', ['$scope', 'rest', 'breadcrumbsService', '$http', function ($scope, rest, breadcrumbsService, $http) {
+app.controller('SiteIndex', ['$scope', 'rest', 'breadcrumbsService', '$http', "$location", function ($scope, rest, breadcrumbsService, $http, $location) {
         
     rest.path = "projects";
     breadcrumbsService.clearAll();
     breadcrumbsService.setTitle("Site Track - Dashboard");
     breadcrumbsService.headTitle(" ");
     
-    rest.models().success(function (data) {
-        $scope.projects = data.items;
-    })
+    if($location.$$path!='/login') {
+        rest.models().success(function (data) {
+            $scope.projects = data.items;
+        })
+    }
 }]);
 
 

@@ -136,7 +136,7 @@ appServices.directive('ngConfirmClick', [
 
 appServices.filter('titlecase', function() {
     return function(s) {
-        s = ( s === undefined || s === null ) ? '' : s.replace("_", " ");
+        s = ( s === undefined || s === null ) ? '' : s.replace(/_/g, " ");
         return s.toString().toLowerCase().replace( /\b([a-z])/g, function(ch) {
             return ch.toUpperCase();
         });
@@ -182,50 +182,6 @@ appServices.directive('openlightbox',
    return openLightBox;
 });
 
-appServices.directive("modalShow", function ($parse) {
-    return {
-        restrict: "A",
-        link: function (scope, element, attrs) {
-
-            //Hide or show the modal
-            scope.showModal = function (visible, elem) {
-                if (!elem)
-                    elem = element;
-
-                if (visible)
-                    $(elem).modal("show");                     
-                else
-                    $(elem).modal("hide");
-            }
-
-            //Watch for changes to the modal-visible attribute
-            scope.$watch(attrs.modalShow, function (newValue, oldValue) {
-                scope.showModal(newValue, attrs.$$element);
-            });
-
-            //Update the visible value when the dialog is closed through UI actions (Ok, cancel, etc.)
-            $(element).bind("hide.bs.modal", function () {
-                $parse(attrs.modalShow).assign(scope, false);
-                if (!scope.$$phase && !scope.$root.$$phase)
-                    scope.$apply();
-            });
-        }
-
-    };
-});
-
-
-appServices.directive('preloadable', function () {        
-    return {
-       link: function(scope, element) {
-          element.addClass("empty");
-          element.bind("load" , function(e){
-             element.removeClass("empty");
-          });
-       }
-    }
- });
- 
  appServices.directive("clickToEdit", function() {
           
     return {
@@ -238,13 +194,15 @@ appServices.directive('preloadable', function () {
             view: "=clickToEdit",
             editableValue: "=editableField"
         },
-        controller: function($scope) {
-            $scope.view.editableValue = $scope.editableValue                
+        controller: function($scope, $element, process_stage_type) {
+            $scope.view.editableValue = $scope.editableValue
             $scope.editorEnabled = false;
+            $scope.process_stage_type = process_stage_type;
             
             $scope.enableEditor = function() {
                 $scope.view.editorEnabled = true;
                 $scope.view.editableValue = $scope.editableValue;
+                angular.element("input:first-child", $element).focus();
             };
 
             $scope.disableEditor = function() {

@@ -1,5 +1,5 @@
-app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'page_dropdown', 
-                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, page_dropdown) {
+app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'page_dropdown', '$rootScope',
+                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, page_dropdown, $rootScope) {
         $scope.tagsNum = 1;
         rest.path = "tags";
         $scope.page_dropdown = page_dropdown;
@@ -28,6 +28,12 @@ app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParam
         $scope.usergroups = [];
         $scope.items = [];
         $scope.processes = [];
+        $scope.showSearchBox = true;
+        
+        if(typeof $rootScope.globalSearch != 'undefined' && $rootScope.globalSearch.length > 2) {
+            $scope.search.globalSearch = $rootScope.globalSearch;
+            $scope.showSearchBox = false;
+        }
         
         if($location.$$search.sort!=undefined) {
             $scope.predicate = $location.$$search.sort;
@@ -1081,7 +1087,7 @@ app.controller('TagsUpdateMaster', ['$scope', 'rest', '$location', '$route','$ro
                 $scope.tagDetails.tag_name = data.tag_name;
                 $scope.tagDetails.pre = data.pre;
                 $scope.tagDetails.post = data.post;
-                $scope.tagDetails.tag_description = data.tag_desrciption;
+                $scope.tagDetails.tag_description = data.tag_description;
                 $scope.tagDetails.product_code = data.product_code;
                 $scope.tagDetails.relatedTags = data.relatedTags;
                 
@@ -1376,127 +1382,6 @@ app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParam
             breadcrumbsService.headTitle("Tag Analytics - <span class='"+data.type+"'>"+data.type+"</span>");
         });
     }])
-
-app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 
-                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService) {
-        rest.path = "tagprocess";
-        
-        var ctrl = this;
-        
-        alertService.clearAll();        
-        breadcrumbsService.clearAll();
-        breadcrumbsService.setTitle("Manage Tag Process");
-        breadcrumbsService.add("/#/", "Home");
-        breadcrumbsService.add("/#/tags", "Tags");
-        breadcrumbsService.add("/#/tag-process-flow", "Tag Process");
-        
-        $scope.list = [{
-            "id": 1,
-            "type": "process_type",
-            "title": "Construction Item Process",
-            "items": []
-          }, {
-            "id": 2,
-            "type": "process_type",
-            "title": "2. Assets Tracking",
-            "items": [{
-              "id": 21,
-              "type": "process_flow",
-              "title": "2.1. Item Delivered",
-            }, {
-              "id": 22,
-              "type": "process_flow",
-              "title": "2.2. Item Installed",
-              "items": [{
-                    "id": 211,
-                    "type": "process_stage",
-                    "title": "2.1.2 Item Checked - (Dropdown)",
-                  }, {
-                    "id": 212,
-                    "type": "process_stage",
-                    "title": "2.2.2 Item Installed - (Checkbox)",
-                  }, {
-                    "id": 213,
-                    "type": "process_stage",
-                    "title": "2.2.2 Item Installed Approved - (Radio)",
-                  }],
-            }],
-          }, {
-            "id": 3,
-            "type": "process_type",
-            "title": "3. Area 3",
-            "items": []
-          }, {
-            "id": 4,
-            "type": "process_type",
-            "title": "4. Area 4",
-            "items": []
-          }];
-
-          $scope.selectedItem = {};
-
-          $scope.options = {
-          };
-
-          $scope.remove = function(scope) {
-            scope.remove();
-          };
-
-          $scope.toggle = function(scope) {
-            scope.toggle();
-          };
-
-          $scope.updateItem = function(scope) {
-              scope.editing = true;
-          }
-
-          $scope.addProcessType = function() {
-            var nodeData = $scope.list;
-            nodeData.push({
-              id: null,
-              title: "Process Type " + (nodeData.length + 1),
-              type: "process_type",
-              items: []
-            });
-          };
-
-          $scope.newSubItem = function(scope, type) {
-            var nodeData = scope.$modelValue;
-            if(type)
-                type = (type=="process_type"?"process_flow":"process_stage");
-            else
-                type = "process_type";
-
-            if(nodeData.items==undefined)
-                nodeData.items = [];
-
-            nodeData.items.push({
-              id: nodeData.id * 10 + nodeData.items.length,
-              title: nodeData.title + '.' + (nodeData.items.length + 1),
-              type: type,
-              items: []
-            });
-          };
-                
-        rest.models().success(function (data) {
-            $scope.data = data.items;
-                        
-            $scope.totalCount = data._meta.totalCount;
-            $scope.pageCount = data._meta.pageCount;
-            $scope.currentPage = (data._meta.currentPage);
-            $scope.numPerPage = data._meta.perPage;
-            
-            $http.get("/projects/getall").success(function(data) {
-                $scope.projects = data.items;
-            });
-            
-            $http.get("/usergroups/getall").success(function(data) {
-                $scope.usergroups = data.items;
-            });
-            
-        });
-        
-    }]);
 
 app.controller('TagItems', function($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, page_dropdown, $modal, $log) {
     

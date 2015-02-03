@@ -14,23 +14,6 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
     $scope.options = {
     };
     
-    $scope.callbacks = {
-        accept: function(sourceNodeScope, destNodesScope, destIndex) {
-            var sourceLevel = sourceNodeScope.$modelValue;
-            // Check if item is dragged between siblings.
-            if((typeof destNodesScope.$modelValue[0] != 'undefined')) {
-                if(sourceLevel.user_group_id>0) {
-                    if(angular.equals(destNodesScope.$modelValue[0].user_group_id, sourceLevel.user_group_id)) {
-                        return true;
-                    }
-                }
-                alert("Not allowed");
-                return false;
-            }            
-            return true;
-        },
-    };
-
     $scope.updateItem = function(scope) {
         scope.editing = true; 
     }
@@ -172,7 +155,6 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
     };
     
     $scope.showProjectsModal = function (scope) {
-        console.log(scope);
         if(scope.user_group_id)
             return 0;
         var modalInstance = $modal.open({
