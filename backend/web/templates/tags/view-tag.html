@@ -103,14 +103,14 @@
                 <div class='col-sm-3'>
                     <div class="col-sm-5 col-md-6 bar-code-container2">
 
-                        <button openlightbox="" imageurl="{{tagAnalytic.uid}}.png" type="barCode" image-header="Tag - {{tagAnalytic.tag_name}}" image-footer="UID - {{tagAnalytic.uid}}" class="bar-code text-center">
+                        <button openlightbox="" imageurl="{{tagAnalytic.uid}}.png" type="YmFyY29kZQ==" image-header="Tag - {{tagAnalytic.tag_name}}" image-footer="UID - {{tagAnalytic.uid}}" class="bar-code text-center">
                             <i class="fa fa-barcode fa-5x"></i><br />
                             Bar Code
                         </button>
                     </div>
                     <div class="col-sm-5 col-md-6 bar-code-container2">
 
-                        <button openlightbox="" imageurl="{{tagAnalytic.uid}}.png" type="qrCode"  image-header="Tag - {{tagAnalytic.tag_name}}" image-footer="UID - {{tagAnalytic.uid}}" class="bar-code text-center">
+                        <button openlightbox="" imageurl="{{tagAnalytic.uid}}.png" type="cXJjb2Rl"  image-header="Tag - {{tagAnalytic.tag_name}}" image-footer="UID - {{tagAnalytic.uid}}" class="bar-code text-center">
                             <i class="fa fa-qrcode fa-5x"></i><br />
                             QR Code
                         </button>
@@ -118,7 +118,7 @@
                 </div>
             </div><!--/row-->
             <div class="clearfix"></div>
-            <div class="row" style="padding:10px;">
+            <div class="row" style="padding:10px;" ng-if="tagAnalytic.type=='mT'">
                 <div class="col-xs-12 search-box mb-sm-large">
                     <div class="row">
                         <h2 class="col-xs-12 search-title">Related Tags
@@ -266,14 +266,13 @@
                     <thead>
                         <tr>
                             <th class="text-center">S.No</th>
-                            <th class="text-center">Status</th>
                             <th class="text-center">Comments</th>
                             <th class="text-center">Attachments<br />
-                                <small>(click to view)</small>
+                                <small>(click to download)</small>
                             </th>
                             <th class="text-center">
                                 Activity Location<br />
-                                <small>(click to download)</small>
+                                <small>(click to view)</small>
                             </th>
                             <th class="text-center">Logged By</th>
                             <th class="text-center">Action</th>
@@ -282,13 +281,11 @@
                     <tbody>
                         <tr ng-repeat="act in activity">
                             <td class="text-center">{{$index+1}}</td>
-                            <td class="text-center">{{act.status}}
-                            </td>
-                            <td class="text-center">{{act.comments}}</td>
+                            <td class="text-center">{{act.comment}}</td>
                             <td class="text-center">
 
-                                <span  ng-repeat="attch in act.attachments" >
-                                    <a href="">{{attch.filename}}&nbsp;&nbsp;<i class="fa fa-file-word-o"></i></a>,
+                                <span  ng-repeat="attach in act.attachments" >
+                                    <a href="/filemanager/download?type=YXR0YWNobWVudHM=&file={{attach.filename}}" target="_blank">{{attach.filename}}&nbsp;&nbsp;<i class="fa fa-file-{{attach.file_type}}-o"></i></a>,
                                 </span>
                                 <span ng-hide="act.attachments.length>0">No attachments available</span>
                             </td>
@@ -296,8 +293,8 @@
                                 <a>{{act.location}}</a><br /><small>{{act.device}}</small>
                             </td>
                             <td class="text-center">
-                                Mr. Ankur Sharma <br/>
-                                <small>24 Nov 2014 13:10:11</small>
+                                {{act.user.first_name}} {{act.user.last_name}} <br/>
+                                <small>{{act.logged_date}}</small>
                             </td>
                             <td class="text-center">
                                 <button class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></button>

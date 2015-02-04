@@ -1,80 +1,82 @@
-<style>
-    .level-0 {
-        background-color: #687074 !important;
-        color: #FFF !important;
-    }
-    .angular-ui-tree-nodes .angular-ui-tree-nodes {
-        padding-left: 40px;
-    }
-    .btn {
-        margin-right: 8px;
-    }
-
-    .angular-ui-tree-handle {
-        background: #f8faff;
-        border: 1px solid #dae2ea;
-        color: #7c9eb2;
-        padding: 10px 10px;
-    }
-
-    .angular-ui-tree-handle:hover {
-        color: #438eb9;
-        background: #f4f6f7;
-        border-color: #dce2e8;
-    }
-
-    .angular-ui-tree-placeholder {
-        background: #f0f9ff;
-        border: 2px dashed #bed2db;
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-    }
-    .group-title {
-        background-color: #687074 !important;
-        color: #FFF !important;
-    }
-</style>
 <div class="row mt-15">
     <div class="col-xs-12">
         <div role="tabpanel">
             <!-- Tab panes -->
             <div class="tab-content col-xs-12 pl-lg-25 pr-lg-25">
-                 <div class="row">
+                <div class="row">
                     <div class="col-md-12">
                         <div class="row">
-                          <div class="col-lg-12">
-                              <button class='btn btn-primary'>
-                                  Add New Level
-                              </button>
-                              <div class='row' style='padding:20px;'>
-                                <!-- Nested list template -->
-                                <script type="text/ng-template" id="items_renderer.html">
-                                  <div ui-tree-handle ng-class="'level-'+item.level">
-                                    <a class="btn btn-success btn-xs" data-nodrag ng-click="toggle(this)"><span class="fa" ng-class="{'fa-chevron-right': collapsed, 'fa-chevron-down': !collapsed}"></span></a>
-                                    {{item.title}}
-                                    <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="remove(this)"><span class="fa fa-remove"></span></a>
-                                    <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newSubItem(this)" style="margin-right: 8px;"><span class="fa fa-plus"></span></a>
-                                    <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(this)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
-                                    <a ng-hide="item.level!=0" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="showProjects(this)" style="margin-right: 8px;">Projects</a>
-                                  </div>
-                                  <ol ui-tree-nodes="options" ng-model="item.items" ng-class="{hidden: collapsed}">
-                                    <li ng-repeat="item in item.items" ui-tree-node ng-include="'items_renderer.html'">
-                                    </li>
-                                  </ol>
-                                </script>
-                                <div ui-tree="options">
-                                  <ol ui-tree-nodes ng-model="list" >
-                                    <li ng-repeat="item in list" ui-tree-node ng-include="'items_renderer.html'"></li>
-                                  </ol>
+                            <div class="col-lg-12">
+                                <button class='btn btn-primary' ng-click="newSubItem(list, 'top')">
+                                    Add New Level
+                                </button>
+                                <div class='row' style='padding:20px;'>
+                                    <div class="alert alert-info" ng-if="flagUpdatedPosition">
+                                        <span>
+                                            We have noted the updates in level positions. Click 'Save Now' to save. 
+                                            <button ng-disabled="loadingSaveLevelPosition" class='btn btn-primary' ng-click="saveLevelPosition()">
+                                                <span ng-if="loadingSaveLevelPosition">
+                                                    <i class="fa fa-refresh"></i> Saving..
+                                                </span>
+                                                <span ng-if="!loadingSaveLevelPosition">Save Now</span>
+                                            </button>
+                                            <button ng-hide="loadingSaveLevelPosition" class='btn btn-primary' ng-click="resetLevels()">
+                                                Reset Levels
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <!-- Nested list template -->
+                                    <script type="text/ng-template" id="items_renderer.html">
+                                        <div ui-tree-handle ng-class="'level-'+(this.depth()-1)">
+                                          <div click-to-edit="item" template-url="editLevel.html" editable-field="item.level_name"></div>
+                                        </div>
+                                        <ol ui-tree-nodes="options" ng-model="item.levels" ng-hide="collapsed" ng-init="item.levels = (item.levels.length > 0 ? item.levels :[])" class="slide">
+                                          <li ng-repeat="item in item.levels" ui-tree-node ng-include="'items_renderer.html'">
+                                          </li>
+                                        </ol>
+                                    </script>
+                                    <div ui-tree="options" callbacks="callbacks">
+                                        <ol ui-tree-nodes ng-model="list" >
+                                            <li ng-repeat="item in list" ui-tree-node ng-include="'items_renderer.html'"></li>
+                                        </ol>
+                                        <span ng-if="list.length==0">No data available.</span>
+                                        <span ng-if="!list"><i class="fa fa-refresh"></i>Loading...</span>
+                                    </div>
                                 </div>
-                              </div>
-                          </div>
-                      </div>
+                            </div>
+                        </div>
 
                     </div>
-                  </div>
-
+                </div>
             </div><!--/tab-content-->
         </div><!--/tabpanel-->
     </div>
+</div>
+<script type="text/ng-template" id="editLevel.html">
+    <div class="click-to-edit">
+        <div ng-hide="view.editorEnabled"><a class="btn btn-success btn-xs" ng-click="$parent.toggle($parent)">
+            <span class="fa" ng-class="{'fa-chevron-right': $parent.collapsed, 'fa-chevron-down': !$parent.collapsed}"></span></a>
+            {{view.editableValue}}
+            <a class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this level? This action cannot be undone."><span class="fa fa-trash"></span></a>
+            <a class="pull-right btn btn-primary btn-xs" nodrag ng-click="$parent.newSubItem($parent, '')" style="margin-right: 8px;">
+                <span class="fa fa-plus"></span>
+            </a>
+            <a class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
+                <span class="fa fa-pencil"></span>
+            </a>
+            <a ng-show="view.parent_id==0" class="pull-right btn btn-primary btn-xs" nodrag 
+               ng-click="$parent.showProjectsModal(view)" style="margin-right: 8px;">
+                Projects
+            </a>
+        </div>
+        <div ng-show="view.editorEnabled" class="slide">
+            <form class="form-inline" ng-submit="$parent.saveItem($parent, view.editableValue);" ng-attr-id="{{ 'frmEditable-' + $id }}">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Level Name" ng-required="true" ng-model="view.editableValue"/>
+                </div>
+                <button class="btn btn-primary">Save</button>
+                <a ng-click="disableEditor()" class="btn btn-primary">cancel</a>
+            </form>
+        </div>
+    </div>
+</script>

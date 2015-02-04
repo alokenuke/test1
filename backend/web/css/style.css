@@ -729,7 +729,7 @@ textarea.form-control {
     cursor: pointer;
     opacity: 0;
     filter: alpha(opacity=0);
-    width: 100px;
+    width: 100%;
 }
 .btn-plr-medium {
  padding-left: 40px !important;
@@ -789,6 +789,117 @@ margin-top: -5px
 .mT {color: #66afe9;}
 .modal-lg {
     width: 1166px;
+}
+
+.angular-ui-tree ol {
+    list-style: none;
+}
+
+.angular-ui-tree-empty {
+    min-height: 50px;
+    background-image: none;
+}
+.angular-ui-tree-empty:before {
+    content: "No data available.";
+    font-size: 20px;
+    margin-left: 20px;
+}
+.angular-ui-tree-nodes .angular-ui-tree-nodes {
+    padding-left: 40px;
+}
+.btn {
+    margin-right: 8px;
+}
+.angular-ui-tree-handle {
+    background: #f8faff;
+    border: 1px solid #dae2ea;
+    color: #7c9eb2;
+    padding: 10px 10px;
+}
+.angular-ui-tree-handle:hover {
+    color: #438eb9;
+    background: #f4f6f7;
+    border-color: #dce2e8;
+}
+.angular-ui-tree-placeholder {
+    background: #f0f9ff;
+    border: 2px dashed #bed2db;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.group-title {
+    background-color: #687074 !important;
+    color: #FFF !important;
+}
+.user_type, .user_type:hover {
+    background-color: #EDEDED;
+    cursor: inherit;
+}
+.user_group, .user_group:hover {
+    background-color: #555;
+    color: #fff;
+    cursor: inherit;
+}
+.user_level, .user_level:hover {
+    background-color: #a3a3a3;
+    color: #000;
+    border: 1px solid #ccc;
+}
+.click-to-edit {
+    cursor: default;
+}
+
+.item_1, .item_1:hover {
+    background-color: #EDEDED;
+    cursor: inherit;
+}
+.item_0, .item_0:hover {
+    background-color: #555;
+    color: #fff;
+    cursor: inherit;
+}
+.item_2 {
+    padding: 20px;
+    border: 1px solid #ccc;
+}
+.level-0 {
+    background-color: #687074 !important;
+    color: #FFF !important;
+}
+.angular-ui-tree .level-1 {background: #9FA2A3;color: #fff;}
+.angular-ui-tree .level-2 {background: #C2C3C4;color: #666;}
+.angular-ui-tree .level-3 {background: #D0D5D8;color: #666;}
+.angular-ui-tree .level-4 {background: #EFF1F2;}
+.click-to-edit .setFlagBox button {
+    display:none;
+}
+.click-to-edit:hover .setFlagBox button{
+    display: inline;
+}
+.click-to-edit .setFlagBox button.showFlag {
+    display:inline;
+}
+
+.angular-ui-tree .level-1 {background: #9FA2A3;color: #fff;}
+.angular-ui-tree .level-2 {background: #C2C3C4;color: #666;}
+.angular-ui-tree .level-3 {background: #D0D5D8;color: #666;}
+
+.process_flow, .process_flow:hover {
+    background-color: #EDEDED;
+    cursor: inherit;
+}
+.process_type, .process_type:hover {
+    background-color: #555;
+    color: #fff;
+    cursor: inherit;
+}
+.process_stage-options {
+    padding: 20px;
+    border: 1px solid #ccc;
+}
+.nodrag {
+    cursor: default;
 }
 
 /*------------/footer----------*/

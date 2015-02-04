@@ -1372,7 +1372,7 @@ app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParam
             isopen: false
         };
 		
-        $http.post("/tag-activity-log/search?expand=attachments",{'search': {'tag_id':$routeParams.id}}).success(function(data) {
+        $http.post("/tag-activity-log/search?expand=attachments,user",{'search': {'tag_id':$routeParams.id}}).success(function(data) {
             $scope.activity = data.items;
         });
         
@@ -1393,7 +1393,7 @@ app.controller('TagItems', function($scope, rest, $location, $route, $routeParam
     breadcrumbsService.add("/#/", "Home");
     breadcrumbsService.add("/#/tagitems", "Manage tag Items");
     
-    $scope.list = [];
+    $scope.list = null;
     $scope.selectedItem = {};
     $scope.page_dropdown = page_dropdown;
     $scope.$search = {};
@@ -1573,7 +1573,6 @@ app.controller('createSimilarTagModalController', function ($scope, $modalInstan
     $scope.popupTags.selectedTagId = 0;
     $scope.search.project_id = itemScope.project_id;
     
-    alertService.clearAll();
     $scope.searchTags = function(){
         $http.post("/tags/search",{search:$scope.search}).success(function(data) {
             $scope.popupTags = data.items;

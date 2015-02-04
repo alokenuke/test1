@@ -165,41 +165,6 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
             templateUrl: path+'tags/view-tag.html',
             controller: 'TagsView'
         })
-        
-        .when('/r-:mod', {
-            templateUrl: function(modattr){
-                return path + 'mod/index' + '.html';
-            },
-            controller: 'Index'
-        })
-
-        .when('/r-:mod/create', {
-            templateUrl: function(modattr){
-                return path + 'mod/form.html';
-            },
-            controller: 'Create'
-        })
-
-        .when('/r-:mod/delete/:id', {
-            templateUrl: function(modattr){
-                return path + 'mod/index.html';
-            },
-            controller: 'Delete'
-        })
-
-        .when('/r-:mod/:id', {
-            templateUrl: function(modattr){
-                return path + 'mod/view.html';
-            },
-            controller: 'View'
-        })
-
-        .when('/r-:mod/update/:id', {
-            templateUrl: function(modattr){
-                return path + 'mod/form.html'
-            },
-            controller: 'Form'
-        })
 
         .when('/site/error', {
             templateUrl: path + 'site/error.html',
@@ -216,15 +181,22 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
 
 app.controller('SiteIndex', ['$scope', 'rest', 'breadcrumbsService', '$http', "$location", function ($scope, rest, breadcrumbsService, $http, $location) {
         
-    rest.path = "projects";
     breadcrumbsService.clearAll();
     breadcrumbsService.setTitle("Site Track - Dashboard");
     breadcrumbsService.headTitle(" ");
     
     if($location.$$path!='/login') {
-        rest.models().success(function (data) {
-            $scope.projects = data.items;
-        })
+        if($location.$$path=='/') {
+            $http.post("users/stats").success(function (data) {
+                $scope.stats = data;
+            });
+            $http.post("projects/getall?expand=stats").success(function (data) {
+                $scope.projects = data.items;
+            });
+            $http.post("usergroups/getall?expand=stats").success(function (data) {
+                $scope.usergroups = data.items;
+            })
+        }
     }
 }]);
 

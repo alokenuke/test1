@@ -4,19 +4,44 @@
             <div class="content primary-bg-wrapper">
                 <div class="wrapper">
                     <div class="primary-title-box">
-                        <h3 class="primary-title mt-0">Active Project : <span class="pull-right">6 of 50 allowed</span></h3>
+                        <h3 class="primary-title mt-0">
+                            Active Project : 
+                            <span class="pull-right">
+                                {{stats.projects.count}} of {{stats.projects.limit}}
+                            </span>
+                        </h3>
                     </div>
                     <div class="primary-title-box">
-                        <h3 class="primary-title mt-0">Total Tags : <span class="pull-right">1000 of 5000 allowed</span></h3>
+                        <h3 class="primary-title mt-0">
+                            Total Tags : 
+                            <span class="pull-right">
+                                {{stats.projects.count}} of {{stats.projects.limit}}
+                            </span>
+                        </h3>
                     </div>
                     <div class="primary-title-box">
-                        <h3 class="primary-title mt-0">Total Users : <span class="pull-right">30 of 100 allowed</span></h3>
+                        <h3 class="primary-title mt-0">
+                            Total Users : 
+                            <span class="pull-right">
+                                {{stats.users.count}} of {{stats.users.limit}}
+                            </span>
+                        </h3>
                     </div>
                     <div class="primary-title-box">
-                        <h3 class="primary-title mt-0">Total Items : <span class="pull-right">1000 of 5000 allowed</span></h3>
+                        <h3 class="primary-title mt-0">
+                            Total Items : 
+                            <span class="pull-right">
+                                {{stats.items.count}} of {{stats.items.limit}}
+                            </span>
+                        </h3>
                     </div>
                     <div class="primary-title-box">
-                        <h3 class="primary-title mt-0">Space Used : <span class="pull-right">0.4 GB / 1 GB allowed</span></h3>
+                        <h3 class="primary-title mt-0">
+                            Data : 
+                            <span class="pull-right">
+                                {{stats.space.count}} of {{stats.space.limit}}
+                            </span>
+                        </h3>
                     </div>
                 </div><!--/wrapper-->
                 <div class="wrapper">
@@ -26,108 +51,72 @@
                                 <div class="box">
                                     <h5 class="project-title mt-0">
                                         <strong>Project: <span class="project-name">{{project.project_name}}</span></strong><br />
-                                        <span>{{project.project_location}}, {{project.city}}, UAE</span>
+                                        <span>{{project.project_location}}, {{project.project_city}}, {{project.project_country}}</span>
                                     </h5>
                                     <ul ng-class="{showfull: project.showFull}">
                                         <li>
-                                            <span class="pull-left">Total Tags</span>
-                                            <span class="pull-right">500</span>
+                                            <span class="pull-left">Simple Tags</span>
+                                            <span class="pull-right">{{project.stats.sTags.count}}</span>
                                         </li>
                                         <li style="padding-left: 30px;">
                                             <span class="pull-left">Activities Logged</span>
-                                            <span class="pull-right">600</span>
+                                            <span class="pull-right">{{project.stats.sTags.activities}}</span>
                                         </li>
                                         <li>
                                             <span class="pull-left">Total master Tags</span>
-                                            <span class="pull-right">50</span>
+                                            <span class="pull-right">{{project.stats.mTags.count}}</span>
                                         </li>
                                         <li style="padding-left: 30px;">
                                             <span class="pull-left">Activities Logged</span>
-                                            <span class="pull-right">600</span>
+                                            <span class="pull-right">{{project.stats.mTags.activities}}</span>
                                         </li>
                                         <li>
                                             <span class="pull-left">Total Levels</span>
-                                            <span class="pull-right">5</span>
+                                            <span class="pull-right">{{project.stats.levels.count}}</span>
                                         </li>
                                         <li style="padding-left: 30px;">
                                             <span class="pull-left">Total Sub Levels</span>
-                                            <span class="pull-right">15</span>
+                                            <span class="pull-right">{{project.stats.sublevels.count}}</span>
                                         </li>
                                         <li>
                                             <span class="pull-left">Tag Item Types</span>
-                                            <span class="pull-right">20</span>
+                                            <span class="pull-right">{{project.stats.item.count}}</span>
                                         </li>
                                         <li style="padding-left: 30px;">
                                             <span class="pull-left">Tag Sub Items</span>
-                                            <span class="pull-right">40</span>
+                                            <span class="pull-right">{{project.stats.subitem.count}}</span>
                                         </li>
                                         <li>
                                             <span class="pull-left">Total User Groups</span>
-                                            <span class="pull-right">5</span>
+                                            <span class="pull-right">{{project.stats.usergroups.count}}</span>
                                         </li>
                                         <li style="padding-left: 30px;">
                                             <span class="pull-left">Total Users</span>
-                                            <span class="pull-right">100</span>
+                                            <span class="pull-right">{{project.stats.users.count}}</span>
                                         </li>
                                     </ul>
                                     <button class="btn show-more" ng-click="project.showFull=true" ng-hide="project.showFull"><span class="caret"></span></button>
                                 </div><!--/box-->
                             </div>
+                            <h3 ng-if="projects.length ==0" class="cust-col">
+                                No Projects Available <a href="/#/projects/create">Click here to create one.</a>
+                            </h3>
                         </div><!--/row-->
                     </div>
                     <div class="col-sm-5 col-md-4 col-lg-3 cust-col">
-                        <div class="box sidebar-box">
-                            <hgroup>
-                            <h5 class="project-title mt-0">Total User Group: <span class="project-name pull-right">5</span></h5>
-                            <h6>Group A<span class="pull-right">5</span></h6>
-                            </hgroup>
+                        <hgroup>
+                            <h5 class="project-title mt-0 mb-0">Total User Group: <span class="project-name pull-right">{{usergroups.length}}</span></h5>
+                        </hgroup>
+                        <div class="box sidebar-box" ng-repeat="group in usergroups">
+                            <h6>{{group.group_name}}<span class="pull-right"></span></h6>
                             <ul>
                                 <li>
                                     <span class="pull-left">Total User Levels</span>
-                                    <span class="pull-right">30</span>
+                                    <span class="pull-right">{{group.stats.levels.count}}</span>
                                 </li>
                                 <li>
                                     <span class="pull-left">Total Users</span>
-                                    <span class="pull-right">15</span>
-                                </li>
-                            </ul>
-                        </div><!--/box-->
-                        <div class="box sidebar-box">
-                            <h6>Group A<span class="pull-right">5</span></h6>
-                            <ul>
-                                <li>
-                                    <span class="pull-left">Total User Levels</span>
-                                    <span class="pull-right">30</span>
-                                </li>
-                                <li>
-                                    <span class="pull-left">Total Users</span>
-                                    <span class="pull-right">15</span>
-                                </li>
-                            </ul>
-                        </div><!--/box-->
-                        <div class="box sidebar-box">
-                            <h6>Group A<span class="pull-right">5</span></h6>
-                            <ul>
-                                <li>
-                                    <span class="pull-left">Total User Levels</span>
-                                    <span class="pull-right">30</span>
-                                </li>
-                                <li>
-                                    <span class="pull-left">Total Users</span>
-                                    <span class="pull-right">15</span>
-                                </li>
-                            </ul>
-                        </div><!--/box-->
-                        <div class="box sidebar-box">
-                            <h6>Group A<span class="pull-right">5</span></h6>
-                            <ul>
-                                <li>
-                                    <span class="pull-left">Total User Levels</span>
-                                    <span class="pull-right">30</span>
-                                </li>
-                                <li>
-                                    <span class="pull-left">Total Users</span>
-                                    <span class="pull-right">15</span>
+                                    <span class="pull-right">{{group.stats.users.count}}</span>
                                 </li>
                             </ul>
                         </div><!--/box-->

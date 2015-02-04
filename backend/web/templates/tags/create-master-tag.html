@@ -10,14 +10,14 @@
                         <label class="col-sm-4 control-label text-right">Project Name :</label>
                         <div class="col-sm-6 multi-level">
                             <ui-select ng-model="search.project"
-                                       theme="bootstrap" class='last-child'>
+                                       theme="bootstrap" class='last-child' ng-if="projects.length >0">
                               <ui-select-match placeholder="Select a project...">{{$select.selected.project_name}}</ui-select-match>
                               <ui-select-choices repeat="project in projects | filter: $select.search"
                                        refresh-delay="0">
                                   <div ng-bind-html="project.project_name" ng-click="updateSelectBox('projectlevels', project.id, 0, 0)"></div>
                               </ui-select-choices>
                             </ui-select>
-                            <input ng-model="tagDetails.project_id" type="hidden" ng-required="true" />
+                            <a href="/#/projects/create" ng-if="projects.length ==0">No project available. Create one.</a>
                         </div>
                     </div>
                 </div>

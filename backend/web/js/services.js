@@ -162,7 +162,7 @@ appServices.directive('openlightbox',
                                     <h4 class="modal-title">'+header+'</h4>\n\
                                 </div>\n\
                                 <div class="modal-body text-center">\n\
-                                    <img src="/userUploads/1/tagsImages/'+imageType+'/'+imageUrl+'" style="max-height: 200px;" />\n\
+                                    <img src="/filemanager/getimage?type='+imageType+'&file='+imageUrl+'" style="max-height: 200px;" />\n\
                                 </div>\n\
                                 <div class="modal-footer">\n\
                                     <h4 class="text-center">'+footer+'</h4>\n\

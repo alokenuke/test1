@@ -1,0 +1,187 @@
+<div role="tabpanel">
+    <!-- Tab panes -->
+    <div class="tab-content col-xs-12 pl-lg-25 pr-lg-25">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <button class='btn btn-primary' ng-click="newSubItem(list, 'top')">
+                            Add Tag Process Type
+                        </button>
+                        <div class='row' style='padding:20px;'>
+                            <div class="alert alert-info" ng-if="flagUpdatedPosition">
+                                <span>
+                                    We have noted the updates in level positions. Click 'Save Now' to save. 
+                                    <button ng-disabled="loadingSaveLevelPosition" class='btn btn-primary' ng-click="saveProcessPosition()">
+                                        <span ng-if="loadingSaveLevelPosition">
+                                            <i class="fa fa-refresh"></i> Saving..
+                                        </span>
+                                        <span ng-if="!loadingSaveLevelPosition">Save Now</span>
+                                    </button>
+                                    <button ng-hide="loadingSaveLevelPosition" class='btn btn-primary' ng-click="resetLevels()">
+                                        Reset Levels
+                                    </button>
+                                </span>
+                            </div>
+                            <div ui-tree="options" callbacks="callbacks">
+                                <ol ui-tree-nodes="" ng-model="list">
+                                    <li ng-repeat="item in list" ui-tree-node>
+                                        <div nodrag ui-tree-handle ng-class="'level-'+(this.depth()-1)" class="nodrag">
+                                            <div click-to-edit="item" template-url="editGroup.html" editable-field="item.process_name"></div>
+                                        </div>
+                                        <ol ui-tree-nodes="options" ng-model="item.tree" ng-hide="collapsed" class="slide">
+                                            <li ng-repeat="item in item.tree" ui-tree-node>
+                                                <div ui-tree-handle ng-class="'level-'+(this.depth()-1)" nodrag class="nodrag">
+                                                    <div click-to-edit="item" template-url="editFlow.html" editable-field="item.process_name"></div>
+                                                </div>
+                                                <ol ui-tree-nodes="options" ng-model="item.tree" ng-hide="collapsed" class="slide">
+                                                    <li ng-repeat="item in item.tree" ui-tree-node>
+                                                        <div ui-tree-handle ng-class="'level-'+(this.depth()-1)">
+                                                            <div click-to-edit="item" template-url="editStage.html" editable-field="item.process_name">
+                                                            </div>
+                                                        </div>
+                                                        <ol ui-tree-nodes="options" ng-model="item.tree" ng-hide="collapsed" class="slide">
+                                                            <li ng-repeat="item in item.tree" ui-tree-node>
+                                                                <div ui-tree-handle class="form-horizontal">
+                                                                    <div click-to-edit="item" template-url="editOption.html" editable-field="item.process_name"></div>
+                                                                </div>
+                                                            </li>
+                                                        </ol>
+                                                    </li>
+                                                </ol>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                </ol>
+                                <span ng-if="list.length==0">No data available.</span>
+                                <span ng-if="!list"><i class="fa fa-refresh"></i>Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!--/tab-content-->
+</div><!--/tabpanel-->
+<script type="text/ng-template" id="editGroup.html">
+    <div class="click-to-edit">
+        <div ng-hide="view.editorEnabled">
+            <a class="btn btn-success btn-xs" ng-click="$parent.toggle($parent)" nodrag>
+                <span class="fa" ng-class="{'fa-chevron-right': $parent.collapsed, 'fa-chevron-down': !$parent.collapsed}"></span>
+            </a>
+            {{view.editableValue}}
+            <a class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this process type? This action cannot be undone."><span class="fa fa-trash"></span></a>
+            <a class="pull-right btn btn-primary btn-xs" nodrag ng-click="$parent.newSubItem($parent, '')" style="margin-right: 8px;">
+                <span class="fa fa-plus"></span>
+            </a>
+            <a class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
+                <span class="fa fa-pencil"></span>
+            </a>
+            <a ng-show="view.parent_id==0" class="pull-right btn btn-primary btn-xs" nodrag 
+               ng-click="$parent.showProjectsModal(view)" style="margin-right: 8px;">
+                Projects
+            </a>
+        </div>
+        <div ng-show="view.editorEnabled" class="slide">
+            <form class="form-inline" ng-submit="$parent.saveItem($parent, view.editableValue);" ng-attr-id="{{ 'frmEditable-' + $id }}">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Level Name" ng-required="true" ng-model="view.editableValue"/>
+                </div>
+                <button class="btn btn-primary">Save</button>
+                <a ng-click="disableEditor()" class="btn btn-primary">cancel</a>
+            </form>
+        </div>
+    </div>
+</script>
+<script type="text/ng-template" id="editFlow.html">
+    <div class="click-to-edit">
+        <div ng-hide="view.editorEnabled">
+            <a class="btn btn-success btn-xs" ng-click="$parent.toggle($parent)">
+                <span class="fa" ng-class="{'fa-chevron-right': $parent.collapsed, 'fa-chevron-down': !$parent.collapsed}"></span></a>
+                {{view.editableValue}}
+            <a class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this process? This action cannot be undone.">
+                <span class="fa fa-trash"></span>
+            </a>
+            <a class="pull-right btn btn-primary btn-xs" nodrag ng-click="$parent.newSubItem($parent, '')" style="margin-right: 8px;">
+                <span class="fa fa-plus"></span>
+            </a>
+            <a class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
+                <span class="fa fa-pencil"></span>
+            </a>
+            <a class="pull-right btn btn-primary btn-xs" nodrag style="margin-right: 8px;" ng-click="view.hCompulsory = !view.hCompulsory" tooltip-html-unsafe="{{$parent.tooltip.hierarchy_compulsory}}" >
+                <span class="fa fa-question-circle"></span> Hierarchy C. <sapn class="fa fa-check-square" ng-if="view.hCompulsory"></span>
+            </a>
+        </div>
+        <div ng-show="view.editorEnabled" class="slide">
+            <form class="form-inline" ng-submit="$parent.saveItem($parent, view.editableValue);" ng-attr-id="{{ 'frmEditable-' + $id }}">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Level Name" ng-required="true" ng-model="view.editableValue"/>
+                </div>
+                <button class="btn btn-primary">Save</button>
+                <a ng-click="disableEditor()" class="btn btn-primary">cancel</a>
+            </form>
+        </div>
+    </div>
+</script>
+<script type="text/ng-template" id="editStage.html">
+    <div class="click-to-edit">
+        <div ng-hide="view.editorEnabled"><a class="btn btn-success btn-xs" ng-click="$parent.toggle($parent)">
+            <span class="fa" ng-class="{'fa-chevron-right': $parent.collapsed, 'fa-chevron-down': !$parent.collapsed}"></span></a>
+            {{view.editableValue}}
+            (<u>{{process_stage_type[view.type]}}<u>)
+            <a class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this status? This action cannot be undone."><span class="fa fa-trash"></span></a>
+            <a class="pull-right btn btn-primary btn-xs" nodrag ng-click="$parent.newSubItem($parent, '')" style="margin-right: 8px;">
+                <span class="fa fa-plus"></span>
+            </a>
+            <a class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
+                <span class="fa fa-pencil"></span>
+            </a>
+            <a ng-show="view.parent_id==0" class="pull-right btn btn-primary btn-xs" nodrag 
+               ng-click="$parent.showProjectsModal(view)" style="margin-right: 8px;">
+                Projects
+            </a>
+        </div>
+        <div ng-show="view.editorEnabled" class="slide">
+            <form class="form-inline" ng-submit="$parent.saveItem($parent, view.editableValue);" ng-attr-id="{{ 'frmEditable-' + $id }}">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Level Name" ng-required="true" ng-model="view.editableValue"/>
+                    <select class="form-control form-control-small" ng-model="view.type" ng-options="k as v for (k,v) in process_stage_type" ng-required="true">
+                        <option value=''>--Select option type--</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary">Save</button>
+                <a ng-click="disableEditor()" class="btn btn-primary">cancel</a>
+            </form>
+        </div>
+    </div>
+</script>
+<script type="text/ng-template" id="editOption.html">
+    <div class="click-to-edit">
+        <div ng-hide="view.editorEnabled">
+            <span class="btn btn-success btn-xs">&nbsp;{{$parent.$index+1}}&nbsp;</span>
+            <span class="mt-5">{{view.editableValue}}</span>
+            <span class="setFlagBox pl-10">
+                <button type="button" class="btn btn-primary btn-xs" ng-class="{'showFlag': view.flagDefault, 'hide': view.flagCompletion}" ng-click="view.flagDefault = !view.flagDefault"><i class="fa fa-check-square" ng-if="view.flagDefault"></i> Default Flag</button>
+                <button type="button" class="btn btn-primary btn-xs" ng-class="{'showFlag': view.flagCompletion, 'hide': view.flagDefault}" ng-click="view.flagCompletion = !view.flagCompletion"><i class="fa fa-check-square" ng-if="view.flagCompletion"></i> Completion Flag</button>
+            </span>
+            <span class="pull-right">
+                <a class="btn btn-primary btn-xs" nodrag ng-click="enableEditor(this)">
+                    <span class="fa fa-pencil"></span>
+                </a>
+                <a class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this option? This action cannot be undone.">
+                    <span class="fa fa-trash"></span>
+                </a>
+            </span>
+        </div>
+        <div ng-show="view.editorEnabled" class="slide">
+            <form class="form-inline" ng-submit="$parent.saveItem($parent, view.editableValue);" ng-attr-id="{{ 'frmEditable-' + $id }}">
+                <div class="col-md-2 col-lg-1 text-right control-label"><label>Option {{$parent.$index+1}}</label></div>
+                <div class="col-md-3">
+                    <input type="text" ng-model="view.editableValue" class="form-control" placeholder="Option {{$parent.$index+1}}"/>
+                </div>
+                <button class="btn btn-primary">Save</button>
+                <a ng-click="disableEditor()" class="btn btn-primary">cancel</a>
+            </form>
+        </div>
+    </div>
+</script>

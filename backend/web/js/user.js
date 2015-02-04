@@ -7,7 +7,7 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
     breadcrumbsService.add("/#/", "Home");
     breadcrumbsService.add("/#/user-groups", "Manage - User Groups");
 
-    $scope.list = [];
+    $scope.list = null;
     $scope.selectedItem = {};
     $scope.page_dropdown = page_dropdown;
     
@@ -351,7 +351,7 @@ app.controller('UserCreate',
             for (var i = 0; i < $files.length; i++) {
                 var file = $files[i];
                 $scope.upload = $upload.upload({
-                    url: 'fileupload/upload', //upload.php script, node.js route, or servlet url
+                    url: 'filemanager/upload', //upload.php script, node.js route, or servlet url
                     data: {myObj: $scope.myModelObj},
                     file: file,
                 }).progress(function(evt) {
@@ -580,7 +580,7 @@ app.controller('UserUpdate',
             for (var i = 0; i < $files.length; i++) {
                 var file = $files[i];
                 $scope.upload = $upload.upload({
-                    url: 'fileupload/upload', //upload.php script, node.js route, or servlet url
+                    url: 'filemanager/upload', //upload.php script, node.js route, or servlet url
                     data: {myObj: $scope.myModelObj},
                     file: file,
                 }).progress(function(evt) {

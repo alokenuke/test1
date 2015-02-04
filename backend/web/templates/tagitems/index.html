@@ -2,61 +2,6 @@
     <div role="tabpanel">
         <!-- Tab panes -->
         <div class="tab-content col-xs-12 pl-lg-25 pr-lg-25">
-            <style>
-                .angular-ui-tree-empty {
-                    min-height: 50px;
-                    background-image: none;
-                }
-                .angular-ui-tree-empty:before {
-                    content: "No data";
-                    font-size: 20px;
-                    margin-left: 20px;
-                }
-                .angular-ui-tree-nodes .angular-ui-tree-nodes {
-                    padding-left: 40px;
-                }
-                .btn {
-                    margin-right: 8px;
-                }
-
-                .angular-ui-tree-handle {
-                    background: #f8faff;
-                    border: 1px solid #dae2ea;
-                    color: #7c9eb2;
-                    padding: 10px 10px;
-                }
-
-                .angular-ui-tree-handle:hover {
-                    color: #438eb9;
-                    background: #f4f6f7;
-                    border-color: #dce2e8;
-                }
-
-                .angular-ui-tree-placeholder {
-                    background: #f0f9ff;
-                    border: 2px dashed #bed2db;
-                    -webkit-box-sizing: border-box;
-                    -moz-box-sizing: border-box;
-                    box-sizing: border-box;
-                }
-                .group-title {
-                    background-color: #687074 !important;
-                    color: #FFF !important;
-                }
-                .item_1, .item_1:hover {
-                    background-color: #EDEDED;
-                    cursor: inherit;
-                }
-                .item_0, .item_0:hover {
-                    background-color: #555;
-                    color: #fff;
-                    cursor: inherit;
-                }
-                .item_2 {
-                    padding: 20px;
-                    border: 1px solid #ccc;
-                }
-            </style>
              <div class="row">
                 <div class="col-md-12">
                     <div class="row">
@@ -65,9 +10,8 @@
                               Add Tag Item Group
                           </button>
                           <div class='row' style='padding:20px;' ng->
-
                             <div ui-tree>
-                                <ol ui-tree-nodes="" ng-model="list" data-nodrag="true">
+                                <ol ui-tree-nodes="" ng-model="list" nodrag="true">
                                   <li ng-repeat="item in list" ui-tree-node>
                                     <div ui-tree-handle ng-class="'item_'+item.parent_id">
                                         <div ng-hide="item.editing">
@@ -139,8 +83,9 @@
                                      </ol>
                                   </li>
                                 </ol>
-                              </div>
-
+                                <span ng-if="list.length==0">No data available.</span>
+                                <span ng-if="!list"><i class="fa fa-refresh"></i>Loading...</span>
+                            </div>
                           </div>
                       </div>
                   </div>
