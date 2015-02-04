@@ -101,6 +101,30 @@ class Projects extends \yii\db\ActiveRecord
         ];
     }
     
+    public function extraFields() {
+        return [
+            'stats' => function() {
+                $return = array();
+                $return['sTags']['count'] = Tags::find()->andWhere(['type' => 'sT', 'project_id' => $this->id])->count();
+                $return['sTags']['activities'] = TagActivityLog::find()->andWhere(['tag_id' => Tags::find()->select("id")->andWhere(['type' => 'sT', 'project_id' => $this->id])])->count();
+                
+                $return['mTags']['count'] = Tags::find()->andWhere(['type' => 'mT', 'project_id' => $this->id])->count();
+                $return['mTags']['activities'] = TagActivityLog::find()->andWhere(['tag_id' => Tags::find()->select("id")->andWhere(['type' => 'mT', 'project_id' => $this->id])])->count();
+                
+                $return['levels']['count'] = ProjectLevel::find()->andWhere(['parent_id' => 0, 'project_id' => $this->id])->count();
+                $return['sublevels']['count'] = ProjectLevel::find()->andWhere(['parent_id' => ProjectLevel::find()->select("project_level.id")->andWhere(['parent_id' => 0, 'project_id' => $this->id])])->count();
+                
+                $return['item']['count'] = Items::find()->andWhere(['parent_id' => '0', 'project_id' => $this->id])->count();
+                $return['subitem']['count'] = Items::find()->andWhere(['parent_id' => Items::find()->select("id")->andWhere(['parent_id' => '0', 'project_id' => $this->id]), 'project_id' => $this->id])->count();
+                
+                $return['usergroups']['count'] = UserGroups::find()->andWhere(['project_id' => $this->id])->count();
+                $return['users']['count'] = RelUserLevelsUsers::find()->andWhere(['user_group_id' => UserGroups::find()->select("user_groups.id")->andWhere(['project_id' => $this->id])])->count();
+                
+                return $return;
+            }
+        ];
+    }
+    
     /**
      * @inheritdoc
      */

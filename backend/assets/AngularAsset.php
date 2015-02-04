@@ -30,7 +30,7 @@ class AngularAsset extends AssetBundle
                 $this->js[] = 'angular-resource' . $prefix . 'js';
                 $this->js[] = 'angular-sanitize' . $prefix . 'js';
                 $this->js[] = 'angular-ui-tree' . $prefix . 'js';
-                $this->css[] = 'angular-ui-tree' . $prefix . 'css';
+                //$this->css[] = 'angular-ui-tree' . $prefix . 'css';
                 
                 $this->js[] = 'loading-bar' . $prefix . 'js';
                 $this->css[] = 'loading-bar' . $prefix . 'css';

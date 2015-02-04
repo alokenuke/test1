@@ -21,6 +21,11 @@ class FilemanagerController extends Controller
         return $verbs;
     }
     
+    public function beforeAction($action) {
+        $this->enableCsrfValidation = false;
+        return parent::beforeAction($action);
+    }
+    
     public function actionUpload() {
         $fileManager = new \backend\models\FileManager();
         

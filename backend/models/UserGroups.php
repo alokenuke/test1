@@ -74,7 +74,13 @@ class UserGroups extends \yii\db\ActiveRecord
     {
         return [
             'levels',
-            'projectIds'
+            'projectIds',
+            'stats' => function() {
+                $return = array();
+                $return['levels']['count'] = UserLevels::find()->andWhere(['user_group_id' => $this->id])->count();
+                $return['users']['count'] = RelUserLevelsUsers::find()->andWhere(['user_group_id' => $this->id])->count();
+                return $return;
+            }
         ];
     }
 
