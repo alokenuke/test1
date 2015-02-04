@@ -20,7 +20,11 @@
                         <?php } ?>
                     </ul>
                  </li>
-                 <li><a class="btn btn-primary btn-small" href="<?php echo \yii::$app->getUrlManager()->createUrl("/site/logout")?>" data-method="post">Logout <i class="fa fa-sign-out"></i></a>
+                 <li ng-non-bindable>
+                     <a class="btn btn-primary btn-small" href="<?php echo \yii::$app->getUrlManager()->createUrl("/site/logout")?>" data-method="post">
+                         Logout 
+                         <i class="fa fa-sign-out"></i>
+                     </a>
                 </li>
             </ul>
             <div class="last-login">Last login : <span class="date-time text-muted">14 Oct 2014 13:10:11</span></div>
@@ -54,9 +58,9 @@
                 <ul class="nav navbar-nav navbar-right">
                     <li>
                         <div class="col-xs-12 pull-right">
-                            <form class="" role="search">
+                            <form class="" role="search" ng-submit="searchTags(globalSearch)">
                                 <div class="input-group">
-                                    <input type="text" class="form-control search-control" placeholder="Tag Name, Description, UID or Product Code" name="q" style="padding:6px 6px;">
+                                    <input type="text" class="form-control search-control" placeholder="Tag Name, Description, UID or Product Code" name="searchTags" autocomplete="false" style="padding:6px 6px;" ng-model="globalSearch" ng-required="true">
                                     <div class="input-group-btn">
                                         <button class="btn btn-primary search-btn" type="submit"><i class="fa fa-search"></i></button>
                                     </div>

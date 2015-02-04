@@ -82,7 +82,7 @@ class LoginForm extends Model
                     $location = "Not Available";
                 }
                 else
-                    $location = $locationDetails['geoplugin_region']." (".$locationDetails['countryName'].")";
+                    $location = $locationDetails['geoplugin_region']." (".$locationDetails['geoplugin_countryName'].")";
             }
             else {
                 $location = $locationDetails->login_location;

@@ -18,6 +18,8 @@ use Yii;
  */
 class TagProcess extends \yii\db\ActiveRecord
 {
+    const STATUS_NOTACTIVE = 0;
+    const STATUS_ACTIVE = 1;
     /**
      * @inheritdoc
      */
@@ -32,18 +34,29 @@ class TagProcess extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['type', 'company_id', 'status', 'parent_id', 'created_by'], 'integer'],
-            [['process_name', 'company_id', 'status', 'parent_id', 'created_by'], 'required'],
+            [['process_name', 'parent_id'], 'required'],
+            [['type', 'parent_id'], 'integer'],
             [['created_date'], 'safe'],
-            [['process_name'], 'string', 'max' => 128]
+            [['process_name'], 'string', 'max' => 128],
+            ['status', 'default', 'value' => self::STATUS_ACTIVE],
+            ['company_id', 'default', 'value' => \yii::$app->user->identity->company_id],
+            ['created_by', 'default', 'value' => \yii::$app->user->id],
+            [['created_date'], 'safe'],
         ];
     }
     
     public static function find()
     {
-        $query = parent::find()->where(['tag_process.company_id' => \yii::$app->user->identity->company_id, 'status' => 1])
-            ->joinWith("projectIds");
-                return $query;
+        $post = \Yii::$app->request->post();
+        
+        $select = ['tag_process.id', 'tag_process.process_name', 'tag_process.parent_id', 'tag_process.type'];
+
+        if(isset($post['select']['Process']))
+           $select = $post['select']['Process'];
+
+        $query = parent::find()->select($select)->where(['tag_process.company_id' => \yii::$app->user->identity->company_id, 'tag_process.status' => 1])->joinWith("projectIds");
+        
+        return $query;
     }
 
     public function fields() {
@@ -51,14 +64,44 @@ class TagProcess extends \yii\db\ActiveRecord
             'id',
             'process_name',
             'parent_id',
+            'type',
             'status'
         ];
     }
     
     public function extraFields() {
         return [
-            'parentProcess'
+            'parentProcess',
+            'tree' => function() {
+                return static::getTreeRecrusive($this->id);
+            }
         ];
+    }
+    
+    
+    private static function getTreeRecrusive($parent)
+    {
+        $items = static::find()
+            ->andWhere(['parent_id' => $parent])
+            ->orderBy("position")
+            ->all();
+        
+        $result = []; 
+
+        foreach ($items as $item) {
+            $child = static::getTreeRecrusive($item->id);
+                        
+            $linkOptions = [];
+            
+            $result[] = [
+                'id' => $item->id,
+                'process_name' => $item->process_name,
+                'type' => $item->type,
+                'tree' => ($child?$child:[]),
+                'parent_id' => $item->parent_id
+            ];
+        }
+        return $result;
     }
 
     /**
@@ -83,7 +126,7 @@ class TagProcess extends \yii\db\ActiveRecord
      */
     public function getProjectIds()
     {
-        return $this->hasMany(TagProcessProjects::className(), ['tag_process_id' => 'id']);
+        return $this->hasMany(TagProcessProjects::className(), ['process_id' => 'id']);
     }
     
     public function actDelete() {

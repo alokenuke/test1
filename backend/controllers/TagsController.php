@@ -36,7 +36,10 @@ class TagsController extends ApiController
 
             if(isset($post['search'])) {
                 foreach($post['search'] as $key => $val)
-                    if($key=="date_range") {
+                    if($key=="globalSearch") {
+                        $query->andWhere("tag_name like :search or tag_description like :search or uid like :search or product_code like :search", ['search' => "%$val%" ]);
+                    }
+                    else if($key=="date_range") {
                         if(isset($val['from_date']) && isset($val['to_date'])) {
                             $val['from_date'] = date("Y-m-d H:i:s", strtotime($val['from_date']));
                             $val['to_date'] = date("Y-m-d", strtotime($val['to_date']));
@@ -331,7 +334,7 @@ class TagsController extends ApiController
             $model->user_group_id = $post['user_group_id'];
             $model->tag_name = $post['tag_name'];
             $model->tag_description = $post['tag_description'];
-			$model->tag_item_id = $post['tag_item_id'];
+            $model->tag_item_id = $post['tag_item_id'];
             $model->tag_process_flow_id = $post['tag_process_flow_id'];
                         
             $company_id = \yii::$app->user->identity->company_id;

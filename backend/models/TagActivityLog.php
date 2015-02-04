@@ -44,9 +44,26 @@ class TagActivityLog extends \yii\db\ActiveRecord
         ];
     }
     
+    public function fields() {
+        return [
+            'tag_id',
+            'process_stage_id',
+            'process_stage_answer',
+            'comment',
+            'location',
+            'status',
+            'logged_by',
+            'device',
+            'logged_date' => function() {
+                return date("d M Y H:i:s", strtotime($this->logged_date));
+            }
+        ];
+    }
+    
     public function extraFields() {
         return [
-                'attachments'
+                'attachments',
+                'user',
             ];
     }
     
@@ -72,5 +89,10 @@ class TagActivityLog extends \yii\db\ActiveRecord
     public function getAttachments()
     {
         return $this->hasMany(TagActivityAttachment::className(), ['activity_log_id' => 'id']);
+    }
+    
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'logged_by']);
     }
 }

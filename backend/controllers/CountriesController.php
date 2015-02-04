@@ -67,6 +67,8 @@ class CountriesController extends ApiController
     }
     
     public function actionGetall() {
+        if(!isset($post['sort']))
+            $_GET['sort'] = "country_name";
         return parent::actionGetall();
     }
     

@@ -39,6 +39,17 @@ class Company extends \yii\db\ActiveRecord
         ];
     }
     
+    public function fields() {
+        return [
+            'company_name',
+            'company_owner',
+            'company_logo',
+            'company_status',
+            'membership',
+            'expiry_date'
+        ];
+    }
+    
     /**
      * @inheritdoc
      */
@@ -59,4 +70,10 @@ class Company extends \yii\db\ActiveRecord
         $this->company_status = 2;
         return $this->save();
     }
+    
+    public function getMembership()
+    {
+        return $this->hasOne(Membership::className(), ['id' => 'membership_id']);
+    }
+    
 }

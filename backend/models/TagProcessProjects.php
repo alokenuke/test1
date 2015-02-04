@@ -7,7 +7,7 @@ use Yii;
 /**
  * This is the model class for table "tag_process_projects".
  *
- * @property integer $tag_process_id
+ * @property integer $process_id
  * @property integer $project_id
  * @property integer $created_by
  * @property string $created_date
@@ -28,8 +28,8 @@ class TagProcessProjects extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['tag_process_id', 'project_id', 'created_by'], 'required'],
-            [['tag_process_id', 'project_id', 'created_by'], 'integer'],
+            [['process_id', 'project_id', 'created_by'], 'required'],
+            [['process_id', 'project_id', 'created_by'], 'integer'],
             [['created_date'], 'safe']
         ];
     }
@@ -40,7 +40,7 @@ class TagProcessProjects extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'tag_process_id' => 'Tag Process ID',
+            'process_id' => 'Tag Process ID',
             'project_id' => 'Project ID',
             'created_by' => 'Created By',
             'created_date' => 'Created Date',

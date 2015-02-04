@@ -60,7 +60,9 @@ class TagActivityAttachment extends \yii\db\ActiveRecord
     public function fields() {
         return[
             'filename',
-            'id'
+            'id',
+            'activity_log_id',
+            'file_type'
         ];
     }
 }

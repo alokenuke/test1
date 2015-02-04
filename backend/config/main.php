@@ -45,7 +45,7 @@ return [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
-		    ['class' => 'yii\rest\UrlRule', 'controller' => ['api', 'users', 'userlevels', 'usergroups', 'roles', 'items', 'tags', 'labeltemplates', 'projects'], 'pluralize'=>false, 'extraPatterns' => ['GET search' => 'search']],
+		    ['class' => 'yii\rest\UrlRule', 'controller' => ['api', 'users', 'userlevels', 'usergroups', 'roles', 'items', 'tags', 'labeltemplates', 'projects', 'projectlevel', 'tagprocess'], 'pluralize'=>false, 'extraPatterns' => ['GET search' => 'search']],
 		    'api/fields' => 'api/fields',
                     'dashboard' => 'site/dashboard',
                     '<controller>/<action>' => '<controller>/<action>',

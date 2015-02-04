@@ -65,8 +65,10 @@ class Tags extends \yii\db\ActiveRecord
     
     public function afterSave($insert, $changedAttributes) {
         
-        $qrCodePath = "userUploads/".\yii::$app->user->identity->company_id . "/tagsImages/qrCode/";
-        $barCodePath = "userUploads/".\yii::$app->user->identity->company_id . "/tagsImages/barCode/";
+        $fileManager = new FileManager();
+        
+        $qrCodePath = $fileManager->getPath("qrcode")."/";
+        $barCodePath = $fileManager->getPath("barcode")."/";
         
         if(!file_exists($qrCodePath.$this->uid.".png")) {
             error_reporting(0);
@@ -138,7 +140,8 @@ class Tags extends \yii\db\ActiveRecord
             'uid',
             'project_id',
             'project_name' => function() {
-                return $this->project->project_name;
+                if($this->project)
+                    return $this->project->project_name;
             },
             'tag_name',
             'tag_item_id',
@@ -157,7 +160,7 @@ class Tags extends \yii\db\ActiveRecord
                 $projectLevel = [];
                 $projectLevel[] = $this->projectLevel->level_name;
                 $parent = $this->projectLevel->parent_id;
-                while($parentLevelDetails = $this->getLevelDetails($parent, ['level_name', 'parent_id'])) {
+                while($parentLevelDetails = $this->getLevelDetails($parent, [])) {
                     $projectLevel[] = $parentLevelDetails->level_name;
                     $parent = $parentLevelDetails->parent_id;
                 }
@@ -167,7 +170,7 @@ class Tags extends \yii\db\ActiveRecord
                 $projectLevel = [];
                 $projectLevel[] = $this->projectLevel;
                 $parent = $this->projectLevel->parent_id;
-                while($parentLevelDetails = $this->getLevelDetails($parent, ['id', 'level_name', 'parent_id'])) {
+                while($parentLevelDetails = $this->getLevelDetails($parent, [])) {
                     $projectLevel[] = $parentLevelDetails;
                     $parent = $parentLevelDetails->parent_id;
                 }
@@ -268,7 +271,7 @@ class Tags extends \yii\db\ActiveRecord
     
     public function getLevelDetails($id, $field)
     {
-        return ProjectLevel::find()->select($field)->where(['id' => $id])->one();
+        return ProjectLevel::find()->select($field)->where(['project_level.id' => $id])->one();
     }
     
     public function getItemDetails() {

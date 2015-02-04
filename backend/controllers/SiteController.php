@@ -35,7 +35,7 @@ class SiteController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'logout' => ['post'],
+                    //'logout' => ['post'],
                     'change-password' => ['post'],
                 ],
             ],
@@ -59,11 +59,6 @@ class SiteController extends Controller
         return $this->render('index');
     }
     
-    public function actionDashboard()
-    {
-        return $this->renderPartial('dashboard');
-    }
-   
     public function actionLogin()
     {
         if (!\Yii::$app->user->isGuest) {

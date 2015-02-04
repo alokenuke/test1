@@ -1,60 +1,62 @@
 <?php
-namespace backend\controllers;
-
-use yii;
-use yii\filters\auth\QueryParamAuth;
-use yii\rest\ActiveController;
-use yii\data\ActiveDataProvider;
+namespace backend\models;
 use yii\base\Model;
-use yii\bootstrap\ActiveForm;
+use Yii;
+
 /**
- * Class TagsController
- * @package rest\versions\v1\controllers
+ * Password change form
  */
-class FileuploadController extends ApiController
+class FileManager extends Model
 {
-    public $partialMatchFields;
-        
-    //public $documentPath = 'userUploads/';
-    public $documentPath = 'temp/';
-
-    public function verbs()
-    {
-        $verbs = parent::verbs();
-        $verbs[ "upload" ] = ['POST' ];
-        return $verbs;
+    public $company, $file_type, $filename, $destination;
+    private $_user;
+    
+    public function __construct() {
+        $this->company = \yii::$app->user->identity->company_id;
     }
     
-    public function actionUpload()
-    {
-        
-        $postdata = fopen( $_FILES[ 'file' ][ 'tmp_name' ], "r" );
-        /* Get file extension */
-        $extension = substr( $_FILES[ 'file' ][ 'name' ], strrpos( $_FILES[ 'file' ][ 'name' ], '.' ) );
-
-        /* Generate unique name */
-        $filename = $this->documentPath.\yii::$app->user->identity->company_id."/userImages/" . uniqid() . $extension;
-
-        /* Open a file for writing */
-        $fp = fopen( $filename, "w" );
-
-        /* Read the data 1 KB at a time
-          and write to the file */
-        while( $data = fread( $postdata, 1024 ) )
-            fwrite( $fp, $data );
-
-        /* Close the streams */
-        fclose( $fp );
-        fclose( $postdata );
-        
-        
-	/* the result object that is sent to client*/
-        $this->resize($filename, 100, 100, $filename);
-        return $filename;
+    public function getLocalPath($type) {
+        $pathConstants = [
+            "project_image" => "projectImage",
+            "barcode" => "tagsImages/barCode",
+            "nfccode" => "tagsImages/NFC",
+            "qrcode" => "tagsImages/qrCode",
+            "user_image" => "userImages",
+            "attachments" => "attachments",
+        ];
+        return $pathConstants[$type];
     }
     
-    function resize($imagePath, $destinationWidth, $destinationHeight, $destinationPath)
-    {
+    public function getRootPath() {
+        return \Yii::$app->params['repository'].$this->company;
+    }
+
+    /**
+     * Get path.
+     *
+     * @return string of path.
+     */
+    public function getPath($type) {
+        $path = \Yii::$app->params['repository'].$this->company."/".$this->getLocalPath($type);
+        
+        if(!file_exists($path))
+            mkdir($path);
+        return $path;
+    }
+    
+    public function getFileType($path="", $filename, $type) {
+        if(!$path)
+            $path = $this->getPath($type);
+        
+        $file = $path."/".$filename;
+        
+        $fileinfo = new \SplFileInfo($file);
+        $extension = $fileinfo->getExtension();
+        
+        return $extension;
+    }
+    
+    public function imageResize($imagePath, $destinationWidth, $destinationHeight, $destinationPath) {
         if (file_exists($imagePath)) {
             $imageInfo = getimagesize($imagePath);
             $sourceWidth = $imageInfo[0];
@@ -101,4 +103,13 @@ class FileuploadController extends ApiController
             return true; 
         }
     }
- }   
+    
+    public function replaceFile($oldfile, $newfile, $existingPath, $type) {
+        $path = $this->getPath($type);
+        
+        if(file_exists($path."/".$oldfile))
+            unlink($path."/".$oldfile);
+        
+        rename($existingPath."/".$newfile, $path."/".$newfile);        
+    }
+}

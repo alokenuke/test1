@@ -83,34 +83,6 @@ class Items extends \yii\db\ActiveRecord
         ];
     }
     
-    private static function getMenuRecrusive($parent)
-    {
-
-        $items = static::find()
-            ->where(['parent_id' => $parent])
-            ->all();
-
-        $result = []; 
-
-        foreach ($items as $item) {
-            
-            $child = static::getMenuRecrusive($item->id);
-            
-            $linkOptions = [];
-            
-            if($child)
-                $linkOptions = ["ng-disable" => "true", 'ng-href' => ""];
-                    
-            $result[] = [
-                    'label' => $item->label,
-                    'url' => [$item->url],
-                    'items' => $child,
-                    'linkOptions' => $linkOptions
-                ];
-        }
-        return ($result?$result:null);
-    }
-    
     /**
      * @return \yii\db\ActiveQuery
      */

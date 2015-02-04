@@ -98,6 +98,81 @@ class UsersController extends ApiController
         }
     }
     
+    public function actionStats() {
+        return $this->getResourceCount();
+    }
+    
+    public function getResourceCount() {
+        $return = array();
+        $return['projects']['count'] = \backend\models\Projects::find()->count();
+        $return['tags']['count'] = \backend\models\Tags::find()->count();
+        $return['users']['count'] = \backend\models\User::find()->andWhere(['user.status' => 1])->count();
+        $return['items']['count'] = \backend\models\Items::find()->count();
+        
+        $fileManager = new \backend\models\FileManager();
+        
+        $rootPath = $fileManager->getRootPath();
+        
+        if(!file_exists($rootPath))
+            mkdir ($rootPath);
+        
+        $return['space']['count'] = $this->getFolderSize($rootPath);
+        
+        $membership = \backend\models\Company::findOne($fileManager->company);
+        
+        $return['projects']['limit'] = ($membership->membership->limit_active_projects==-1?"Unlimited":$membership->membership->limit_active_projects." Allowed");
+        $return['tags']['limit'] = ($membership->membership->limit_tags==-1?"Unlimited":$membership->membership->limit_tags." Allowed");
+        $return['users']['limit'] = ($membership->membership->limit_users==-1?"Unlimited":$membership->membership->limit_users." Allowed");
+        $return['items']['limit'] = ($membership->membership->limit_items==-1?"Unlimited":$membership->membership->limit_items." allowed");
+        $return['space']['limit'] = ($membership->membership->limit_data==-1?"Unlimited":$this->format_size($membership->membership->limit_data, "MB")." Allowed");
+        
+        return $return;
+    }
+    
+    public function getFolderSize($path) {
+        
+        $path = realpath($path);
+        
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $obj = new \COM ( 'scripting.filesystemobject' );
+                        
+            if ( is_object ( $obj ) )
+            {
+                $ref = $obj->getfolder ( $path );
+                $size = $ref->size;
+                $obj = null;
+            }
+            else
+            {
+                echo 'can not create object';
+            }
+        } else {
+            $io = popen ( '/usr/bin/du -sk ' . $path, 'r' );
+            $size = fgets ( $io, 4096);
+            $size = substr ( $size, 0, strpos ( $size, "\t" ) );
+            pclose ( $io );
+        }
+        return $this->format_size($size);
+    }
+    
+    public function format_size($size, $currentSize="") {
+        $units = explode(' ', 'B KB MB GB TB PB');
+        
+        $mod = 1024;
+
+        for ($i = 0; $size > $mod; $i++) {
+            $size /= $mod;
+        }
+
+        $endIndex = strpos($size, ".")+3;
+        
+        if($currentSize) {
+            $i += array_search($currentSize, $units);
+        }
+
+        return substr( $size, 0, $endIndex).' '.$units[$i];
+    }
+    
     public function actionLevelusers($id) {
         if (!$_POST) {
             

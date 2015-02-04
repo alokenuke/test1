@@ -168,8 +168,6 @@ class ApiController extends ActiveController
             
             if(isset($post['sort']))
                 $_GET['sort'] = $post['sort'];
-            if(isset($post['page']))
-                $_GET['page'] = $post['page'];
              
             try {
                 $provider = new ActiveDataProvider ([

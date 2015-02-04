@@ -31,7 +31,7 @@ class RelItemProcess extends \yii\db\ActiveRecord
             [['item_type_id', 'process_flow_id'], 'required'],
             [['company_id', 'item_type_id', 'process_flow_id'], 'integer'],
             ['company_id', 'default', 'value' => \yii::$app->user->identity->company_id],
-            [['item_type_id', 'process_flow_id'], 'unique'],
+            ['process_flow_id', 'unique', 'targetAttribute' => ['item_type_id', 'process_flow_id']],
             [['created_date'], 'safe']
         ];
     }

@@ -80,24 +80,22 @@ class User extends ActiveRecord implements IdentityInterface
     }
    
     public function beforeSave($insert)
-    {	
+    {
         $this->first_name = ucwords($this->first_name);
         $this->last_name = ucwords($this->last_name);
         $this->designation = ucwords($this->designation);
         
-        if(!$insert)
-        {
-            $company_id = \yii::$app->user->identity->company_id;
-            if(isset($this->photo)) {
-                $temp_file = $this->photo;
-                $this->photo = array_pop(explode('/',$this->photo));
-                try {
-                    rename($temp_file, "userUploads/".$company_id."/userImages/".$this->photo);
-                }catch(Exception $e) {}
-            }
+        $fileManager = new FileManager();
+        
+        if(isset($this->photo)) {
+            $temp_file = $this->photo;
+            $this->photo = array_pop(explode('/',$this->photo));
+            try {
+                rename($temp_file, $fileManager->getPath("user_image")."/".$this->photo);
+            }catch(Exception $e) {}
         }
-        else {
-            
+        
+        if($insert) {
             $this->newPassword = Yii::$app->security->generateRandomString(6);
             
             $this->setPassword($this->newPassword);
@@ -105,9 +103,17 @@ class User extends ActiveRecord implements IdentityInterface
             $this->company = Company::findOne($this->company_id);
             
             SendMails::send("newUserConfirmation", $this->email, "New User confirmation", $this);
-            
         }
         return parent::beforeSave($insert);
+    }
+    
+    public function afterSave($insert, $changedAttributes) {
+        
+        if(!$insert) {
+            $fileManager = new FileManager();
+            $fileManager->replaceFile($changedAttributes->photo, $this->photo, "temp/".\yii::$app->user->identity->company_id."/userImages", $type);
+        }
+        parent::afterSave($insert, $changedAttributes);
     }
     
     public static function getRoleIds() {
