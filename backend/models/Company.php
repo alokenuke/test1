@@ -45,8 +45,13 @@ class Company extends \yii\db\ActiveRecord
             'company_owner',
             'company_logo',
             'company_status',
-            'membership',
             'expiry_date'
+        ];
+    }
+    
+    public function extraFields() {
+        return [
+            'membership',
         ];
     }
     

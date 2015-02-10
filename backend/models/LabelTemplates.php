@@ -64,6 +64,70 @@ class LabelTemplates extends \yii\db\ActiveRecord
         $query = parent::find()->where(['company_id' => \yii::$app->user->identity->company_id])->andWhere(['<>', 'status', '0']);
         return $query;
     }
+    
+    public function beforeSave($insert)
+    {
+        if($this->logo) {
+            $fileManager = new FileManager();
+            
+            $temp_file = $this->logo;
+            $this->logo = array_pop(preg_split("/((=)|(\/))/", $this->logo));
+            
+            if(isset($this->logo) && strpos($temp_file,'filemanager/getimage') === false && strpos($temp_file,'temp') !== false) {
+                try {
+                    $rootPath = $fileManager->getRootPath();
+                    rename($temp_file, $rootPath."/".$this->logo);
+                }catch(Exception $e) {}
+            } 
+        }
+        
+        return parent::beforeSave($insert);
+    }
+    
+    public function afterSave($insert, $changedAttributes) {
+        if(isset($changedAttributes['logo']) && $changedAttributes['logo'] != $this->logo) {
+            $fileManager = new FileManager();
+            $projectPath = $fileManager->getRootPath()."/";
+            
+            if(file_exists($projectPath.$changedAttributes['logo']))
+                unlink($projectPath.$changedAttributes['logo']);
+        }
+        
+        parent::afterSave($insert, $changedAttributes);
+    }
+    
+    public function fields() {
+        return [
+            'id',
+            'template_name',
+            'company_id',
+            'print_type',
+            'logo',
+            'company_id',
+            'page_width',
+            'page_height',
+            'logo_width',
+            'logo_height',
+            'font_size',
+            'top_margin',
+            'bottom_margin',
+            'right_margin',
+            'left_margin',
+            'num_label_horizontal',
+            'num_label_vertical',
+            'hor_label_spacing',
+            'ver_label_spacing',
+            'cal_label_width',
+            'cal_label_height',
+            'print_type',
+            'logo' => function() {
+                if($this->logo) {
+                    $fileManager = new FileManager();
+                    return '/filemanager/getimage?type=&file='.$this->logo;
+                }
+            }
+        ];
+    }
 
     /**
      * @inheritdoc

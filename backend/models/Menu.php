@@ -31,6 +31,7 @@ class Menu extends \yii\db\ActiveRecord
         return [
             [['label', 'url', 'position'], 'required'],
             [['parent_id', 'status'], 'integer'],
+            ['parent_id', 'default', 'value' => '0'],
             [['label'], 'string', 'max' => 128],
             [['url'], 'string', 'max' => 256]
         ];

@@ -47,8 +47,9 @@ class TagActivityLog extends \yii\db\ActiveRecord
     public function fields() {
         return [
             'tag_id',
-            'process_stage_id',
-            'process_stage_answer',
+            'stageInfo',
+            'answer',
+            'loggedBy',
             'comment',
             'location',
             'status',
@@ -94,5 +95,17 @@ class TagActivityLog extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::className(), ['id' => 'logged_by']);
+    }
+	
+    public function getStageInfo(){
+        return $this->hasOne(TagProcess::className(),['id' => 'process_stage_id']);
+    }
+    
+    public function getAnswer(){
+        return $this->hasOne(TagProcess::className(),['id' => 'process_stage_answer']);
+    }
+    
+    public function getLoggedBy(){
+        return $this->hasOne(User::className(),['id' => 'logged_by']);
     }
 }

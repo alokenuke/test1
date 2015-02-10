@@ -144,6 +144,10 @@ class TagProcessController extends ApiController
     }
     
     public function actionGetall() {
+        
+        if(!isset($_GET['sort']))
+            $_GET['sort'] = "position";
+        
         return parent::actionGetall();
     }
 }

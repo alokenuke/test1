@@ -145,7 +145,41 @@ class ProjectLevelController extends ApiController
     }
     
     public function actionGetall() {
-        return parent::actionGetall();
+        if (!empty($_GET)) {
+            
+            $post = \Yii::$app->request->post();
+            
+            $model = new $this->modelClass;
+            
+            $query = $model->find();
+            
+            if(isset($post['search']) && isset($post['search']['parent_id']) && $post['search']['parent_id']>0)
+                $post['search']['project_id'] = null;
+            
+            if(isset($post['search'])) {
+                foreach($post['search'] as $key => $val)
+                    if(isset($val)) {
+                        if(in_array($key, $this->partialMatchFields))
+                            $query->andWhere(['like', $key, $val]);
+                        else
+                            $query->andWhere([$key => $val]);
+                    }
+            }
+            
+            if(isset($post['sort']))
+                $_GET['sort'] = $post['sort'];
+             
+            try {
+                $provider = new ActiveDataProvider ([
+                    'query' => $query,
+                    'pagination' => false
+                ]);
+            } catch (Exception $ex) {
+                throw new \yii\web\HttpException(500, 'Internal server error');
+            }
+            return $provider;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
     }
-    
 }

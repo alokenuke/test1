@@ -17,6 +17,7 @@ class FileManager extends Model
     
     public function getLocalPath($type) {
         $pathConstants = [
+            "" => "",
             "project_image" => "projectImage",
             "barcode" => "tagsImages/barCode",
             "nfccode" => "tagsImages/NFC",
@@ -37,7 +38,11 @@ class FileManager extends Model
      * @return string of path.
      */
     public function getPath($type) {
-        $path = \Yii::$app->params['repository'].$this->company."/".$this->getLocalPath($type);
+        $localPath = $this->getLocalPath($type);
+        $path = \Yii::$app->params['repository'].$this->company;
+        
+        if($localPath)
+            $path = $path."/".$localPath;
         
         if(!file_exists($path))
             mkdir($path);

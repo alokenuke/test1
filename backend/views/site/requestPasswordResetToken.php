@@ -16,6 +16,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 <a target="_blank" href="<?php echo Yii::getAlias("@web");?>"><img title="Sitetrack" alt="Sitetrack" src="<?php echo Yii::getAlias("@web")?>/img/logo_inner.png"></a>
                 <h3><?= Html::encode($this->title) ?></h3>
 
+                <?php
+                    foreach (\Yii::$app->session->getAllFlashes() as $key => $message) {
+                        echo '<div class="alert alert-' . ($key=='error'?"danger":"success") . '">' . $message . '</div>';
+                    }
+                ?>
                 <p>Please fill out your email. A link to reset password will be sent there.</p>
 
                 <?php $form = ActiveForm::begin(['id' => 'request-password-reset-form']); ?>

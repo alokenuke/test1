@@ -62,6 +62,9 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function rules()
     {
+        $company = null;
+        if(!\yii::$app->user->isGuest)
+            $company = \yii::$app->user->identity->company_id;
         return [
             [['first_name', 'last_name', 'email', 'username', 'role'], 'required'],
             ['email', 'email','message'=>'Invalid email'],
@@ -70,12 +73,12 @@ class User extends ActiveRecord implements IdentityInterface
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_NOTACTIVE, self::STATUS_DELETED]],
             ['photo','string'],
-            ['company_id', 'default', 'value' => \yii::$app->user->identity->company_id],
+            ['company_id', 'default', 'value' => $company, 'on' => 'insert'],
             ['created_date', 'default', 'value' => date("Y-m-d H:i:s")],
             ['role', 'default', 'value' => self::ROLE_USER],
             ['created_date', 'default', 'value' => date("Y-m-d H:i:s")],
             ['role', 'in', 'range' => self::getRoleIds()],
-            [['rec_notification', 'photo', 'contact_number', 'designation'], 'safe']
+            [['rec_notification', 'password_reset_token', 'last_login', 'photo', 'contact_number', 'designation'], 'safe']
         ];
     }
    
@@ -85,16 +88,17 @@ class User extends ActiveRecord implements IdentityInterface
         $this->last_name = ucwords($this->last_name);
         $this->designation = ucwords($this->designation);
         
-        $fileManager = new FileManager();
-        
-        if(isset($this->photo)) {
-            $temp_file = $this->photo;
-            $this->photo = array_pop(explode('/',$this->photo));
-            try {
-                rename($temp_file, $fileManager->getPath("user_image")."/".$this->photo);
-            }catch(Exception $e) {}
+        if($this->photo) {
+            $fileManager = new FileManager();
+
+            if(isset($this->photo)) {
+                $temp_file = $this->photo;
+                $this->photo = array_pop(explode('/',$this->photo));
+                try {
+                    rename($temp_file, $fileManager->getPath("user_image")."/".$this->photo);
+                }catch(Exception $e) {}
+            }
         }
-        
         if($insert) {
             $this->newPassword = Yii::$app->security->generateRandomString(6);
             
@@ -108,8 +112,7 @@ class User extends ActiveRecord implements IdentityInterface
     }
     
     public function afterSave($insert, $changedAttributes) {
-        
-        if(!$insert) {
+        if(!$insert && isset($changedAttributes['photo']) && $changedAttributes['photo'] != $this->photo) {
             $fileManager = new FileManager();
             $fileManager->replaceFile($changedAttributes->photo, $this->photo, "temp/".\yii::$app->user->identity->company_id."/userImages", $type);
         }
@@ -231,8 +234,10 @@ class User extends ActiveRecord implements IdentityInterface
             'status',
             'created_date',
             'modified_date',
+            'password_reset_token',
             'auth_key' => $auth,
-            'LastTokens'
+            'LastTokens',
+            'last_login'
         ];
     }
     
@@ -278,7 +283,8 @@ class User extends ActiveRecord implements IdentityInterface
                     if(count($projectIds))
                         return Projects::find()->select(['id', 'project_name'])->andWhere(['id' => $projectIds])->all();
                 }
-            }
+            },
+            'company'
         ];
     }
 
@@ -369,7 +375,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function generatePasswordResetToken()
     {
-        $this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
+        return $this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
     }
 
     /**
@@ -388,6 +394,11 @@ class User extends ActiveRecord implements IdentityInterface
     public function getRoles()
     {
         return $this->hasOne(Roles::className(), ['id' => 'role']);
+    }
+
+    public function getCompany()
+    {
+        return $this->hasOne(Company::className(), ['id' => 'company_id']);
     }
     
     public function actDelete() {

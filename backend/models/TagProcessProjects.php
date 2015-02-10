@@ -9,7 +9,7 @@ use Yii;
  *
  * @property integer $process_id
  * @property integer $project_id
- * @property integer $created_by
+ * @property integer $assigned_by
  * @property string $created_date
  */
 class TagProcessProjects extends \yii\db\ActiveRecord
@@ -28,8 +28,8 @@ class TagProcessProjects extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['process_id', 'project_id', 'created_by'], 'required'],
-            [['process_id', 'project_id', 'created_by'], 'integer'],
+            [['process_id', 'project_id', 'assigned_by'], 'required'],
+            [['process_id', 'project_id', 'assigned_by'], 'integer'],
             [['created_date'], 'safe']
         ];
     }
@@ -42,7 +42,7 @@ class TagProcessProjects extends \yii\db\ActiveRecord
         return [
             'process_id' => 'Tag Process ID',
             'project_id' => 'Project ID',
-            'created_by' => 'Created By',
+            'assigned_by' => 'Created By',
             'created_date' => 'Created Date',
         ];
     }

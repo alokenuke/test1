@@ -241,8 +241,8 @@ class Tags extends \yii\db\ActiveRecord
             'itemDetails',
             'userGroup',
             'tagAssignment',
-            'relatedTags'
-        ];
+            'relatedTags',
+			'tagActivityLog'        ];
     }
     
     /**
@@ -318,4 +318,13 @@ class Tags extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Tags::className(), ['id'=>'tag_id'])
                 ->viaTable('related_tags', ['master_tag_id'=>'id']);
-    }}
+    }
+	
+    
+    public function getTagActivityLog()
+    {
+        return $this->hasOne(TagActivityLog::className(), ['tag_id'=>'id'])->orderBy("logged_date");
+    }
+    
+
+}

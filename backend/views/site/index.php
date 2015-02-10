@@ -1,4 +1,4 @@
-<div ng-controller="AlertController">
+<div ng-controller="AlertController" id="alertMessages">
     <div ng-repeat="alert in alerts" class="alert alert-{{(alert.type=='error'?'danger':alert.type)}}" data-dismiss="alert" type="{{alert.type}}" close="closeAlert($index)">
         <a href="" class="close" data-dismiss="alert">&times;</a>
         <strong>{{alert.type | titlecase}}!</strong> {{alert.msg}}
@@ -21,7 +21,7 @@
                     </div>              
                 </div><!--/row-->
                 <div class="row mt-15">
-                    <div class="col-xs-12" ng-view  ng-animation="am-fade-and-slide-left">
+                    <div class="col-xs-12" ng-view  ng-animation="am-fade-and-slide-left" autoscroll="true">
                         <?= $this->render('_index'); ?>
                     </div>
                 </div>

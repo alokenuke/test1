@@ -8,11 +8,16 @@ $params = array_merge(
 
 return [
     'id' => 'app-backend',
+    'name' => "Site Track - NFC",
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backend\controllers',
     'bootstrap' => ['log'],
     'modules' => [],
     'components' => [
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+             'useFileTransport'=>false
+         ],
         'response' => [
             'class' => 'yii\web\Response',
             'on beforeSend' => function ($event) {
@@ -45,7 +50,7 @@ return [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
-		    ['class' => 'yii\rest\UrlRule', 'controller' => ['api', 'users', 'userlevels', 'usergroups', 'roles', 'items', 'tags', 'labeltemplates', 'projects', 'projectlevel', 'tagprocess'], 'pluralize'=>false, 'extraPatterns' => ['GET search' => 'search']],
+		    ['class' => 'yii\rest\UrlRule', 'controller' => ['users', 'userlevels', 'usergroups', 'roles', 'items', 'tags', 'labeltemplates', 'projects', 'projectlevel', 'tagprocess', 'company'], 'pluralize'=>false, 'extraPatterns' => ['GET search' => 'search']],
 		    'api/fields' => 'api/fields',
                     'dashboard' => 'site/dashboard',
                     '<controller>/<action>' => '<controller>/<action>',

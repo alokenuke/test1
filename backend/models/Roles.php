@@ -56,7 +56,10 @@ class Roles extends \yii\db\ActiveRecord
     // default scope to check company_id
     public static function find()
     {
-$query = parent::find()->where(['company_id' => \yii::$app->user->identity->company_id])->andWhere(['<>', 'status', '2']);
+        $query = parent::find()->andWhere(['<>', 'status', '2']);
+        
+        if(!\yii::$app->user->isGuest)
+            $query = $query->where(['company_id' => \yii::$app->user->identity->company_id]);
         
         return $query;
     }

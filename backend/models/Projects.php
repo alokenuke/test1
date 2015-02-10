@@ -54,7 +54,7 @@ class Projects extends \yii\db\ActiveRecord
             [['project_name', 'client_project_manager', 'project_location', 'about', 'project_address', 'project_city', 'project_country'], 'required'],
             [['project_status', 'timezone_id'], 'integer'],
             [['about'], 'string', 'max' => 512],
-            [['created_date', 'modified_date'], 'safe'],
+            [['created_date', 'modified_date','client_address','client_city','client_country','project_status','client_name','consultant_project_manager','contractor_project_manager'], 'safe'],
             [['project_name'], 'string', 'max' => 200],
             [['client_project_manager', 'project_location', 'project_director', 'consultant', 'main_contractor', 'project_manager', 'project_logo', 'project_image', 'project_address', 'project_city', 'client_address', 'client_city'], 'string', 'max' => 128],
             ['project_status', 'default', 'value' => self::STATUS_ACTIVE],
@@ -69,6 +69,49 @@ class Projects extends \yii\db\ActiveRecord
         $query = parent::find()->where(['company_id' => \yii::$app->user->identity->company_id, 'project_status' => 1]);
         
         return $query;
+    }
+    
+    public function beforeSave($insert)
+    {
+        if($this->project_logo) {
+            $fileManager = new FileManager();
+
+            if(isset($this->project_logo) && strpos($this->project_logo,'temp') !== false) {
+                $temp_file = $this->project_logo;
+                $this->project_logo = array_pop(explode('/',$this->project_logo));
+                try {
+                    rename($temp_file, $fileManager->getPath("project_image")."/".$this->project_logo);
+                }catch(Exception $e) {}
+            }
+            if(isset($this->project_image) && strpos($this->project_image,'temp') !== false) {
+                $temp_file = $this->project_image;
+                $this->project_image = array_pop(explode('/',$this->project_image));
+                try {
+                    rename($temp_file, $fileManager->getPath("project_image")."/".$this->project_image);
+                }catch(Exception $e) {}
+            }
+        }
+        
+        return parent::beforeSave($insert);
+    }
+    
+    public function afterSave($insert, $changedAttributes) {
+        
+        if(isset($changedAttributes['project_logo']) || isset($changedAttributes['project_image'])) {
+            $fileManager = new FileManager();
+            $projectPath = $fileManager->getPath("project_image")."/";
+        }
+        if(isset($changedAttributes['project_logo'])) {
+            if(file_exists($projectPath.$this->project_logo))
+                unlink($projectPath.$this->project_logo);
+        }
+        
+        if(isset($changedAttributes['project_image'])) {
+            if(file_exists($projectPath.$this->project_image))
+                unlink($projectPath.$this->project_image);
+        }
+        
+        parent::afterSave($insert, $changedAttributes);
     }
     
     public function fields()
@@ -98,6 +141,9 @@ class Projects extends \yii\db\ActiveRecord
             'client_country',
             'project_status',
             'timezone_id',
+            'client_name',
+            'consultant_project_manager',
+            'contractor_project_manager'
         ];
     }
     
@@ -135,9 +181,9 @@ class Projects extends \yii\db\ActiveRecord
             'company_id' => 'Company ID',
             'project_name' => 'Project Name',
             'client_project_manager' => 'Client Project Manager',
-            'project_location' => 'Project Location',
+            'project_location' => 'Area',
             'project_director' => 'Project Director',
-            'about' => 'About',
+            'about' => 'Project description',
             'consultant' => 'Consultant',
             'main_contractor' => 'Main Contractor',
             'project_manager' => 'Project Manager',

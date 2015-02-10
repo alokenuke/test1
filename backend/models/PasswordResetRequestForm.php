@@ -20,7 +20,8 @@ class PasswordResetRequestForm extends Model
             ['email', 'required'],
             ['email', 'email'],
             ['email', 'exist',
-                 'filter' => ['status' => User::STATUS_ACTIVE],
+                'targetClass' => '\backend\models\User',
+                'filter' => ['status' => User::STATUS_ACTIVE],
                 'message' => 'There is no user with such email.'
             ],
         ];
@@ -38,7 +39,7 @@ class PasswordResetRequestForm extends Model
             'status' => User::STATUS_ACTIVE,
             'email' => $this->email,
         ]);
-
+        
         if ($user) {
             if (!User::isPasswordResetTokenValid($user->password_reset_token)) {
                 $user->generatePasswordResetToken();

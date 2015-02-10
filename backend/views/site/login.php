@@ -15,6 +15,12 @@ $this->params['breadcrumbs'][] = $this->title;
             <center style="padding-bottom: 20px;">
                 <a target="_blank" href="<?php echo Yii::getAlias("@web");?>"><img title="Sitetrack" alt="Sitetrack" src="<?php echo Yii::getAlias("@web")?>/img/logo_inner.png"></a>
             </center>
+            
+            <?php
+                foreach (\Yii::$app->session->getAllFlashes() as $key => $message) {
+                    echo '<div class="alert alert-' . ($key=='error'?"danger":"success") . '">' . $message . '</div>';
+                }
+            ?>
 
             <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
                 <?php $form->errorSummary($model);?>

@@ -123,7 +123,7 @@ class SiteController extends Controller
     public function actionResetPassword($token)
     {
         try {
-            $model = new ResetPasswordForm($token);
+            $model = new \backend\models\ResetPasswordForm($token);
         } catch (InvalidParamException $e) {
             throw new BadRequestHttpException($e->getMessage());
         }
