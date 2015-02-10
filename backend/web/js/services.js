@@ -5,24 +5,25 @@
 // don't forget to declare this service module as a dependency in your main app constructor!
 var appServices = angular.module('appApp.services', []);
 
-appServices.factory('alertService', function($rootScope) {
+appServices.factory('alertService', function($rootScope, $timeout) {
     var alertService = {};
 
     // create an array of alerts available globally
     $rootScope.alerts = [];
     
     alertService.add = function(type, msg) {
-        $rootScope.alerts.push({'type': type, 'msg': msg});
-        
-        //$timeout(function(){element.remove();}, 5000);
-        
+        var alertPos = $rootScope.alerts.push({'type': type, 'msg': msg});
+        window.scrollTo(0, 0);
+        $timeout(function(){
+            angular.element("#alertMessages .alert:nth-child("+alertPos+")").remove();
+        }, 5000);
     };
 
     alertService.closeAlert = function(index) {
         $rootScope.alerts.splice(index, 1);
     };
     
-	alertService.clearAll = function() {
+    alertService.clearAll = function() {
         $rootScope.alerts = [];
     };
     

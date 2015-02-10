@@ -248,8 +248,13 @@
                                 <td class="text-center">{{dat.tag_description}}</td>
                                 <td class="text-center">{{dat.product_code}}</td>
                                 <td class="text-center">
-                                    Material Received - No<br/>
-                                    <small>(A.R. Hussain Nov 11, 2014 13:10:11)</small>
+                                    <div ng-if="dat.tagActivityLog.stageInfo">
+                                        {{dat.tagActivityLog.stageInfo.process_name}} - {{dat.tagActivityLog.answer.process_name}}<br/>
+                                        <small>({{dat.tagActivityLog.loggedBy.first_name}}{{dat.tagActivityLog.loggedBy.last_name}}  {{dat.tagActivityLog.logged_date}})</small>
+                                    </div>
+                                    <div ng-if="!dat.tagActivityLog.stageInfo">
+                                        Not started
+                                    </div>
                                 </td>
                                 <td class="text-center">
                                     <a href="/#/tags/{{dat.id}}" class="btn icon-btn"><i class="fa fa-list-alt fa-lg"></i></a>

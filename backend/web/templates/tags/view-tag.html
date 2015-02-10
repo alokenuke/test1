@@ -266,6 +266,7 @@
                     <thead>
                         <tr>
                             <th class="text-center">S.No</th>
+                            <th class="text-center">Status</th>
                             <th class="text-center">Comments</th>
                             <th class="text-center">Attachments<br />
                                 <small>(click to download)</small>
@@ -281,6 +282,7 @@
                     <tbody>
                         <tr ng-repeat="act in activity">
                             <td class="text-center">{{$index+1}}</td>
+                            <td class="text-center">{{act.stageInfo.process_name}} - <strong>{{act.answer.process_name}}</strong></td>
                             <td class="text-center">{{act.comment}}</td>
                             <td class="text-center">
 

@@ -143,7 +143,7 @@ app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParam
         
         var updateTagList = function() {
             var params = {'search': $scope.search, 'sort': $scope.sortBy, 'limit': $scope.numPerPage, 'page':$scope.currentPage, };
-            rest.models(params).success(function (data) {
+			rest.customModelData("tags/search?expand=tagActivityLog", params).success(function (data) {
                 $scope.data = data.items;
                 $scope.totalCount = data._meta.totalCount;
                 $scope.pageCount = data._meta.pageCount;
@@ -179,7 +179,7 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
         breadcrumbsService.headTitle("Create Tag - <span class='sT'>sT</span>");
         breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/tags", "Tags");
-        breadcrumbsService.add("/#/tags", "Create Tag");
+        breadcrumbsService.add("/#/tags/create", "Create Tag");
         
         $scope.search = {};
         $scope.projectlevels = [];
@@ -324,7 +324,7 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
                 $scope.tagLoading = false;
             });
         }
-                
+        
         $scope.getUserLevel = function() {
             
             if(!$scope.tagDetails['project_level_id'])
@@ -372,24 +372,57 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
                 $scope[variable].splice(level, ($scope[variable].length-level));
                 
                 $http.post("/projectlevel/getall", {'search': {'project_id': projectId, 'parent_id': parent}, 'select': ['id', 'level_name']}).success(function(data) {
-                    if(data.items.length>0)
+                    if(data.items.length>0) {
                         $scope[variable].push(data.items);
+                        if(data.items.length==1 && level<=1) {
+                            if(typeof $scope.search.childlevels == 'undefined') {
+                                $scope.search.childlevels = [];
+                            }
+                            $scope.tagDetails.project_level_id = data.items[0].id;
+                            $scope.search.childlevels[level] = data.items[0];
+                        }
+                    }
                 });
 
                 if(level==0) {
                     $scope.items = [];
                     $scope.processes = [];
-                    rest.setData("usergroups/getall", [], {'project_id': projectId}).success(function(data) {
-                        if(data.items.length)
-                            $scope.usergroups = data.items;
-                    });
-                    rest.setData("items/getall", ['id', 'item_name'], {'parent_id': 0, 'project_id': projectId}).success(function(data) {
-                        if(data.items.length)
+                    var itemLoading = rest.setData("items/getall", ['id', 'item_name'], {'parent_id': 0, 'project_id': projectId}).success(function(data) {
+                        if(data.items.length) {
                             $scope.items.push(data.items);
+                            $scope.search.item = [];
+                            if(data.items.length==1) {
+                                $scope.search.item[0] = data.items[0];
+                                $scope.tagDetails.tag_item_id = data.items[0].id;
+                                return $scope.updateSelectBox('items', projectId, level+1, $scope.search.item[0].id);
+                            }
+                            else
+                                return true;
+                        }
                     });
-                    rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': 0, 'project_id': projectId}).success(function(data) {
+                    var processLoading = rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': 0, 'project_id': projectId}).success(function(data) {
                         if(data.items.length)
                             $scope.processes.push(data.items);
+                            $scope.search.process = [];
+                            if(data.items.length==1) {
+                                $scope.search.process[0] = data.items[0];
+                                $scope.tagDetails.tag_process_flow_id = data.items[0].id;
+                                return $scope.updateSelectBox('processes', projectId, level+1, $scope.search.process[0].id);
+                            }
+                            else
+                                return true;
+                    });
+                    
+                    if(itemLoading && processLoading)
+                      rest.setData("usergroups/getall", [], {'project_id': projectId}).success(function(data) {
+                        if(data.items.length) {
+                            $scope.usergroups = data.items;
+                            if(data.items.length==1) {
+                                $scope.search.usergroup = data.items[0];
+                                $scope.tagDetails.user_group_id = data.items[0].id;
+                                $scope.getUserLevel();
+                            }
+                        }
                     });
                 }
                 else
@@ -404,16 +437,27 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
                 $scope[variable].splice(level, ($scope[variable].length-level-1));
                 
                 rest.setData("items/getall", ['id', 'item_name'], {'parent_id': parent}).success(function(data) {
-                    if(data.items.length>0)
-                        $scope[variable].push(data.items);
+                    if(data.items.length>0) {
+                        $scope.items.push(data.items);
+                        if(data.items.length==1) {
+                            $scope.search.item[level] = data.items[0];
+                            $scope.updateSelectBox('items', projectId, level, $scope.search.item[level].id);
+                        }
+                    }
                 });
                 
                 if($scope.search['process'] && $scope.search.process[0] && level==1) {
                     $scope['processes'].splice(0, ($scope['processes'].length-1));
 
                     rest.setData("items/getrelatedprocess/"+parent, ['id', 'process_name'], {'process_parent_id': $scope.search.process[0], 'tag_item_id': $scope.search.item[1]}).success(function(data) {
-                        if(data.items.length>0)
+                        if(data.items.length>0) {
                             $scope['processes'].push(data.items);
+                            
+                            if(data.items.length==1) {
+                                $scope.search.process[level+1] = data.items[0];
+                                $scope.updateSelectBox('processes', projectId, level, $scope.search.process[level].id);
+                            }
+                        }
                     });
                 }
             }
@@ -427,8 +471,13 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
                     
                     if(level < 1) {   
                         rest.setData("items/getrelatedprocess/"+$scope.search.item[1].id, ['id', 'process_name'], {'process_parent_id': parent}).success(function(data) {
-                            if(data.items.length>0)
+                            if(data.items.length>0) {
                                 $scope[variable].push(data.items);
+                                if(data.items.length==1) {
+                                    $scope.search.process[$scope[variable].length] = data.items[0];
+                                    $scope.updateSelectBox('processes', projectId, level+1, $scope.search.process[level].id);
+                                }
+                            }
                         });
                     }
                     else if(level==1) {
@@ -500,7 +549,7 @@ app.controller('TagsUpdate', ['$scope', 'rest', '$location', '$route','$routePar
         breadcrumbsService.headTitle("Update Tag - <span class='sT'>sT</span>");
         breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/tags", "Tags");
-        breadcrumbsService.add("/#/tags", "Update Tag");
+        breadcrumbsService.add("/#/tags/update/"+$routeParams.id+"/"+$routeParams.project_id, "Update Tag");
         
         alertService.clearAll();
         
@@ -758,7 +807,7 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
         breadcrumbsService.headTitle("Create Tag - <span class='mT'>mT</span>");
         breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/tags", "Tags");
-        breadcrumbsService.add("/#/tags", "Create Master Tag");
+        breadcrumbsService.add("/#/tags/createmaster", "Create Master Tag");
         
         $scope.search = {};
         $scope.projectlevels = [];
@@ -878,24 +927,57 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
                 $scope[variable].splice(level, ($scope[variable].length-level));
                 
                 $http.post("/projectlevel/getall", {'search': {'project_id': projectId, 'parent_id': parent}, 'select': ['id', 'level_name']}).success(function(data) {
-                    if(data.items.length>0)
+                    if(data.items.length>0) {
                         $scope[variable].push(data.items);
+                        if(data.items.length==1 && level<=1) {
+                            if(typeof $scope.search.childlevels == 'undefined') {
+                                $scope.search.childlevels = [];
+                            }
+                            $scope.tagDetails.project_level_id = data.items[0].id;
+                            $scope.search.childlevels[level] = data.items[0];
+                        }
+                    }
                 });
 
                 if(level==0) {
                     $scope.items = [];
                     $scope.processes = [];
-                    rest.setData("usergroups/getall", ['id', 'group_name'], {'project_id': projectId}).success(function(data) {
-                        if(data.items.length)
-                            $scope.usergroups = data.items;
-                    });
-                    rest.setData("items/getall", ['id', 'item_name'], {'parent_id': 0, 'project_id': projectId}).success(function(data) {
-                        if(data.items.length)
+                    var itemLoading = rest.setData("items/getall", ['id', 'item_name'], {'parent_id': 0, 'project_id': projectId}).success(function(data) {
+                        if(data.items.length) {
                             $scope.items.push(data.items);
+                            $scope.search.item = [];
+                            if(data.items.length==1) {
+                                $scope.search.item[0] = data.items[0];
+                                $scope.tagDetails.tag_item_id = data.items[0].id;
+                                return $scope.updateSelectBox('items', projectId, level+1, $scope.search.item[0].id);
+                            }
+                            else
+                                return true;
+                        }
                     });
-                    rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': 0, 'project_id': projectId}).success(function(data) {
+                    var processLoading = rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': 0, 'project_id': projectId}).success(function(data) {
                         if(data.items.length)
                             $scope.processes.push(data.items);
+                            $scope.search.process = [];
+                            if(data.items.length==1) {
+                                $scope.search.process[0] = data.items[0];
+                                $scope.tagDetails.tag_process_flow_id = data.items[0].id;
+                                return $scope.updateSelectBox('processes', projectId, level+1, $scope.search.process[0].id);
+                            }
+                            else
+                                return true;
+                    });
+                    
+                    if(itemLoading && processLoading)
+                      rest.setData("usergroups/getall", [], {'project_id': projectId}).success(function(data) {
+                        if(data.items.length) {
+                            $scope.usergroups = data.items;
+                            if(data.items.length==1) {
+                                $scope.search.usergroup = data.items[0];
+                                $scope.tagDetails.user_group_id = data.items[0].id;
+                                $scope.getUserLevel();
+                            }
+                        }
                     });
                 }
                 else
@@ -910,16 +992,27 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
                 $scope[variable].splice(level, ($scope[variable].length-level-1));
                 
                 rest.setData("items/getall", ['id', 'item_name'], {'parent_id': parent}).success(function(data) {
-                    if(data.items.length>0)
-                        $scope[variable].push(data.items);
+                    if(data.items.length>0) {
+                        $scope.items.push(data.items);
+                        if(data.items.length==1) {
+                            $scope.search.item[level] = data.items[0];
+                            $scope.updateSelectBox('items', projectId, level, $scope.search.item[level].id);
+                        }
+                    }
                 });
                 
                 if($scope.search['process'] && $scope.search.process[0] && level==1) {
                     $scope['processes'].splice(0, ($scope['processes'].length-1));
 
                     rest.setData("items/getrelatedprocess/"+parent, ['id', 'process_name'], {'process_parent_id': $scope.search.process[0], 'tag_item_id': $scope.search.item[1]}).success(function(data) {
-                        if(data.items.length>0)
+                        if(data.items.length>0) {
                             $scope['processes'].push(data.items);
+                            
+                            if(data.items.length==1) {
+                                $scope.search.process[level+1] = data.items[0];
+                                $scope.updateSelectBox('processes', projectId, level, $scope.search.process[level].id);
+                            }
+                        }
                     });
                 }
             }
@@ -933,8 +1026,13 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
                     
                     if(level < 1) {   
                         rest.setData("items/getrelatedprocess/"+$scope.search.item[1].id, ['id', 'process_name'], {'process_parent_id': parent}).success(function(data) {
-                            if(data.items.length>0)
+                            if(data.items.length>0) {
                                 $scope[variable].push(data.items);
+                                if(data.items.length==1) {
+                                    $scope.search.process[$scope[variable].length] = data.items[0];
+                                    $scope.updateSelectBox('processes', projectId, level+1, $scope.search.process[level].id);
+                                }
+                            }
                         });
                     }
                     else if(level==1) {
@@ -945,6 +1043,83 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
                 }
             }
         }
+        
+//        $scope.updateSelectBox = function(variable, projectId, level, parent) {
+//            
+//            $scope.tagDetails['project_id'] = projectId;
+//            
+//            if(variable=="projectlevels") {
+//                
+//                $scope[variable].splice(level, ($scope[variable].length-level));
+//                
+//                $http.post("/projectlevel/getall", {'search': {'project_id': projectId, 'parent_id': parent}, 'select': ['id', 'level_name']}).success(function(data) {
+//                    if(data.items.length>0)
+//                        $scope[variable].push(data.items);
+//                });
+//
+//                if(level==0) {
+//                    $scope.items = [];
+//                    $scope.processes = [];
+//                    rest.setData("usergroups/getall", ['id', 'group_name'], {'project_id': projectId}).success(function(data) {
+//                        if(data.items.length)
+//                            $scope.usergroups = data.items;
+//                    });
+//                    rest.setData("items/getall", ['id', 'item_name'], {'parent_id': 0, 'project_id': projectId}).success(function(data) {
+//                        if(data.items.length)
+//                            $scope.items.push(data.items);
+//                    });
+//                    rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': 0, 'project_id': projectId}).success(function(data) {
+//                        if(data.items.length)
+//                            $scope.processes.push(data.items);
+//                    });
+//                }
+//                else
+//                {
+//                    $scope.tagDetails['project_level_id'] = parent;
+//                }
+//            }
+//            else if(variable=='items') {
+//                if(level > 0)
+//                    $scope.tagDetails['tag_item_id'] = parent;
+//                
+//                $scope[variable].splice(level, ($scope[variable].length-level-1));
+//                
+//                rest.setData("items/getall", ['id', 'item_name'], {'parent_id': parent}).success(function(data) {
+//                    if(data.items.length>0)
+//                        $scope[variable].push(data.items);
+//                });
+//                
+//                if($scope.search['process'] && $scope.search.process[0] && level==1) {
+//                    $scope['processes'].splice(0, ($scope['processes'].length-1));
+//
+//                    rest.setData("items/getrelatedprocess/"+parent, ['id', 'process_name'], {'process_parent_id': $scope.search.process[0], 'tag_item_id': $scope.search.item[1]}).success(function(data) {
+//                        if(data.items.length>0)
+//                            $scope['processes'].push(data.items);
+//                    });
+//                }
+//            }
+//            else if(variable=='processes') {
+//                
+//                if(level==1)
+//                    $scope.tagDetails['tag_process_flow_id'] = parent;
+//                
+//                if($scope.search['item'] && $scope.search.item[1]) {
+//                    $scope[variable].splice(level, ($scope[variable].length-level-1));
+//                    
+//                    if(level < 1) {   
+//                        rest.setData("items/getrelatedprocess/"+$scope.search.item[1].id, ['id', 'process_name'], {'process_parent_id': parent}).success(function(data) {
+//                            if(data.items.length>0)
+//                                $scope[variable].push(data.items);
+//                        });
+//                    }
+//                    else if(level==1) {
+//                        rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': parent}).success(function(data) {
+//                            $scope.process_stages = data.items;
+//                        });
+//                    }
+//                }
+//            }
+//        }
         
         $scope.saveTagDetails = function() {
             
@@ -1017,7 +1192,7 @@ app.controller('TagsUpdateMaster', ['$scope', 'rest', '$location', '$route','$ro
         breadcrumbsService.headTitle("Update Tag - <span class='mT'>mT</span>");
         breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/tags", "Tags");
-        breadcrumbsService.add("/#/tags", "Update Master Tag");
+        breadcrumbsService.add("/#/tags/updatemaster/"+$routeParams.id+"/"+$routeParams.project_id, "Update Master Tag");
         
         alertService.clearAll();
         

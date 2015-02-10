@@ -561,6 +561,11 @@ color: #59caf2;
     font-size: 12px;
 }
 
+.input-group .dropdown-menu table .btn-default {
+    font-size: 0.8em;
+    padding: 0.5em 1em;
+}
+
 .add-new-btn {
     padding-left: 10px
 }
@@ -902,6 +907,18 @@ margin-top: -5px
     cursor: default;
 }
 
+.preview-box .center img{
+    margin: 0 auto;
+    display: table;
+    position: relative;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
 /*------------/footer----------*/
 @media (min-width: 1200px) {
     .projectbox:nth-child(3n+1) {
@@ -1114,6 +1131,23 @@ ul.showfull {
         font-size: 2.2rem;
         position: relative;
         top: 1px;
+    }
+    .print-elm-left-xs {
+        float:left;
+    }
+    .print-elm-right-xs {
+        float:right;
+    }
+    .print-elm-right-xs .form-group {
+        float:left;
+        margin-right: 5px;
+    }
+    .print-elm-right-xs label, .print-elm-right-xs button {
+        margin-top: 5px;
+    }
+    .print-elm-right-xs .form-group:last-child {
+        float:right;
+        margin-right: 0;
     }
 }
 

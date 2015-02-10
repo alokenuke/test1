@@ -105,7 +105,7 @@ app.controller('RolesUpdate', ['$scope', 'rest', '$location', '$route','$routePa
         });
     }])
 
-app.controller('ManageLabelTemplates', function($scope, rest, $location, alertService, $http, breadcrumbsService, $window) {
+app.controller('ManageLabelTemplates', function($scope, rest, $location, alertService, $http, breadcrumbsService, $window, $upload) {
     rest.path = "labeltemplates";
     
     breadcrumbsService.clearAll();
@@ -166,8 +166,11 @@ app.controller('ManageLabelTemplates', function($scope, rest, $location, alertSe
                 var index = $scope.templates.indexOf($scope.label_template);
                 $scope.templates.splice(index,1);
                 alertService.clearAll();
-                alertService.add('success', "Template ("+$scope.label_template.template_name+") removed.");
-                $scope.label_template = $scope.templates[0];
+                console.log($scope.label_template);
+                rest.deleteById($scope.label_template).success(function() {
+                    alertService.add('success', "Template ("+$scope.label_template.template_name+") removed.");
+                    $scope.label_template = $scope.templates[0];
+                });
             });
         }
     }
@@ -181,17 +184,41 @@ app.controller('ManageLabelTemplates', function($scope, rest, $location, alertSe
     }
     
     $scope.saveTemplate = function($e) {
+        alertService.clearAll();
         if($scope.returnAction==false)
             $e.preventDefault();
         if($scope.label_template.id)
-            $http.put("/labeltemplates/"+$scope.label_template.id, $scope.label_template).success(function() {
+            $http.put("/labeltemplates/"+$scope.label_template.id, $scope.label_template).success(function(data) {
                 alertService.add('success', "Template updated successfully.");
+                $scope.label_template = data;
             }).error(errorCallback);        
         else
             rest.postModel($scope.label_template).success(function(data) {
                 alertService.add('success', "Template created successfully.");
+                $scope.label_template = data;
             }).error(errorCallback);
     }
+    
+    $scope.removePhoto = function() {
+        $scope.label_template.logo = null;
+    }
+    
+    $scope.onFileSelect = function ($files) {
+            //$files: an array of files selected, each file has name, size, and type.
+            for (var i = 0; i < $files.length; i++) {
+                var file = $files[i];
+                $scope.upload = $upload.upload({
+                    url: 'filemanager/upload', //upload.php script, node.js route, or servlet url
+                    data: {myObj: $scope.myModelObj},
+                    file: file,
+                }).progress(function (evt) {
+                    console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
+                }).success(function (data, status, headers, config) {
+                    // file is uploaded successfully
+                    $scope.label_template.logo = data;
+                });
+            }
+        };
     
     rest.models({}).success(function (data) {
         $scope.templates = data.items;

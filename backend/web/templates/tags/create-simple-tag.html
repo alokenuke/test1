@@ -10,7 +10,7 @@
                 <div class="col-md-6 col-lg-5">
                     <div class="form-group">
                         <label class="col-sm-4 control-label text-right">Project Name :</label>
-                        <div class="col-sm-6 multi-level">
+                        <div class="col-sm-8 multi-level">
                             <ui-select ng-model="search.project"
                                        theme="bootstrap" class='last-child' ng-if="projects.length >0">
                               <ui-select-match placeholder="Select a project...">{{$select.selected.project_name}}</ui-select-match>
@@ -49,7 +49,7 @@
                 <div class="col-md-6 col-lg-5">
                     <div class="form-group">
                         <label class="col-sm-4 control-label text-right">Item:</label>
-                        <div class="col-sm-6 multi-level">
+                        <div class="col-sm-8 multi-level">
                             <ui-select ng-repeat="item in items"  ng-model="search.item[$index]"
                                        theme="bootstrap" ng-disabled="disabled" class="{{((items.length-1)===$index?'last-child ':'')}}" ng-if="(items.length && tagDetails.project_id)">
                               <ui-select-match placeholder="Select item {{$index==0?'Group':$index==1?'Type':'Sub Type'}}">{{$select.selected.item_name}}</ui-select-match>
@@ -69,7 +69,7 @@
                 <div class="col-md-6 col-lg-7">
                     <div class="form-group">
                         <label class="col-sm-4 col-lg-3 control-label text-right">Process Flow:</label>
-                        <div class="col-sm-6 multi-level">
+                        <div class="col-sm-8 col-lg-9 multi-level">
                             <ui-select ng-repeat="process in processes"  ng-model="search.process[$index]"
                                        theme="bootstrap" ng-disabled="disabled" class="{{((processes.length-1)===$index?'last-child ':'')}}" ng-if="(processes.length && tagDetails.project_id)">
                               <ui-select-match placeholder="Select process {{$index==0?'Type':'Flow'}}">{{$select.selected.process_name}}</ui-select-match>
@@ -94,7 +94,7 @@
                 <div class="col-md-6 col-lg-5">
                     <div class="form-group">
                         <label class="col-sm-4 control-label text-right">User Group :</label>
-                        <div class="col-sm-6 multi-level">
+                        <div class="col-sm-8 multi-level">
                             <ui-select ng-model="search.usergroup"
                                        theme="bootstrap" class="last-child" ng-change="getUserLevel()" ng-hide="!(usergroups.length && tagDetails.project_id)">
                                 <ui-select-match placeholder="Select a group...">{{$select.selected.group_name}}</ui-select-match>

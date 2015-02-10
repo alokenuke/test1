@@ -86,6 +86,16 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
             controller: 'UserIndex'
         })
         
+        .when('/reports', {
+            templateUrl: path+'reports/index.html',
+            controller: 'Reports'
+        })
+        
+        .when('/print-label', {
+            templateUrl: path+'reports/printlabel.html',
+            controller: 'PrintLabel'
+        })
+        
         .when('/users/create', {
             templateUrl: path+'users/create.html',
             controller: 'UserCreate'

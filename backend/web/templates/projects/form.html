@@ -1,3 +1,8 @@
+<style>
+    .control-label{
+        font-size: 1.6rem !important;
+    }
+</style>
 <div class="col-xs-12 secondary-bg">
     <div class="col-xs-12 shadow-box">
         <form id="form" class="form-wrapper form-horizontal form-horizontal-typ1 pr-md-large" role="form" ng-submit="saveProject()">
@@ -12,8 +17,28 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="col-sm-4 col-md-5 control-label" ng-class="{ 'has-error': serverError.client_project_manager}">Client :</label>
+                    <div class="form-group" ng-class="{ 'has-error': serverError.client_project_manager}">
+                        <label class="col-sm-4 col-md-5 control-label">Client Name :</label>
+                        <div class="col-sm-8 col-md-7">
+                            <input type="text" class="form-control" ng-model="project.client_name" />
+                            <div class="help-block help-block-error">{{serverError.client_name}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div><!--/row-->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group" ng-class="{ 'has-error': serverError.project_location}">
+                        <label class="col-sm-4 col-md-5 control-label">Area :</label>
+                        <div class="col-sm-8 col-md-7">
+                            <input type="text" class="form-control" ng-model="project.project_location" ng-required="true" />
+                            <div class="help-block help-block-error">{{serverError.project_location}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group" ng-class="{ 'has-error': serverError.project_director}">
+                        <label class="col-sm-4 col-md-5 control-label" >Client-Project Manager :</label>
                         <div class="col-sm-8 col-md-7">
                             <input type="text" class="form-control" ng-model="project.client_project_manager" />
                             <div class="help-block help-block-error">{{serverError.client_project_manager}}</div>
@@ -23,41 +48,19 @@
             </div><!--/row-->
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="col-sm-4 col-md-5 control-label" ng-class="{ 'has-error': serverError.project_location}">Project Location :</label>
+                    <div class="form-group" ng-class="{ 'has-error': serverError.project_manager}">
+                        <label class="col-sm-4 col-md-5 control-label">Project Management- Project Manager :</label>
                         <div class="col-sm-8 col-md-7">
-                            <input type="text" class="form-control" ng-model="project.project_location" ng-required="true" />
-                            <div class="help-block help-block-error">{{serverError.project_location}}</div>
+                            <input type="text" class="form-control" ng-model="project.project_manager" />
+                            <div class="help-block help-block-error">{{serverError.project_manager}}</div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="col-sm-4 col-md-5 control-label" ng-class="{ 'has-error': serverError.project_director}">Project Director :</label>
+                    <div class="form-group" ng-class="{ 'has-error': serverError.project_location}">
+                        <label class="col-sm-4 col-md-5 control-label" >Consultant :</label>
                         <div class="col-sm-8 col-md-7">
-                            <input type="text" class="form-control" ng-model="project.project_director" />
-                            <div class="help-block help-block-error">{{serverError.project_director}}</div>
-                        </div>
-                    </div>
-                </div>
-            </div><!--/row-->
-            <div class="row">
-
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="col-sm-4 col-md-5 control-label" ng-class="{ 'has-error': serverError.about}">About Project :</label>
-                        <div class="col-sm-8 col-md-7">
-                            <textarea ng-model="project.about" class="form-control" rows="2" ng-required="true"></textarea>
-                            <div class="help-block help-block-error">{{serverError.about}}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="col-sm-4 col-md-5 control-label" ng-class="{ 'has-error': serverError.consultant}">Consultant :</label>
-                        <div class="col-sm-8 col-md-7">
-                            <input type="text" class="form-control" ng-model="project.consultant" />
+                            <input type="text" class="form-control" ng-model="project.consultant" ng-required="true" />
                             <div class="help-block help-block-error">{{serverError.consultant}}</div>
                         </div>
                     </div>
@@ -65,15 +68,44 @@
             </div><!--/row-->
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="col-sm-4 col-md-5 control-label"></label>
+                    <div class="form-group" ng-class="{ 'has-error': serverError.project_director}">
+                        <label class="col-sm-4 col-md-5 control-label" >Project Director :</label>
                         <div class="col-sm-8 col-md-7">
+                            <input type="text" class="form-control" ng-model="project.project_director" />
+                            <div class="help-block help-block-error">{{serverError.project_director}}</div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="col-sm-4 col-md-5 control-label" ng-class="{ 'has-error': serverError.main_contractor}">Main Contractor :</label>
+                    <div class="form-group" ng-class="{ 'has-error': serverError.project_director}">
+                        <label class="col-sm-4 col-md-5 control-label" >Consultant-Project Manager :</label>
+                        <div class="col-sm-8 col-md-7">
+                            <input type="text" class="form-control" ng-model="project.consultant_project_manager" />
+                            <div class="help-block help-block-error">{{serverError.consultant_project_manager}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div><!--/row-->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group" ng-class="{ 'has-error': serverError.about}">
+                        <label class="col-sm-4 col-md-5 control-label" >About Project :</label>
+                        <div class="col-sm-8 col-md-7">
+                            <textarea ng-model="project.about" class="form-control" rows="3" ng-required="true"></textarea>
+                            <div class="help-block help-block-error">{{serverError.about}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group" ng-class="{ 'has-error': serverError.project_director}">
+                        <label class="col-sm-4 col-md-5 control-label" >Contractor-Project Manager :</label>
+                        <div class="col-sm-8 col-md-7">
+                            <input type="text" class="form-control" ng-model="project.contractor_project_manager" />
+                            <div class="help-block help-block-error">{{serverError.contractor_project_manager}}</div>
+                        </div>
+                    </div>
+                    <div class="form-group"  ng-class="{ 'has-error': serverError.project_director}">
+                        <label class="col-sm-4 col-md-5 control-label">Main Contractor :</label>
                         <div class="col-sm-8 col-md-7">
                             <input type="text" class="form-control" ng-model="project.main_contractor" />
                             <div class="help-block help-block-error">{{serverError.main_contractor}}</div>
@@ -81,27 +113,6 @@
                     </div>
                 </div>
             </div><!--/row-->
-
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="col-sm-4 col-md-5 control-label"></label>
-                        <div class="col-sm-8 col-md-7">
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group" ng-class="{ 'has-error': serverError.project_manager}">
-                        <label class="col-sm-4 col-md-5 control-label">Project Management :</label>
-                        <div class="col-sm-8 col-md-7">
-                            <input type="text" class="form-control" ng-model="project.project_manager" />
-                            <div class="help-block help-block-error">{{serverError.project_manager}}</div>
-                        </div>
-                    </div>
-                </div>
-
-            </div><!--/row-->
-
             <div class="row mt-40">
                 <div class="col-md-4 col-sm-6">
                     <div class="row">
@@ -117,7 +128,7 @@
                                             <span>Upload</span>
                                             <input type="file" class="upload" onchange="angular.element(this).scope().onFileSelect(this.files, 'project_logo')" ng-model="project.project_logo">
                                         </div>
-                                        <small>Max: 1 MB</small>
+                                        <small>Max: 1 MB <br/>Allow: jpg,png,gif</small>
                                     </div>
                                     <div class="col-sm-6" ng-class="{ 'has-error': serverError.project_logo}">
                                         <div class="preview-box ">
@@ -152,7 +163,7 @@
                                             <span>Upload</span>
                                             <input type="file" class="upload" onchange="angular.element(this).scope().onFileSelect(this.files, 'project_image')" ng-model="project.project_image">
                                         </div>
-                                        <small>Max: 1 MB</small>
+                                        <small>Max: 1 MB <br/>Allow: jpg,png,gif</small>
                                     </div>
                                     <div class="col-sm-6" ng-class="{ 'has-error': serverError.project_image}">
                                         <div class="preview-box ">
@@ -178,7 +189,7 @@
                     <div class="row mt-xs-medium">
                         <div class="col-lg-offset-1 col-lg-10">
                             <div class="form-group">
-                                <label class="col-xs-12 control-label text-center mb-20">Project Address 
+                                <label class="col-xs-12 control-label text-center mb-20">Project Address/Location 
                                 </label>
                             </div>
                             <div class="form-group" ng-class="{ 'has-error': serverError.project_address}">
@@ -201,6 +212,15 @@
                                     <div class="help-block help-block-error">{{serverError.project_country}}</div>
                                 </div>
                             </div>
+                            
+                            <div class="form-group">
+                                <div class="col-xs-12" ng-class="{ 'has-error': serverError.client_country}">
+                                    <select class="form-control" ng-model="project.timezone_id" ng-options="timezone.id as timezone.name for timezone in timezones " ng-required="true">
+                                        <option value="">Select Timezone</option>
+                                    </select>
+                                    <div class="help-block help-block-error">{{serverError.client_country}}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -213,13 +233,13 @@
                             </div>
                             <div class="form-group" ng-class="{ 'has-error': serverError.client_address}">
                                 <div class="col-xs-12">
-                                    <textarea class="form-control" rows="2" ng-model="client_address"></textarea>
+                                    <textarea class="form-control" rows="2" ng-model="project.client_address"></textarea>
                                     <div class="help-block help-block-error">{{serverError.client_address}}</div>
                                 </div>
                             </div>
                             <div class="form-group" ng-class="{ 'has-error': serverError.client_city}">
                                 <div class="col-xs-12">
-                                    <input type="text" class="form-control" placeholder="City" ng-model="client_city">
+                                    <input type="text" class="form-control" placeholder="City" ng-model="project.client_city">
                                     <div class="help-block help-block-error">{{serverError.client_city}}</div>
                                 </div>
                             </div>
@@ -231,6 +251,7 @@
                                     <div class="help-block help-block-error">{{serverError.client_country}}</div>
                                 </div>
                             </div>
+                            
                         </div>
                     </div>
                 </div>
