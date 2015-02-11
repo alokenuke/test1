@@ -1,8 +1,7 @@
-app.controller('PrintLabel', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'page_dropdown', '$rootScope',
-                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, page_dropdown, $rootScope) {
+app.controller('PrintLabel', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', '$rootScope',
+                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, $rootScope) {
         
         rest.path = "tags";
-        $scope.page_dropdown = page_dropdown;
         
         breadcrumbsService.clearAll();
         breadcrumbsService.setTitle("Print NFC UIDs/QR Codes");
@@ -21,32 +20,21 @@ app.controller('PrintLabel', ['$scope', 'rest', '$location', '$route','$routePar
         $scope.format = $scope.formats[0];
         
         $scope.search = {};
-        $scope.sort = [];
-        $scope.sortBy = "";
         $scope.projectlevels = [];
         $scope.projects = null;
         $scope.usergroups = [];
         $scope.items = [];
         $scope.processes = [];
-        $scope.showSearchBox = true;
+        $scope.print = {};
+        $scope.print.labels = {};
         $scope.basePrintType = {
             'bar_code': 'YmFyY29kZQ==',
             'qr_code': 'cXJjb2Rl',
             'nfc_code': 'bmZjY29kZQ=='
         };
         
-        if(typeof $rootScope.globalSearch != 'undefined' && $rootScope.globalSearch.length > 2) {
-            $scope.search.globalSearch = $rootScope.globalSearch;
-            $scope.showSearchBox = false;
-        }
-        
-        if($location.$$search.sort!=undefined) {
-            $scope.predicate = $location.$$search.sort;
-            $scope.reverse = ($scope.predicate.search("-")==-1?false:true);
-        }
-        
         $scope.setSearch = function() {
-            updateTagList();
+            viewLabels();
         }
         
         $scope.clearSearch = function() {
@@ -64,39 +52,6 @@ app.controller('PrintLabel', ['$scope', 'rest', '$location', '$route','$routePar
             updateTagList();
         }
         
-        $scope.order = function(elm) {
-            $scope.sortBy = elm;
-            if($scope.sort[elm] && $scope.sort[elm].search("-up")!=-1) {
-                $scope.sort[elm] = "-down";
-                $scope.sortBy = "-"+elm;
-            }
-            else {
-                $scope.sort = [];
-                $scope.sort[elm] = "-up";    
-            }
-            updateTagList();
-        };
-        
-        $scope.deleteTag = function (id) {
-            rest.deleteById({id: id}).success(function () {
-                $location.path('/tags');
-                $route.reload();
-            }).error(errorCallback);
-        }
-        
-        $scope.pageChanged = function() {
-            updateTagList();
-        }
-        
-        $scope.setPageLimit = function(){
-            updateTagList();
-        }
-        
-        $scope.removeUser =  function(model, $index) {
-            rest.deleteById(model);
-            $scope.data.splice($index, 1);
-        }
-                
         $scope.updateSelectBox = function(variable, projectId, level, parent) {
             $scope.search.project_id = projectId;
             
@@ -146,6 +101,80 @@ app.controller('PrintLabel', ['$scope', 'rest', '$location', '$route','$routePar
             }
         }
         
+        $scope.printLabel = function() {
+            if(parseInt($scope.print.label_template.id)>0) {
+                if(  Object.keys($scope.print.labels).length>0) {
+                    var tabWindowId = window.open('about:blank', '_blank');
+                    
+                    $http.post("/reportsdownload/printlabel", {'print': $scope.print, 'filter': $scope.checked, 'print_type': $scope.print_type}).success(function(response) {
+                        tabWindowId.location.href = response;
+                    }).error(errorCallback);
+                }
+                else {
+                    alert("Please select a label to print.");
+                }
+            }
+            else
+            {
+                alert("Please select a label template.");
+            }
+        }
+        
+        $scope.checkLabel = function(label) {
+            if(label.isSelected) {
+                $scope.print.labels[label['id']] = {};
+                $scope.print.labels[label['id']]['uid'] = label['uid'];
+                if($scope.checked.company_name) $scope.print.labels[label['id']]['company_name'] = $scope.company.company_name;
+                if($scope.checked.client_name) $scope.print.labels[label['id']]['client_name'] = $scope.search.project.client_name;
+                if($scope.checked.client_location) $scope.print.labels[label['id']]['client_location'] = $scope.search.project.client_address+" "+$scope.search.project.client_city;
+                if($scope.checked.main_contractor) $scope.print.labels[label['id']]['main_contractor'] = $scope.search.project.main_contractor;
+                if($scope.checked.project_name) $scope.print.labels[label['id']]['project_name'] = $scope.search.project.project_name;
+                if($scope.checked.project_location) $scope.print.labels[label['id']]['area'] = $scope.search.project.project_location;
+                if($scope.checked.project_level) {
+                    $scope.print.labels[label['id']]['project_level'] = "";
+                    var index = 0;
+                    angular.forEach(label.project_level, function(val) {
+                        if(index!=0)
+                            $scope.print.labels[label['id']]['project_level'] += " > ";
+                        $scope.print.labels[label['id']]['project_level'] += val;
+                        index++;
+                    });
+                }
+                if($scope.checked.tag_item) {
+                    $scope.print.labels[label['id']]['item'] = "";
+                    angular.forEach(label.itemObj, function(val, key) {
+                        if(key!=0)
+                            $scope.print.labels[label['id']]['item'] += " > ";
+                        $scope.print.labels[label['id']]['item'] += val['item_name'];
+                    });
+                }
+                if($scope.checked.process) {
+                    $scope.print.labels[label['id']]['process'] = "";
+                    angular.forEach(label.processObj, function(val, key) {
+                        if(key!=0)
+                            $scope.print.labels[label['id']]['process'] += " > ";
+                        $scope.print.labels[label['id']]['process'] += val['process_name'];
+                    });
+                }
+                $scope.print.labels[label['id']]['uid'] = label.uid;
+                if($scope.checked.tag_description) $scope.print.labels[label['id']]['task_summary'] = label.tag_description;
+            }
+            else {
+                $scope.print.labels[label['id']] = undefined;
+            }
+        }
+        
+        $scope.checkAll = function(checkAll) {
+            angular.forEach($scope.labels, function(val) {
+                val['isSelected'] = checkAll;
+                if(checkAll) {
+                    $scope.checkLabel(val);
+                }
+            });
+            if(!checkAll) 
+                $scope.print.labels = {};
+        }
+                
         $scope.viewLabels = function() {
             if(typeof $scope.search.project_id == 'undefined' || $scope.search.project_id <= 0) {
                 alertService.clearAll();
@@ -154,9 +183,13 @@ app.controller('PrintLabel', ['$scope', 'rest', '$location', '$route','$routePar
             }
             var params = {'search': $scope.search, 'filter': $scope.filter, 'print_type': $scope.print_type};
             rest.customModelData("reports/labels", params).success(function (data) {
-                $scope.labels = data.items;
+                $scope.labels = data.items;                
             }).error(errorCallback);
             
+            rest.customModelData("labeltemplates/getall", {}).success(function (data) {
+                $scope.templates = data.items;
+                $scope.print.label_template = $scope.templates[0];
+            }).error(errorCallback);
         }
         
         var errorCallback = function (data) {

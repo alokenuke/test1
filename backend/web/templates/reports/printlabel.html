@@ -300,30 +300,26 @@
                     <form class="search-box " role="form" ng-submit="printLabel()">
                         <div class="form-inline">
                             <div class="mt-10 mb-10 row">
-                                <div class="col-sm-3  print-elm-left-xs mt-5">&nbsp;&nbsp;<i class="fa fa-list-alt fa-lg mr-10 mt-5"></i> <strong>List Of Tasks</strong></div>
-
+                                <div class="col-sm-3  print-elm-left-xs mt-5">
+                                    &nbsp;&nbsp;<i class="fa fa-list-alt fa-lg mr-10 mt-5"></i>
+                                    <strong>List Of Tasks</strong>
+                                </div>
                                 <div class="col-sm-9 print-elm-right-xs text-right">
                                     <div class="form-group">
                                         <label>
-                                            <input type="checkbox" checkbox-all="labels" /> All 
+                                            <input type="checkbox" ng-change="checkAll(selectAll)" ng-model="selectAll" /> All 
                                         </label>
                                     </div>
                                     <div class="form-group">
-                                        <select class="form-control form-control-small">
-                                            <option value="">--Select Label Template--</option>
-                                            <option value="52">8706 70x37 3x8</option>
-                                            <option value="47">A4 2X6</option>
-                                            <option value="46">A4 8 x 2</option>
-                                            <option value="51">A4 8 x 2</option>
-                                            <option value="50">Label Printer</option>
-                                            <option value="53">QR code only A4 middle</option>
+                                        <select class="form-control" ng-model="print.label_template" 
+                                             ng-options="template.template_name for template in templates">
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <button class="btn btn-primary btn-xs"><i class="fa fa-print"></i> Print Label</button>
+                                        <button class="btn btn-primary btn-xs" type="submit"><i class="fa fa-print"></i> Print Label</button>
                                     </div>
                                     <div class="form-group">
-                                        <button ng-click="collapsed=!collapsed;" class="pull-right btn icon-btn btn-xs">
+                                        <button ng-click="collapsed=!collapsed;" class="pull-right btn icon-btn btn-xs" type="button">
                                             <i ng-class="{'fa fa-sort-desc fa-2x': !collapsed,'fa fa-sort-asc fa-2x': collapsed}" class="fa fa-sort-desc fa-2x"></i>
                                         </button>                      
                                     </div>
@@ -334,7 +330,7 @@
                             <div class="row">
                                 <div class="clearfix pl-20" ng-repeat="label in labels" style="border-bottom: 1px solid #ccc;">
                                     <div class="col-sm-4" ng-if="label.uid">
-                                        <input type="checkbox" ng-model="label.isSelected">
+                                        <input type="checkbox" ng-model="label.isSelected" ng-change="checkLabel(label)">
                                         <strong>UID:</strong>{{label.uid}}
                                         <br><br>
                                         <img style='width: 15em' ng-src="/filemanager/getimage?type={{basePrintType[print_type]}}&file={{(print_type=='nfc_code'?'nfc':label.uid)}}.png"><br>
@@ -346,9 +342,6 @@
                                         <div>&nbsp;</div>
                                         <div ng-if="checked.company_name">
                                             <strong>Company Name: </strong>{{company.company_name}}
-                                        </div>
-                                        <div ng-if="checked.project_name">
-                                            <strong>Project Name: </strong>{{search.project.project_name}}
                                         </div>
                                         <div ng-if="checked.client_name">
                                             <strong>Client Name: </strong>{{search.project.client_name}}
@@ -379,9 +372,6 @@
                                             <strong>Process: </strong><span ng-repeat="process in label.processObj">
                                                 {{process.process_name}} <strong ng-if="label.processObj.length !== ($index + 1)">&nbsp;>&nbsp;</strong>
                                             </span>
-                                        </div>
-                                        <div ng-if="checked.uid">
-                                            <strong>UID: </strong>{{label.uid}}
                                         </div>
                                         <div ng-if="checked.tag_description">
                                             <strong>Task Summary: </strong>{{label.tag_description}}

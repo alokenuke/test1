@@ -16,6 +16,7 @@ app.controller('ProjectIndex', ['$scope', 'rest', '$location', '$route', '$route
         $scope.projects = [];
         $scope.countries = [];
         $scope.sort = {};
+        $scope.showSearchBox = 1;
 
         $scope.deleteProject = function (id) {
             rest.deleteById({id: id}).success(function () {
@@ -73,8 +74,10 @@ app.controller('ProjectForm', ['$scope', 'rest', '$location', '$route', '$routeP
         if ($routeParams.id) {
             rest.model({'id': $routeParams.id}).success(function (data) {
                 $scope.project = data;
-                if ($scope.project.photo)
-                    $scope.project.photo = '/userUploads/' + $scope.project.company_id + '/projectImages/' + $scope.project.photo;
+                if ($scope.project.project_logo)
+                    $scope.project.project_logo = 'filemanager/getimage?type=cHJvamVjdF9pbWFnZQ==&file='+$scope.project.project_logo;
+                if ($scope.project.project_image)
+                    $scope.project.project_image = 'filemanager/getimage?type=cHJvamVjdF9pbWFnZQ==&file=' + $scope.project.project_image;
             });
         }
 
@@ -131,6 +134,10 @@ app.controller('ProjectForm', ['$scope', 'rest', '$location', '$route', '$routeP
         }
         rest.setData("countries/getall", ['country_code', 'country_name'], {'project_status': null}).success(function (data) {
             $scope.countries = data.items;
+        });
+        
+        rest.setData("timezones/getall", ['id', 'name'], {'status': 1}).success(function (data) {
+            $scope.timezones = data.items;
         });
     }])
 

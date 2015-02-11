@@ -434,7 +434,7 @@ app.controller('UserCreate',
             }
             else
                 $scope.temp[""+v.id] = undefined;
-        }); 
+        });
     }
      
     $scope.ok = function () {
@@ -572,7 +572,7 @@ app.controller('UserUpdate',
         rest.model({'id': $rootScope.id}).success(function(data) {
             $scope.user = data;
             if($scope.user.photo)
-                $scope.user.photo = '/userUploads/'+$scope.user.company_id+'/userImages/'+$scope.user.photo;
+                $scope.user.photo = 'filemanager/getimage?type=dXNlcl9pbWFnZQ==&file='+$scope.user.photo;
         });
         
         $scope.onFileSelect = function($files) {

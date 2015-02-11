@@ -36,7 +36,7 @@
                               </ui-select-choices>
                             </ui-select>
                             <span ng-if="!(projectlevels.length && tagDetails.project_id)">
-                                <a ng-href="/#/projects/levels/{{tagDetails.project_id}}" ng-if="!((projectlevels.length && tagDetails.project_id) || !tagDetails.project_id)">Click to manage project levels.</a>
+                                <a ng-href="/#/project-levels" ng-if="!((projectlevels.length && tagDetails.project_id) || !tagDetails.project_id)">Click to manage project levels.</a>
                                 <span ng-if="!tagDetails.project_id">Select a project first</span>
                             </span>
                             <input ng-model="tagDetails.project_level_id" name="project_level_id" type="hidden" ng-required="true" />

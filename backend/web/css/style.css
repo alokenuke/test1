@@ -919,6 +919,10 @@ margin-top: -5px
     transform: translateY(-50%);
 }
 
+.clickable {
+    cursor: pointer;
+}
+
 /*------------/footer----------*/
 @media (min-width: 1200px) {
     .projectbox:nth-child(3n+1) {

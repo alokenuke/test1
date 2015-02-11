@@ -132,7 +132,7 @@
                                 <tr>
                                     <th class="text-center"></th>
                                     <th class="text-center">
-                                        <a ng-href="" ng-click="sortUser(item, 'id')">User ID <i class="fa fa-sort{{item.sort.id}}"></i></a>
+                                        <a ng-href="" ng-click="sortUser(item, 'username')">Username <i class="fa fa-sort{{item.sort.username}}"></i></a>
                                     </th>
                                     <th class="text-center">
                                         <a ng-href="" ng-click="sortUser(item, 'first_name, last_name')">Name <i class="fa fa-sort{{item.sort.name}}"></i></a>
@@ -147,7 +147,7 @@
                             <tbody>
                                 <tr ng-repeat="user in item.users">
                                     <td class="text-center"><button class="btn icon-btn" ng-click="unassignLevelUser(user.id, item, $index)" ng-init="item.availableUserIds[$index]=user.id"><i class="fa fa-trash fa-lg"></i></button></td>
-                                    <td class="text-center">{{user.id}}</td>
+                                    <td class="text-center">{{user.username}}</td>
                                     <td class="text-center">{{user.first_name}} {{user.last_name}}</td>
                                     <td class="text-center">{{user.designation}}</td>
                                     <td class="text-center">
