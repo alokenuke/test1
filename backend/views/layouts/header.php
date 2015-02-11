@@ -22,12 +22,12 @@
                  </li>
                  <li ng-non-bindable>
                      <a class="btn btn-primary btn-small" href="<?php echo \yii::$app->getUrlManager()->createUrl("/site/logout")?>" data-method="post">
-                         Logout 
+                         Logout
                          <i class="fa fa-sign-out"></i>
                      </a>
                 </li>
             </ul>
-            <div class="last-login">Last login : <span class="date-time text-muted">14 Oct 2014 13:10:11</span></div>
+            <div class="last-login">Last login : <span class="date-time text-muted"><?php echo date("d M Y H:i:s", \yii::$app->user->identity->lastTokens->created_on); ?></span></div>
         </div>
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">

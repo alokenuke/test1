@@ -97,10 +97,15 @@ class LabelTemplates extends \yii\db\ActiveRecord
     }
     
     public function fields() {
+        
+        $post = \Yii::$app->request->post();
+        
+        if(isset($post['LabelTemplates']['select']))
+           return $post['LabelTemplates']['select'];
+        
         return [
             'id',
             'template_name',
-            'company_id',
             'print_type',
             'logo',
             'company_id',

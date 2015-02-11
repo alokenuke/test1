@@ -96,19 +96,19 @@ class Projects extends \yii\db\ActiveRecord
     }
     
     public function afterSave($insert, $changedAttributes) {
-        
+                
         if(isset($changedAttributes['project_logo']) || isset($changedAttributes['project_image'])) {
             $fileManager = new FileManager();
             $projectPath = $fileManager->getPath("project_image")."/";
         }
         if(isset($changedAttributes['project_logo'])) {
-            if(file_exists($projectPath.$this->project_logo))
-                unlink($projectPath.$this->project_logo);
+            if(file_exists($projectPath.$changedAttributes['project_logo']))
+                unlink($projectPath.$changedAttributes['project_logo']);
         }
         
         if(isset($changedAttributes['project_image'])) {
-            if(file_exists($projectPath.$this->project_image))
-                unlink($projectPath.$this->project_image);
+            if(file_exists($projectPath.$changedAttributes['project_image']))
+                unlink($projectPath.$changedAttributes['project_image']);
         }
         
         parent::afterSave($insert, $changedAttributes);

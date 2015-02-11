@@ -112,10 +112,14 @@ class User extends ActiveRecord implements IdentityInterface
     }
     
     public function afterSave($insert, $changedAttributes) {
-        if(!$insert && isset($changedAttributes['photo']) && $changedAttributes['photo'] != $this->photo) {
+        
+        if(isset($changedAttributes['photo'])) {
             $fileManager = new FileManager();
-            $fileManager->replaceFile($changedAttributes->photo, $this->photo, "temp/".\yii::$app->user->identity->company_id."/userImages", $type);
+            $path = $fileManager->getPath("user_image")."/";
+            if(file_exists($path.$changedAttributes['photo']))
+                unlink($path.$changedAttributes['photo']);
         }
+        
         parent::afterSave($insert, $changedAttributes);
     }
     
