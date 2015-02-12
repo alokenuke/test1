@@ -40,7 +40,7 @@ class UsergroupsController extends ApiController
                         if(in_array($key, $this->partialMatchFields))
                             $query->andWhere(['like', $key, $val]);
                         else
-                            $query->where([$key => $val]);
+                            $query->andWhere([$key => $val]);
                     }
             }
             

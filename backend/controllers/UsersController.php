@@ -7,6 +7,8 @@ use yii\rest\ActiveController;
 use yii\data\ActiveDataProvider;
 use yii\base\Model;
 use yii\bootstrap\ActiveForm;
+use \backend\models\User;
+
 /**
  * Class TagsController
  * @package rest\versions\v1\controllers
@@ -83,7 +85,7 @@ class UsersController extends ApiController
             
             try {
                 $provider = new ActiveDataProvider ([
-                    'query' => $query,
+                    'query' => $query->andWhere(['user.company_id' => \yii::$app->user->identity->company_id])->andWhere(['<>', 'user.status', User::STATUS_DELETED]),
                     'pagination'=>array(
                         'pageSize'=>$pageLimit
                     ),
@@ -106,7 +108,7 @@ class UsersController extends ApiController
         $return = array();
         $return['projects']['count'] = \backend\models\Projects::find()->count();
         $return['tags']['count'] = \backend\models\Tags::find()->count();
-        $return['users']['count'] = \backend\models\User::find()->andWhere(['user.status' => 1])->count();
+        $return['users']['count'] = User::find()->andWhere(['user.status' => 1])->count();
         $return['items']['count'] = \backend\models\Items::find()->count();
         
         $fileManager = new \backend\models\FileManager();
@@ -181,7 +183,7 @@ class UsersController extends ApiController
             $model = new $this->modelClass;
             
             $query = $model->find()
-                    ->leftJoin('rel_user_levels_users rel_ul', 'rel_ul.user_id=user.id')->andWhere(["rel_ul.user_level_id" => $id]);
+                    ->leftJoin('rel_user_levels_users rel_ul', 'rel_ul.user_id=user.id')->andWhere(["rel_ul.user_level_id" => $id])->andWhere(['user.company_id' => \yii::$app->user->identity->company_id])->andWhere(['<>', 'user.status', User::STATUS_DELETED]);
             
             if(isset($post['search'])) {
                 foreach($post['search'] as $key => $val)
@@ -232,16 +234,12 @@ class UsersController extends ApiController
         $post = Yii::$app->request->post("User");
 		
 	$models = $this->loadMultiple($post);
-        $company_id = \yii::$app->user->identity->company_id;
         
         $validate = $this->validateMultiple($models);
                 
         if (!count($validate)) {
             $hasError = false;
             foreach ($models as $key => $item) {
-                $temp_file = $item->photo;
-                $item->photo = array_pop(explode('/',$item->photo));
-                move_uploaded_file($temp_file, "userUploads/".$company_id."/userImages/".$item->photo);
                // populate and save records for each model
                 if ($item->save()) {
                     // do something here after saving
@@ -288,9 +286,11 @@ class UsersController extends ApiController
      */
     public function loadMultiple($data)
     {
+        $company_id = \yii::$app->user->identity->company_id;
         $models = [];
         foreach ($data as $i => $d) {
             $models[$i] = new $this->modelClass;
+            $models[$i]->setAttribute('company_id', $company_id);
             if(isset($d['id']) && $d['id']>0) {
                 $existingUser = $models[$i]->find(['id' => $d['id'], 'status' => self::STATUS_ACTIVE])->one();
                 if($existingUser)

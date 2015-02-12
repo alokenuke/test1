@@ -30,6 +30,7 @@ class AppAsset extends AssetBundle
         'js/app.js',
         'js/module.js',
         'js/tags.js',
+        'js/timeattendance.js',
         'js/user.js',
         'js/projects.js',
         'js/reports.js',

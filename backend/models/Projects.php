@@ -66,7 +66,7 @@ class Projects extends \yii\db\ActiveRecord
     
     public static function find()
     {
-        $query = parent::find()->where(['company_id' => \yii::$app->user->identity->company_id, 'project_status' => 1]);
+        $query = parent::find()->andWhere(['company_id' => \yii::$app->user->identity->company_id])->andWhere(['project_status' => 1]);
         
         return $query;
     }
@@ -80,14 +80,16 @@ class Projects extends \yii\db\ActiveRecord
                 $temp_file = $this->project_logo;
                 $this->project_logo = array_pop(explode('/',$this->project_logo));
                 try {
-                    rename($temp_file, $fileManager->getPath("project_image")."/".$this->project_logo);
+                    if(file_exists($temp_file))
+                        rename($temp_file, $fileManager->getPath("project_image")."/".$this->project_logo);
                 }catch(Exception $e) {}
             }
             if(isset($this->project_image) && strpos($this->project_image,'temp') !== false) {
                 $temp_file = $this->project_image;
                 $this->project_image = array_pop(explode('/',$this->project_image));
                 try {
-                    rename($temp_file, $fileManager->getPath("project_image")."/".$this->project_image);
+                    if(file_exists($temp_file))
+                        rename($temp_file, $fileManager->getPath("project_image")."/".$this->project_image);
                 }catch(Exception $e) {}
             }
         }

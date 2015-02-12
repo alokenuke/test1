@@ -8,12 +8,12 @@ use yii\data\ActiveDataProvider;
  * Class TagsController
  * @package rest\versions\v1\controllers
  */
-class TagsController extends ApiController
+class TimeattendanceController extends ApiController
 {
     public $partialMatchFields;
         
     public function init() {
-        $this->modelClass = 'backend\models\Tags';
+        $this->modelClass = 'backend\models\Timeattendance';
         
         $this->partialMatchFields = ['tag_name', 'tag_description', 'uid', 'product_code'];
         

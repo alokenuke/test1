@@ -65,17 +65,15 @@ class User extends ActiveRecord implements IdentityInterface
         $company = null;
         if(!\yii::$app->user->isGuest)
             $company = \yii::$app->user->identity->company_id;
+                
         return [
-            [['first_name', 'last_name', 'email', 'username', 'role'], 'required'],
+            [['first_name', 'last_name', 'company_id', 'email', 'username', 'role'], 'required'],
             ['email', 'email','message'=>'Invalid email'],
             [['allow_be'], 'integer'],
             [['username','email'], 'unique','message'=>'Already exist'],
-            ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_NOTACTIVE, self::STATUS_DELETED]],
             ['photo','string'],
-            ['company_id', 'default', 'value' => $company, 'on' => 'insert'],
-            ['created_date', 'default', 'value' => date("Y-m-d H:i:s")],
-            ['role', 'default', 'value' => self::ROLE_USER],
+            ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['created_date', 'default', 'value' => date("Y-m-d H:i:s")],
             ['role', 'in', 'range' => self::getRoleIds()],
             [['rec_notification', 'password_reset_token', 'last_login', 'photo', 'contact_number', 'designation'], 'safe']
@@ -95,7 +93,8 @@ class User extends ActiveRecord implements IdentityInterface
                 $temp_file = $this->photo;
                 $this->photo = array_pop(explode('/',$this->photo));
                 try {
-                    rename($temp_file, $fileManager->getPath("user_image")."/".$this->photo);
+                    if(file_exists($temp_file))
+                        rename($temp_file, $fileManager->getPath("user_image")."/".$this->photo);
                 }catch(Exception $e) {}
             }
         }
@@ -178,15 +177,15 @@ class User extends ActiveRecord implements IdentityInterface
     }
     
     // default scope to check company_id
-    public static function find()
-    {
-        if(isset(\yii::$app->user->identity))
-        {
-            return parent::find()->where(['user.company_id' => \yii::$app->user->identity->company_id])->andWhere(['<>', 'user.status', self::STATUS_DELETED]);
-        }
-        else
-            return parent::find();
-    }
+//    public static function find()
+//    {
+//        if(isset(\yii::$app->user->identity))
+//        {
+//            return parent::find()->where(['user.company_id' => \yii::$app->user->identity->company_id])->andWhere(['<>', 'user.status', self::STATUS_DELETED]);
+//        }
+//        else
+//            return parent::find();
+//    }
 
     /**
      * Finds user by username

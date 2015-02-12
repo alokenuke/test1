@@ -38,7 +38,7 @@ class ProjectsController extends ApiController
                         if(in_array($key, $this->partialMatchFields))
                             $query->andWhere(['like', $key, $val]);
                         else
-                            $query->where([$key => $val]);
+                            $query->andWhere([$key => $val]);
                     }
             }
                        
@@ -68,6 +68,7 @@ class ProjectsController extends ApiController
             } catch (Exception $ex) {
                 throw new \yii\web\HttpException(500, 'Internal server error');
             }
+            
             return $provider;
         } else {
             throw new \yii\web\HttpException(404, 'Invalid Request');
