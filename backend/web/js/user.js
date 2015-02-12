@@ -67,7 +67,7 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
     $scope.newSubItem = function(scope, type) {
         if(type=='top')
         {
-            scope.unshift({
+            scope.push({
               id: null,
               group_name: "User Group " + (scope.length + 1),
               levels: [],
@@ -75,7 +75,7 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
             });
         }
         else {
-            scope.levels.unshift({
+            scope.levels.push({
                 id: null,
                 level_name: 'level ' + (scope.levels.length + 1),
                 user_group_id: scope.id,
@@ -234,9 +234,11 @@ app.controller('UserIndex', ['$scope', 'rest', '$location', '$route','$routePara
         
         $scope.removeUser =  function(model, $index) {
             
-            rest.deleteById(model);
-            
-            $scope.users.splice($index, 1);
+            rest.deleteById(model).success(function() {
+                alertService.clearAll();
+                alertService.add("success", "User removed.");
+                $scope.users.splice($index, 1);
+            });
         }
         
         $scope.pageChanged = function() {

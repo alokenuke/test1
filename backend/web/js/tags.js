@@ -1566,7 +1566,7 @@ app.controller('TagItems', function($scope, rest, $location, $route, $routeParam
     $scope.newSubItem = function(scope, type) {
         if(type=='top')
         {
-            scope.unshift({
+            scope.push({
               id: null,
               item_name: "Item Group " + (scope.length + 1),
               items: [],
@@ -1579,7 +1579,7 @@ app.controller('TagItems', function($scope, rest, $location, $route, $routeParam
             if(typeof scope.items === 'undefined')
                 scope.items = [];
             
-            scope.items.unshift({
+            scope.items.push({
                 id: null,
                 item_name: 'Item ' + (scope.items.length + 1),
                 parent_id: scope.id,

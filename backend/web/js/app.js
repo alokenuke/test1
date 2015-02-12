@@ -141,6 +141,26 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
             controller: 'TagItems'
         })
         
+        .when('/timeattendance', {
+            templateUrl: path+'timeattendance/index.html',
+            controller: 'TimeAttendance'
+        })
+        
+        .when('/timeattendance/create', {
+            templateUrl: path+'timeattendance/create.html',
+            controller: 'TimeAttendanceCreate'
+        })
+        
+        .when('/timeattendance/update/:id', {
+            templateUrl: path+'timeattendance/update.html',
+            controller: 'TimeAttendanceUpdate'
+        })
+        
+        .when('/timeattendance/:id', {
+            templateUrl: path+'timeattendance/view.html',
+            controller: 'TimeAttendanceView'
+        })
+        
         .when('/tags', {
             templateUrl: path+'tags/index.html',
             controller: 'TagIndex'

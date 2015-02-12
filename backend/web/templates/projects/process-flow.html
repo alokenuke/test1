@@ -6,7 +6,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <button class='btn btn-primary' ng-click="newSubItem(list, 'top')">
-                            Add Tag Process Type
+                            Create Tag Process Type
                         </button>
                         <div class='row' style='padding:20px;'>
                             <div class="alert alert-info" ng-if="flagUpdatedPosition">
@@ -128,9 +128,9 @@
         <div ng-hide="view.editorEnabled"><a class="btn btn-success btn-xs" ng-click="$parent.toggle($parent)">
             <span class="fa" ng-class="{'fa-chevron-right': $parent.collapsed, 'fa-chevron-down': !$parent.collapsed}"></span></a>
             {{view.editableValue}}
-            (<u>{{process_stage_type[view.type]}}<u>)
+            (<u>{{process_stage_type[view.type]}}</u>)
             <a class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this status? This action cannot be undone."><span class="fa fa-trash"></span></a>
-            <a class="pull-right btn btn-primary btn-xs" nodrag ng-click="$parent.newSubItem($parent, '')" style="margin-right: 8px;">
+            <a ng-if="view.type!='3' && view.type!='5'" class="pull-right btn btn-primary btn-xs" nodrag ng-click="$parent.newSubItem($parent, '')" style="margin-right: 8px;">
                 <span class="fa fa-plus"></span>
             </a>
             <a class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
@@ -145,7 +145,7 @@
             <form class="form-inline" ng-submit="$parent.saveItem($parent, view.editableValue);" ng-attr-id="{{ 'frmEditable-' + $id }}">
                 <div class="form-group">
                     <input type="text" class="form-control" placeholder="Level Name" ng-required="true" ng-model="view.editableValue"/>
-                    <select class="form-control form-control-small" ng-model="view.type" ng-options="k as v for (k,v) in process_stage_type" ng-required="true">
+                    <select class="form-control form-control-small" ng-model="view.type" ng-options="k as v for (k,v) in process_stage_type" ng-required="true" ng-disabled="view.id!=null">
                         <option value=''>--Select option type--</option>
                     </select>
                 </div>

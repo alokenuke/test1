@@ -2,8 +2,8 @@
     <!--/shadow-box-->
     <div style="border: 1px solid #dddddd;">
         <h2 class="pl-10">Assigned Projects
-            <button class="pull-right btn icon-btn" ng-click="close()">
-                <i class="fa fa-close"></i>
+            <button class="pull-right btn btn-success" ng-click="close()">
+                Close
             </button>
         </h2>
         <div class="table-responsive table-responsive-cust mt-15">
@@ -27,7 +27,6 @@
                                 <th class="text-center">Contractor</th>
                                 <th class="text-center">Consultant</th>
                                 <th class="text-center">About</th>
-                                <th class="text-center">Project Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -40,9 +39,6 @@
                                 <td class="text-center">{{project.main_contractor}}</td>
                                 <td class="text-center">{{project.consultant}}</td>
                                 <td class="text-center">{{project.about}}</td>
-                                <td class="text-center">
-                                    <span class="label" ng-class="{'label-success': project.project_status, 'label-danger': !project.project_status}">{{project.project_status?"Active":"Not Active"}}</span>
-                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -53,99 +49,89 @@
     <div class="table-responsive table-responsive-cust mt-20">
         <div class="col-xs-12 search-box mb-sm-large mb-10">
             <div class="row">
-                <h2 class="col-xs-12">Search and assign Projects
-                    <button type="button" class="pull-right btn icon-btn" ng-click="showSearchBox=!showSearchBox;">
-                        <i ng-class="{'fa fa-sort-desc fa-2x': !showSearchBox,'fa fa-sort-asc fa-2x': showSearchBox}"></i>
+                <h2 class="search-title clickable pl-10" ng-click="showSearchBox=!showSearchBox;">
+                    Search and assign Projects
+                    <button type="button" class="pull-right btn icon-btn">
+                        <i ng-class="{'fa fa-sort-desc fa-2x': showSearchBox,'fa fa-sort-asc fa-2x': !showSearchBox}"></i>
                     </button>
                 </h2>
             </div><!--/row-->
-            <form ng-submit="getAllProjects()" role="form" class="form-horizontal form-horizontal-typ1 form-wrapper mt-15 slide" id="form" ng-hide="showSearchBox">
-                <div class="row">
-                    <div class="col-md-6 col-lg-5">
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">Project Name :</label>
-                            <div class="col-sm-6">
-                                <input type="text" class="form-control" ng-model="search.project_name" />
+            <form ng-submit="getAllProjects()" role="form" class="form-horizontal form-horizontal-typ1 form-wrapper mt-15" id="form">
+                <div class="slide" ng-hide="!showSearchBox">
+                    <div class="row">
+                        <div class="col-md-6 col-lg-5">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label text-right">Project Name :</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" ng-model="search.project_name" />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-6 col-lg-7">
-                        <div class="form-group">
-                            <label class="col-sm-4 col-lg-3 control-label text-right">Client :</label>
-                            <div class="col-sm-6 col-lg-5">
-                                <input class="form-control" ng-model="search.client_project_manager" type="text" />
+                        <div class="col-md-6 col-lg-7">
+                            <div class="form-group">
+                                <label class="col-sm-4 col-lg-3 control-label text-right">Client :</label>
+                                <div class="col-sm-6 col-lg-5">
+                                    <input class="form-control" ng-model="search.client_project_manager" type="text" />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div><!--/row-->
+                    </div><!--/row-->
 
-                <div class="row">
-                    <div class="col-md-6 col-lg-5">
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">Location :</label>
-                            <div class="col-sm-6">
-                                <input type="text" class="form-control" ng-model="search.project_location" />
+                    <div class="row">
+                        <div class="col-md-6 col-lg-5">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label text-right">Location :</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" ng-model="search.project_location" />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-6 col-lg-7">
-                        <div class="form-group">
-                            <label class="col-sm-4 col-lg-3 control-label text-right">Consultant :</label>
-                            <div class="col-sm-6 col-lg-5">
-                                <input class="form-control" ng-model="search.consultant" type="text" />
+                        <div class="col-md-6 col-lg-7">
+                            <div class="form-group">
+                                <label class="col-sm-4 col-lg-3 control-label text-right">Consultant :</label>
+                                <div class="col-sm-6 col-lg-5">
+                                    <input class="form-control" ng-model="search.consultant" type="text" />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div><!--/row-->
+                    </div><!--/row-->
 
-                <div class="row">
-                    <div class="col-md-6 col-lg-5">
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">Address :</label>
-                            <div class="col-sm-6">
-                                <input type="text" class="form-control" ng-model="search.project_address" />
+                    <div class="row">
+                        <div class="col-md-6 col-lg-5">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label text-right">Address :</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" ng-model="search.project_address" />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-6 col-lg-7">
-                        <div class="form-group">
-                            <label class="col-sm-4 col-lg-3 control-label text-right">Contractor :</label>
-                            <div class="col-sm-6 col-lg-5">
-                                <input type="text" class="form-control" ng-model="search.main_contractor" />
+                        <div class="col-md-6 col-lg-7">
+                            <div class="form-group">
+                                <label class="col-sm-4 col-lg-3 control-label text-right">Contractor :</label>
+                                <div class="col-sm-6 col-lg-5">
+                                    <input type="text" class="form-control" ng-model="search.main_contractor" />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div><!--/row-->
+                    </div><!--/row-->
 
-                <div class="row">
-                    <div class="col-md-6 col-lg-5">
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">City :</label>
-                            <div class="col-sm-6">
-                                <input type="text" class="form-control" ng-model="search.project_city" />
+                    <div class="row">
+                        <div class="col-md-6 col-lg-5">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label text-right">City :</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" ng-model="search.project_city" />
+                                </div>
                             </div>
                         </div>
+                    </div><!--/row-->
+                    <div class="row mt-20">
+                       <div class="col-sm-10 text-center">
+                            <button class="btn btn-primary mb-sm-5" type="submit">Search</button>
+                            <button class="btn btn-primary mb-sm-5" ng-click="clearSearch()">Clear Search</button>
+                       </div>
                     </div>
-                    <div class="col-md-6 col-lg-7 pull-right">
-                        <div class="form-group">
-                            <label class="col-sm-4 col-lg-3 control-label text-right">Project Status :</label>
-                            <div class="col-sm-6 col-lg-5">
-                                <select class="form-control">
-                                    <option>-- Select Status --</option>
-                                    <option value="1">Active</option>
-                                    <option value="0">Not Active</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div><!--/row-->
-                <div class="row mt-20">
-                   <div class="col-sm-10 text-center">
-                        <button class="btn btn-primary mb-sm-5" type="submit">Search</button>
-                        <button class="btn btn-primary mb-sm-5" ng-click="clearSearch()">Clear Search</button>
-                   </div>
                 </div>
-                
                 <div class="clearfix table-responsive table-responsive-cust mt-15">
                     <button type="button" ng-click="assignProjects()" class="btn btn-warning mb-10">Assign Selected Projects</button>
                     <table class="table table-bordered">
@@ -159,7 +145,6 @@
                                 <th class="text-center">Contractor</th>
                                 <th class="text-center">Consultant</th>
                                 <th class="text-center">Description</th>
-                                <th class="text-center">Project Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -171,9 +156,6 @@
                                 <td class="text-center">{{project.main_contractor}}</td>
                                 <td class="text-center">{{project.consultant}}</td>
                                 <td class="text-center">{{project.about}}</td>
-                                <td class="text-center">
-                                    <span class="label" ng-class="{'label-success': project.project_status, 'label-danger': !project.project_status}">{{project.project_status?"Active":"Not Active"}}</span>
-                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -189,7 +171,7 @@
         <div class="clearfix">
             <div class="pull-right">
                 <div align="right">
-                    <button class="btn btn-danger mb-sm-5" ng-click="close()">Close</button>
+                    <button class="btn btn-danger mb-sm-5" ng-click="close()">Done</button>
                 </div>
             </div>
         </div>

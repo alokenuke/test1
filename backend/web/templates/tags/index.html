@@ -4,14 +4,14 @@
         <div class="row">
             <div class="col-xs-12 search-box mb-sm-large">
                 <div class="row">
-                    <h2 class="col-xs-12 search-title">
-                        Search Tags <strong ng-hide="showSearchBox">: {{search.globalSearch}}</strong>
-                        <button class="pull-right btn icon-btn" ng-click="showSearchBox = !showSearchBox;">
-                            <i ng-class="{'fa fa-sort-desc fa-2x': showSearchBox,'fa fa-sort-asc fa-2x': !showSearchBox}"></i>
+                    <h2 class="col-xs-12 search-title clickable" ng-click="showSearchBox = !showSearchBox;">
+                        Search Tags <strong ng-hide="!search.globalSearch">: {{search.globalSearch}}</strong>
+                        <button class="pull-right btn icon-btn">
+                            <i ng-class="{'fa fa-sort-desc fa-2x': !showSearchBox,'fa fa-sort-asc fa-2x': showSearchBox}"></i>
                         </button>
                     </h2>
                 </div><!--/row-->
-                <form id="form" class="form-wrapper form-horizontal form-horizontal-type1 slide" role="form" ng-show="showSearchBox">
+                <form id="form" class="form-wrapper form-horizontal form-horizontal-type1 slide" role="form" ng-show="!showSearchBox">
                     <div class="row">
                         <div class="col-md-6 col-lg-5">
                             <div class="form-group">
@@ -25,7 +25,7 @@
                                             <div ng-bind-html="project.project_name" ng-click="updateSelectBox('projectlevels', project.id, 0, 0)"></div>
                                         </ui-select-choices>
                                     </ui-select>
-                                    <a href="/#/projects/create" ng-if="projects.length ==0">No project available. Create one.</a>
+                                    <a href="/#/projects/create" ng-if="projects.length ==0">Create Project First.</a>
                                 </div>
                             </div>
                         </div>

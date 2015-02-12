@@ -46,11 +46,11 @@
                     <div class="row">
                         <h2 class="col-xs-12 search-title">Search Assigned Users
                             <button class="pull-right btn icon-btn" ng-click="item.showSearchBox=!item.showSearchBox;">
-                                <i ng-class="{'fa fa-sort-desc fa-2x': !item.showSearchBox,'fa fa-sort-asc fa-2x': item.showSearchBox}"></i>
+                                <i ng-class="{'fa fa-sort-desc fa-2x': item.showSearchBox,'fa fa-sort-asc fa-2x': !item.showSearchBox}"></i>
                             </button>
                         </h2>
                     </div><!--/row-->
-                    <form id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form" ng-class="{'ng-hide':item.showSearchBox}">
+                    <form id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form" ng-class="{'ng-hide':!item.showSearchBox}">
                         <div class="row">
                             <div class="col-md-6 col-lg-5">
                                 <div class="form-group">
@@ -181,6 +181,9 @@
         <a class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this level? This action cannot be undone."><span class="fa fa-trash"></span></a>
         <a class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
             <span class="fa fa-pencil"></span>
+        </a>
+        <a class="pull-right btn btn-primary btn-xs" ng-click="$parent.loadUsers(view)" style="margin-right: 8px;">
+            <i class="fa fa-user"></i> Users
         </a>
     </div>
     <div ng-show="view.editorEnabled" class="slide">

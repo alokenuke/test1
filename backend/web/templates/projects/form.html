@@ -60,7 +60,7 @@
                     <div class="form-group" ng-class="{ 'has-error': serverError.project_location}">
                         <label class="col-sm-4 col-md-5 control-label" >Consultant :</label>
                         <div class="col-sm-8 col-md-7">
-                            <input type="text" class="form-control" ng-model="project.consultant" ng-required="true" />
+                            <input type="text" class="form-control" ng-model="project.consultant" />
                             <div class="help-block help-block-error">{{serverError.consultant}}</div>
                         </div>
                     </div>
@@ -89,7 +89,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group" ng-class="{ 'has-error': serverError.about}">
-                        <label class="col-sm-4 col-md-5 control-label" >About Project :</label>
+                        <label class="col-sm-4 col-md-5 control-label" >Project Description :</label>
                         <div class="col-sm-8 col-md-7">
                             <textarea ng-model="project.about" class="form-control" rows="3" ng-required="true"></textarea>
                             <div class="help-block help-block-error">{{serverError.about}}</div>
@@ -214,11 +214,11 @@
                             </div>
                             
                             <div class="form-group">
-                                <div class="col-xs-12" ng-class="{ 'has-error': serverError.client_country}">
-                                    <select class="form-control" ng-model="project.timezone_id" ng-options="timezone.id as timezone.name for timezone in timezones " ng-required="true">
+                                <div class="col-xs-12" ng-class="{ 'has-error': serverError.timezone_id}">
+                                    <select class="form-control" ng-model="project.timezone_id" ng-options="timezone.id as timezone.name for timezone in timezones ">
                                         <option value="">Select Timezone</option>
                                     </select>
-                                    <div class="help-block help-block-error">{{serverError.client_country}}</div>
+                                    <div class="help-block help-block-error">{{serverError.timezone_id}}</div>
                                 </div>
                             </div>
                         </div>
