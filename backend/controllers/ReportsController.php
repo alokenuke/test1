@@ -131,4 +131,123 @@ class ReportsController extends ApiController
             throw new \yii\web\HttpException(404, 'Invalid Request');
         }
     }
+    
+    public function actionEmployeeLogs() {
+        if (!$_POST) {
+            
+            $post = \Yii::$app->request->post();
+            
+            $model = new \backend\models\UserTokens();
+            
+            $query = $model->find();
+            
+            if(isset($post['select']))
+               $query->select($post['select']);
+
+            if(isset($post['search'])) {
+                foreach($post['search'] as $key => $val)
+                    if(isset($val)) {
+                        if($key=="date_range") {
+                            if(isset($val['from_date']) && isset($val['to_date'])) {
+                                $val['from_date'] = strtotime($val['from_date']);
+                                $val['to_date'] = strtotime($val['to_date'])+86399;
+                                $query->andWhere(['between', 'created_on', $val['from_date'], $val['to_date']]);
+                            }
+                            else if(isset($val['from_date'])) {
+                                $val['from_date'] = strtotime($val['from_date']);
+                                $query->andWhere(['>=', 'created_on', $val['from_date']]);
+                            }
+                            else if(isset($val['to_date'])) {
+                                $val['to_date'] = strtotime($val['to_date'])+86399;
+                                $query->andWhere(['<=', 'created_on', $val['to_date']]);
+                            }
+                        }
+                        else if($key=="employee_name") {
+                            $query->joinWith("user");
+                            $query->andWhere("user.first_name LIKE :name OR user.last_name LIKE :name", ['name' => "%$val%"]);
+                        }
+                        else if(in_array($key, $this->partialMatchFields))
+                            $query->andWhere(['like', $key, $val]);
+                        else
+                            $query->where([$key => $val]);
+                    }
+            }
+            
+            $pageLimit = 20;
+            if(isset($post['sort']))
+                $_GET['sort'] = $post['sort'];
+            if(isset($post['page']))
+                $_GET['page'] = $post['page'];
+            if(isset($post['limit']))
+                $pageLimit = $post['limit'];
+            
+            try {
+                $provider = new ActiveDataProvider ([
+                    'query' => $query->orderBy("created_on DESC"),
+                    'pagination'=>array(
+                        'pageSize'=>$pageLimit
+                    ),                        
+                ]);
+            } catch (Exception $ex) {
+                throw new \yii\web\HttpException(500, 'Internal server error');
+            }
+            return $provider;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
+    public function actionGenerateTagReports() {
+        if (!$_POST) {
+            
+            $post = \Yii::$app->request->post();
+            
+            $model = new $this->modelClass;
+            
+            $query = $model->find();
+            
+            if(isset($post['select']))
+               $query->select($post['select']);
+
+            if(isset($post['search'])) {
+                foreach($post['search'] as $key => $val)
+                    if(isset($val)) {
+                        if(in_array($key, $this->partialMatchFields))
+                            $query->andWhere(['like', $key, $val]);
+                        else
+                            $query->where([$key => $val]);
+                    }
+            }
+                       
+            if(isset($post['excludeProjects'])) {
+                $projectIds = [];
+                foreach($post['excludeProjects'] as $project)
+                    $projectIds[] = $project['id'];
+                
+                $query->andWhere(['not in', 'id', $projectIds]);
+            }
+            
+            $pageLimit = 20;
+            if(isset($post['sort']))
+                $_GET['sort'] = $post['sort'];
+            if(isset($post['page']))
+                $_GET['page'] = $post['page'];
+            if(isset($post['limit']))
+                $pageLimit = $post['limit'];
+            
+            try {
+                $provider = new ActiveDataProvider ([
+                    'query' => $query,
+                    'pagination'=>array(
+                        'pageSize'=>$pageLimit
+                    ),                        
+                ]);
+            } catch (Exception $ex) {
+                throw new \yii\web\HttpException(500, 'Internal server error');
+            }
+            return $provider;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
 }

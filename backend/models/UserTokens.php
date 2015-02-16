@@ -46,11 +46,34 @@ class UserTokens extends \yii\db\ActiveRecord
         ];
     }
     
+    public function fields() {
+        return [
+            'user_id',
+            'token',
+            'login_ip',
+            'login_location',
+            'created_on',
+            'request_from',
+            'expire_on',
+            'expiry_status'
+        ];
+    }
+    
+    public function extraFields() {
+        return [
+            'user'
+        ];
+    }
+    
     /**
      * Generates new password reset token
      */
     public function generateToken()
     {
         $this->token = Yii::$app->security->generateRandomString();
+    }
+    
+    public function getUser(){
+        return $this->hasOne(User::className(),['id' => 'user_id']);
     }
 }

@@ -22,6 +22,9 @@ class FileManager extends Model
             "barcode" => "tagsImages/barCode",
             "nfccode" => "tagsImages/NFC",
             "qrcode" => "tagsImages/qrCode",
+            "Attendancebarcode" => "attendanceTagImages/barCode",
+            "Attendancenfccode" => "attendanceTagImages/NFC",
+            "Attendanceqrcode" => "attendanceTagImages/qrCode",
             "user_image" => "userImages",
             "attachments" => "attachments",
         ];

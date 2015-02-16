@@ -50,7 +50,7 @@ return [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
-		    ['class' => 'yii\rest\UrlRule', 'controller' => ['users', 'userlevels', 'usergroups', 'roles', 'items', 'tags', 'labeltemplates', 'projects', 'projectlevel', 'tagprocess', 'company'], 'pluralize'=>false, 'extraPatterns' => ['GET search' => 'search']],
+		    ['class' => 'yii\rest\UrlRule', 'controller' => ['timeattendance', 'users', 'userlevels', 'usergroups', 'roles', 'items', 'tags', 'labeltemplates', 'projects', 'projectlevel', 'tagprocess', 'company'], 'pluralize'=>false, 'extraPatterns' => ['GET search' => 'search']],
 		    'api/fields' => 'api/fields',
                     'dashboard' => 'site/dashboard',
                     '<controller>/<action>' => '<controller>/<action>',
