@@ -7,11 +7,11 @@
                     <h2 class="col-xs-12 search-title clickable" ng-click="showSearchBox = !showSearchBox;">
                         Search Tags <strong ng-hide="!search.globalSearch">: {{search.globalSearch}}</strong>
                         <button class="pull-right btn icon-btn">
-                            <i ng-class="{'fa fa-sort-desc fa-2x': !showSearchBox,'fa fa-sort-asc fa-2x': showSearchBox}"></i>
+                            <i ng-class="{'fa fa-sort-desc fa-2x': showSearchBox,'fa fa-sort-asc fa-2x': !showSearchBox}"></i>
                         </button>
                     </h2>
                 </div><!--/row-->
-                <form id="form" class="form-wrapper form-horizontal form-horizontal-type1 slide" role="form" ng-show="!showSearchBox">
+                <form id="form" class="form-wrapper form-horizontal form-horizontal-type1 slide" role="form" ng-show="showSearchBox">
                     <div class="row">
                         <div class="col-md-6 col-lg-5">
                             <div class="form-group">
@@ -89,42 +89,9 @@
                         </div>
                         <div class="col-md-6 col-lg-7">
                             <div class="form-group">
-                                <label class="col-sm-4 col-lg-3 control-label text-right">Item:</label>
-                                <div class="col-sm-6 multi-level">
-                                    <ui-select ng-repeat="item in items"  ng-model="tag_item[$index].selected"
-                                               theme="bootstrap" ng-disabled="disabled" class="{{((items.length - 1) === $index ? 'last-child ' : '')}}">
-                                        <ui-select-match placeholder="Select item">{{$select.selected.item_name}}</ui-select-match>
-                                        <ui-select-choices repeat="i in item | filter: $select.search"
-                                                           refresh-delay="0">
-                                            <div ng-bind-html="i.item_name" ng-click="updateSelectBox('items', search.project_id, $parent.$index, i.id)"></div>
-                                        </ui-select-choices>
-                                    </ui-select>
-                                    <div ng-hide="items.length">
-                                        <a ng-href="/#/tagitems">No Item available.</a>
-                                    </div>
-                                    <input type="hidden" ng-model="search.tag_item_id" />
-                                </div>
-                            </div>
-                        </div>
-                    </div><!--/row-->
-
-                    <div class="row">
-                        <div class="col-md-6 col-lg-7">
-                            <div class="form-group">
-                                <label class="col-sm-4 col-lg-3 control-label text-right">Process Flow:</label>
-                                <div class="col-sm-6 multi-level">
-                                    <ui-select ng-repeat="process in processes"  ng-model="tag_process[$index].selected"
-                                               theme="bootstrap" ng-disabled="disabled" class="{{((processes.length - 1) === $index ? 'last-child ' : '')}}">
-                                        <ui-select-match placeholder="Select process">{{$select.selected.process_name}}</ui-select-match>
-                                        <ui-select-choices repeat="p in process | filter: $select.search"
-                                                           refresh-delay="0">
-                                            <div ng-bind-html="p.process_name" ng-click="updateSelectBox('processes', search.project_id, $parent.$index, p.id)"></div>
-                                        </ui-select-choices>
-                                    </ui-select>
-                                    <div ng-hide="processes.length">
-                                        <a ng-href="/#/tag-process-flow">No process available.</a>
-                                    </div>
-                                    <input type="hidden" ng-model="search.tag_process_id" />
+                                <label class="col-sm-4 col-lg-3 control-label text-right">Tag Description :</label>
+                                <div class="col-sm-6">
+                                    <input type="text" ng-model="search.tag_description" class="form-control" />
                                 </div>
                             </div>
                         </div>
@@ -133,16 +100,8 @@
                     <div class="row">
                         <div class="col-md-6 col-lg-5">
                             <div class="form-group">
-                                <label class="col-sm-4 control-label text-right">Tag Description :</label>
-                                <div class="col-sm-6">
-                                    <input type="text" ng-model="search.tag_description" class="form-control" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-7">
-                            <div class="form-group">
-                                <label class="col-sm-4 col-lg-3 control-label text-right">Created Between :</label>
-                                <div class="col-sm-3">
+                                <label class="col-sm-4 control-label text-right">Created Between :</label>
+                                <div class="col-sm-4">
                                     <div class="input-group">
                                         <input type="text" style="padding:6px 6px;" name="q" placeholder="From date..." class="form-control search-control" datepicker-popup="{{format}}" ng-model="search.date_range.from_date" is-open="datepickers.fromDate" max-date="today" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" close-text="Close">
                                         <div class="input-group-btn">
@@ -150,28 +109,13 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-3">
+                                <div class="col-sm-4">
                                     <div class="input-group">
                                         <input type="text" style="padding:6px 6px;" name="q" placeholder="To date..." class="form-control search-control" datepicker-popup="{{format}}" ng-model="search.date_range.to_date" is-open="datepickers.toDate" max-date="today" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" close-text="Close">
                                         <div class="input-group-btn">
                                             <button type="button" class="btn btn-primary search-btn" ng-click="openCalendar($event, 'toDate')"><i class="fa fa-calendar"></i></button>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div><!--/row-->
-
-                    <div class="row">
-                        <div class="col-md-6 col-lg-5">
-                            <div class="form-group">
-                                <label class="col-sm-4 control-label text-right">Tag Type :</label>
-                                <div class="col-sm-6">
-                                    <select class="form-control" ng-model="search.type">
-                                        <option value="">-- Tag Type --</option>
-                                        <option value="sT">Simple Tags (sT)</option>
-                                        <option value="mT">Master Tags (mT)</option>
-                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -201,20 +145,15 @@
                         <thead>
                             <tr>
                                 <th class="text-center">S.No</th>
-                                <th class="text-center">Type</th>
                                 <th class="text-center" style="width: 20%;">Project Level</th>
                                 <th class="text-center">
                                     <a href="" ng-click="order('uid')">UID <i class="fa fa-sort{{sort.uid}}"></i></a>
                                 </th>
-                                <th class="text-center">Item Type</th>
                                 <th class="text-center">
                                     <a href="" ng-click="order('tag_name')">Tag Name <i class="fa fa-sort{{sort.tag_name}}"></i></a>
                                 </th>
                                 <th class="text-center">
                                     <a href="" ng-click="order('tag_description')">Tag Description <i class="fa fa-sort{{sort.tag_description}}"></i></a>
-                                </th>
-                                <th class="text-center">
-                                    Last status updated
                                 </th>
                                 <th class="text-center">Actions</th>
                                 <!-- <th class="text-center"></th> -->
@@ -223,7 +162,6 @@
                         <tbody>
                             <tr ng-repeat="dat in data">
                                 <td class="text-center">{{numPerPage * (currentPage - 1) + $index + 1}}</td>
-                                <td class="text-center {{dat.type}}">{{dat.type}}</td>
                                 <td class="text-center multi-level">
                                     <div class="level-item">{{dat.project_name}}</div>
                                     <div class="level-item" ng-repeat="project_level in dat.project_level" ng-class="{'last-child': dat.project_level.length === ($index + 1)}">
@@ -231,24 +169,14 @@
                                     </div>
                                 </td>
                                 <td class="text-center">{{dat.uid}}</td>
-                                <td class="text-center">{{dat.itemDetails.item_name}}</td>
                                 <td class="text-center">{{dat.tag_name}}</td>
                                 <td class="text-center">{{dat.tag_description}}</td>
-                                <td class="text-center">
-                                    <div ng-if="dat.tagActivityLog.stageInfo">
-                                        {{dat.tagActivityLog.stageInfo.process_name}} - {{dat.tagActivityLog.answer.process_name}}<br/>
-                                        <small>({{dat.tagActivityLog.loggedBy.first_name}}{{dat.tagActivityLog.loggedBy.last_name}}  {{dat.tagActivityLog.logged_date}})</small>
-                                    </div>
-                                    <div ng-if="!dat.tagActivityLog.stageInfo">
-                                        Not started
-                                    </div>
-                                </td>
                                 <td class="text-center">
                                     <a href="/#/timeattendance/{{dat.id}}" class="btn icon-btn"><i class="fa fa-list-alt fa-lg"></i></a>
                                     <button class="btn icon-btn" image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}}" type="YmFyY29kZQ==" imageUrl="{{dat.uid}}.png" openlightbox><i class="fa fa-barcode fa-lg"></i></button>
                                     <button class="btn icon-btn"  image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}} " type="cXJjb2Rl" imageUrl="{{dat.uid}}.png" openlightbox><i class="fa fa-qrcode fa-lg"></i></button><br />
                                     <!--                                    <button class="btn icon-btn"><i class="fa fa-print fa-lg"></i></button>-->
-                                    <a class="btn icon-btn" href="/#/timeattendance/update{{dat.type=='mT'?'master':''}}/{{dat.id}}/{{dat.project_id}}" ><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                    <a class="btn icon-btn" href="/#/timeattendance/update/{{dat.id}}" ><i class="fa fa-pencil-square-o fa-lg"></i></a>
                                     <button ng-click="deleteTag(dat, $index)" class="btn icon-btn" ng-confirm-click="Are you sure to delete this tag."><i class="fa fa-trash fa-lg"></i></button>
                                 </td>
                             </tr>

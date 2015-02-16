@@ -213,7 +213,7 @@ app.controller('ProjectLevel', ['$scope', 'rest', '$location', '$route', '$route
                 }
                 return false;
             },
-            droppedInto: function (event) {
+            dropped: function (event) {
                 if ($scope.draggingInitiated) {
                     $scope.flagUpdatedPosition = true;
                 }
@@ -339,26 +339,19 @@ app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route', '$routeP
         });
     }
 
-    $scope.callbacks = {
+    $scope.options = {
         accept: function (sourceNodeScope, destNodesScope, destIndex) {
             var sourceScope = sourceNodeScope.$modelValue;
             // Allow dragging only if element is not top level (group shouldn't be dragged).
             if (sourceScope.parent_id > 0) {
-                if ((typeof destNodesScope.$modelValue == 'undefined')) {
-                    alert("Not allowed");
-                    return false;
-                }
-                else if(typeof destNodesScope.$parent.$modelValue != "undefined" && 
-                            (destNodesScope.$modelValue.id == sourceScope.parent_id || (destNodesScope.$parent.$modelValue.id == sourceScope.parent_id))
-                        )
-                {
+                if((destNodesScope.$modelValue.length > 0 && destNodesScope.$modelValue[0].parent_id == sourceScope.parent_id) || (destNodesScope.$modelValue.id == sourceScope.parent_id)) {
                     $scope.draggingInitiated = true;
                     return true;
                 }
             }
             return false;
         },
-        droppedInto: function (event) {
+        dropped: function (event) {
             if ($scope.draggingInitiated) {
                 $scope.flagUpdatedPosition = true;
                 $scope.draggingInitiated = false;

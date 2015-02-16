@@ -142,6 +142,16 @@ app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParam
         }
         
         var updateTagList = function() {
+            if(typeof $scope.search.date_range !== 'undefined') {
+                $monthArr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                $fromDate = $scope.search.date_range.from_date;
+                if(typeof $fromDate === 'date')
+                    $scope.search.date_range.from_date = $fromDate.getDate()+" "+$monthArr[$fromDate.getMonth()]+", "+$fromDate.getFullYear();
+                
+                $toDate = $scope.search.date_range.to_date;
+                if(typeof $toDate === 'date')
+                    $scope.search.date_range.to_date = $toDate.getDate()+" "+$monthArr[$toDate.getMonth()]+", "+$toDate.getFullYear();
+            }
             var params = {'search': $scope.search, 'sort': $scope.sortBy, 'limit': $scope.numPerPage, 'page':$scope.currentPage, };
 			rest.customModelData("tags/search?expand=tagActivityLog", params).success(function (data) {
                 $scope.data = data.items;
@@ -526,8 +536,10 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
         
         rest.setData("projects/getall", ['id', 'project_name'], {'project_status': null}).success(function(data) {
             $scope.projects = data.items;
-            $scope.search.project = data.items[0];
-            $scope.updateSelectBox('projectlevels', $scope.search.project.id, 0, 0)
+            if(data.items.length==1) {
+                $scope.search.project = data.items[0];
+                $scope.updateSelectBox('projectlevels', $scope.search.project.id, 0, 0)
+            }
         });
         
         $scope.$watch('process_stages', function (newVal) {
@@ -1095,8 +1107,10 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
         
         rest.setData("projects/getall", ['id', 'project_name'], {'project_status': null}).success(function(data) {
             $scope.projects = data.items;
-            $scope.search.project = data.items[0];
-            $scope.updateSelectBox('projectlevels', $scope.search.project.id, 0, 0)
+            if(data.items.length==1) {
+                $scope.search.project = data.items[0];
+                $scope.updateSelectBox('projectlevels', $scope.search.project.id, 0, 0)
+            }
         });
         
         $scope.$watch('process_stages', function (newVal) {

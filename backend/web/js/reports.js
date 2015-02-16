@@ -371,3 +371,141 @@ app.controller('Reports', ['$scope', 'rest', '$location', '$route','$routeParams
         rest.setData("usergroups/getall", {}, {}).success(function(data) {$scope.usergroups = data.items;});
         
     }])
+
+app.controller('ReportsEmployeeLogs', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'page_dropdown', '$rootScope',
+                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, page_dropdown, $rootScope) {
+        
+        $scope.tagsNum = 1;
+        rest.path = "reports";
+        $scope.page_dropdown = page_dropdown;
+        
+        breadcrumbsService.clearAll();
+        breadcrumbsService.setTitle("Employee Logs");
+        breadcrumbsService.add("/#/", "Home");
+        breadcrumbsService.add("/#/reports/employee-logs", "Employee Logs");
+        
+        $scope.datepickers = {fromDate: false,toDate: false}
+        $scope.openCalendar = function($event, which) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.datepickers[which]= true;
+        };
+        $scope.dateOptions = {formatYear: 'yy',startingDay: 1};
+        $scope.formats = ['dd MMM, yyyy', 'dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
+        $scope.format = $scope.formats[0];
+        
+        $scope.search = {};
+        $scope.sort = [];
+        $scope.sortBy = "";
+        $scope.showSearchBox = true;
+        $scope.time = Date.now() / 1000;
+                
+        $scope.setSearch = function() {
+            updateList();
+        }
+        
+        $scope.clearSearch = function() {
+            $scope.search = {};
+            updateList();
+        }
+        
+        $scope.pageChanged = function() {
+            updateList();
+        }
+        
+        $scope.setPageLimit = function(){
+            updateList();
+        }
+       
+        var updateList = function() {
+            if(typeof $scope.search.date_range !== 'undefined') {
+                $monthArr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                $fromDate = $scope.search.date_range.from_date;
+                if(typeof $fromDate === 'date')
+                    $scope.search.date_range.from_date = $fromDate.getDate()+" "+$monthArr[$fromDate.getMonth()]+", "+$fromDate.getFullYear();
+                
+                $toDate = $scope.search.date_range.to_date;
+                if(typeof $toDate === 'date')
+                    $scope.search.date_range.to_date = $toDate.getDate()+" "+$monthArr[$toDate.getMonth()]+", "+$toDate.getFullYear();
+            }
+            var params = {'search': $scope.search, 'sort': $scope.sortBy, 'limit': $scope.numPerPage, 'page':$scope.currentPage, };
+            rest.customModelData("reports/employee-logs?field=login_location,login_ip,created_on,request_from,expire_on,expiry_status&expand=user", params).success(function (data) {
+                $scope.data = data.items;
+                $scope.totalCount = data._meta.totalCount;
+                $scope.pageCount = data._meta.pageCount;
+                $scope.currentPage = (data._meta.currentPage);
+                $scope.numPerPage = data._meta.perPage;
+            }).error(errorCallback);
+        }
+        updateList();
+        
+        var errorCallback = function (data) {
+            if(data.status!=401) {
+                alertService.add('error', "Error in processing your request. Please try again.");
+            }
+        };
+    }])
+
+app.controller('ReportsTimeattendanceLogs', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'page_dropdown', '$rootScope',
+                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, page_dropdown, $rootScope) {
+        
+        $scope.tagsNum = 1;
+        rest.path = "time-attendance-log";
+        $scope.page_dropdown = page_dropdown;
+        
+        breadcrumbsService.clearAll();
+        breadcrumbsService.setTitle("Time Attendance Logs");
+        breadcrumbsService.add("/#/", "Home");
+        breadcrumbsService.add("/#/reports/timeattendance", "Time Attendance Logs");
+        
+        $scope.datepickers = {fromDate: false,toDate: false}
+        $scope.openCalendar = function($event, which) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.datepickers[which]= true;
+        };
+        $scope.dateOptions = {formatYear: 'yy',startingDay: 1};
+        $scope.formats = ['dd MMM, yyyy', 'dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
+        $scope.format = $scope.formats[0];
+        
+        $scope.search = {};
+        $scope.sort = [];
+        $scope.sortBy = "";
+        $scope.showSearchBox = true;
+        $scope.time = Date.now() / 1000;
+                
+        $scope.setSearch = function() {
+            updateList();
+        }
+        
+        $scope.clearSearch = function() {
+            $scope.search = {};
+            updateList();
+        }
+        
+        $scope.pageChanged = function() {
+            updateList();
+        }
+        
+        $scope.setPageLimit = function(){
+            updateList();
+        }
+       
+        var updateList = function() {
+            var params = {'search': $scope.search, 'sort': $scope.sortBy, 'limit': $scope.numPerPage, 'page':$scope.currentPage, };
+            rest.customModelData("time-attendance-log/search?expand=user", params).success(function (data) {
+                $scope.data = data.items;
+                $scope.totalCount = data._meta.totalCount;
+                $scope.pageCount = data._meta.pageCount;
+                $scope.currentPage = (data._meta.currentPage);
+                $scope.numPerPage = data._meta.perPage;
+            }).error(errorCallback);
+        }
+        updateList();
+        
+        var errorCallback = function (data) {
+            if(data.status!=401) {
+                alertService.add('error', "Error in processing your request. Please try again.");
+            }
+        };
+    }])

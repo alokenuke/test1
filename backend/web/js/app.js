@@ -91,6 +91,16 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
             controller: 'Reports'
         })
         
+        .when('/reports/employee-logs', {
+            templateUrl: path+'reports/employee-logs.html',
+            controller: 'ReportsEmployeeLogs'
+        })
+        
+        .when('/reports/timeattendance', {
+            templateUrl: path+'reports/timeattendance-logs.html',
+            controller: 'ReportsTimeattendanceLogs'
+        })
+        
         .when('/print-label', {
             templateUrl: path+'reports/printlabel.html',
             controller: 'PrintLabel'
@@ -147,13 +157,13 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
         })
         
         .when('/timeattendance/create', {
-            templateUrl: path+'timeattendance/create.html',
-            controller: 'TimeAttendanceCreate'
+            templateUrl: path+'timeattendance/form.html',
+            controller: 'TimeAttendanceForm'
         })
         
         .when('/timeattendance/update/:id', {
-            templateUrl: path+'timeattendance/update.html',
-            controller: 'TimeAttendanceUpdate'
+            templateUrl: path+'timeattendance/form.html',
+            controller: 'TimeAttendanceForm'
         })
         
         .when('/timeattendance/:id', {
@@ -336,28 +346,19 @@ app.factory('Security', ['$http', function ($http) {
 
 app.factory('authHttpResponseInterceptor',['$q','$location', '$window',function($q,$location, $window) {
     return {
-      response: function(response){
-          if (response.status === 401) {
-              $location.path('/login').replace();
-          }
-
-          return response || $q.when(response);
-      },
-      responseError: function(rejection) {
-          if (rejection.status === 401) {
-              $location.path('/login').replace();
-          }
-          return $q.reject(rejection);
-      },
-       request: function (config) {
-            config.headers = config.headers || {};
-            
-            if ($window.sessionStorage.token) {
-                if(config.url.search("/api") != -1 && config.url.search("/api/gettoken") == -1)
-                    config.url = config.url+"&access-token="+$window.sessionStorage.token;
+        response: function(response){
+            if (response.status === 401) {
+                $location.path('/login').replace();
             }
-            return config;
-      },
+
+            return response || $q.when(response);
+        },
+        responseError: function(rejection) {
+            if (rejection.status === 401) {
+                $location.path('/login').replace();
+            }
+            return $q.reject(rejection);
+        },
     };
 }])
 .config(['$httpProvider',function($httpProvider) {
