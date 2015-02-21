@@ -21,8 +21,7 @@ return [
         'response' => [
             'class' => 'yii\web\Response',
             'on beforeSend' => function ($event) {
-                $response = $event->sender;
-                if ($response->data !== null && strpos(Yii::$app->requestedRoute, "api")!==false) {
+                if (isset($response) && $response->data !== null && isset($response->data["statusCode"])) {
                     $response->data["statusCode"] = $response->statusCode;
                 }
             },
@@ -50,7 +49,7 @@ return [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
-		    ['class' => 'yii\rest\UrlRule', 'controller' => ['timeattendance', 'users', 'userlevels', 'usergroups', 'roles', 'items', 'tags', 'labeltemplates', 'projects', 'projectlevel', 'tagprocess', 'company'], 'pluralize'=>false, 'extraPatterns' => ['GET search' => 'search']],
+		    ['class' => 'yii\rest\UrlRule', 'controller' => ['api', 'company', 'membership', 'timeattendance', 'users', 'userlevels', 'usergroups', 'roles', 'items', 'tags', 'labeltemplates', 'reporttemplates', 'projects', 'projectlevel', 'tagprocess', 'company'], 'pluralize'=>false, 'extraPatterns' => ['GET search' => 'search']],
 		    'api/fields' => 'api/fields',
                     'dashboard' => 'site/dashboard',
                     '<controller>/<action>' => '<controller>/<action>',

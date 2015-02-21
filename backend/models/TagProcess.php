@@ -37,6 +37,7 @@ class TagProcess extends \yii\db\ActiveRecord
             [['process_name', 'parent_id'], 'required'],
             [['type', 'parent_id'], 'integer'],
             [['created_date'], 'safe'],
+            ['params', 'string'],
             [['process_name'], 'string', 'max' => 128],
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['company_id', 'default', 'value' => \yii::$app->user->identity->company_id],
@@ -49,7 +50,7 @@ class TagProcess extends \yii\db\ActiveRecord
     {
         $post = \Yii::$app->request->post();
         
-        $select = ['tag_process.id', 'tag_process.process_name', 'tag_process.parent_id', 'tag_process.type'];
+        $select = ['tag_process.id', 'tag_process.process_name', 'tag_process.parent_id', 'tag_process.type', 'tag_process.params'];
 
         if(isset($post['select']['Process']))
            $select = $post['select']['Process'];
@@ -60,11 +61,24 @@ class TagProcess extends \yii\db\ActiveRecord
     }
 
     public function fields() {
+        $params = (array) json_decode($this->params);
         return [
             'id',
             'process_name',
-            'parent_id',
+            'flagDefault' => function() {
+                if(isset($params['flagDefault']))
+                    return $params['flagDefault'];
+            },
+            'flagCompletion' => function() {
+                if(isset($params['flagCompletion']))
+                    return $params['flagCompletion'];
+            },
+            'flagHierarchy' => function() {
+                if(isset($params['flagHierarchy']))
+                    return $params['flagHierarchy'];
+            },
             'type',
+            'parent_id',
             'status'
         ];
     }
@@ -93,9 +107,14 @@ class TagProcess extends \yii\db\ActiveRecord
                         
             $linkOptions = [];
             
+            $params = (array) json_decode($item->params);
+            
             $result[] = [
                 'id' => $item->id,
                 'process_name' => $item->process_name,
+                'flagDefault' => (isset($params['flagDefault'])?$params['flagDefault']:null),
+                'flagCompletion' => (isset($params['flagCompletion'])?$params['flagCompletion']:null),
+                'flagHierarchy' => (isset($params['flagHierarchy'])?$params['flagHierarchy']:null),
                 'type' => $item->type,
                 'tree' => ($child?$child:[]),
                 'parent_id' => $item->parent_id

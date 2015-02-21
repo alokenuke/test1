@@ -67,13 +67,13 @@ class Timeattendance extends \yii\db\ActiveRecord
         $barCodePath = $fileManager->getPath("Attendancebarcode")."/";
         
         if(!file_exists($qrCodePath.$this->uid.".png")) {
-            error_reporting(0);
+            //error_reporting(0);
             $qrCode= new BarCodeGenerator\DNS2DBarcode();
             $qrCode->save_path= $qrCodePath;
-            $qrCode->getBarcodePNGPath($this->uid, 'Attendanceqrcode',10, 10);
+            $qrCode->getBarcodePNGPath($this->uid, 'qrcode',10, 10);
         }
         if(!file_exists($barCodePath.$this->uid.".png")) {
-            error_reporting(0);
+            //error_reporting(0);
             $barCode= new BarCodeGenerator\DNS1DBarcode();
             $barCode->save_path= $barCodePath;
             $barCode->getBarcodePNGPath($this->uid, 'C39', 5, 200);

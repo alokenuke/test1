@@ -23,8 +23,10 @@ class TagsController extends ApiController
     public function actionSearch() {
         if (!$_POST) {
             
-            $_GET['expand'] = "project_level, itemDetails, userGroup";
-            
+            if(!isset($_GET['expand']))
+                $_GET['expand'] = "project_level, itemDetails, userGroup";
+            else
+                $_GET['expand'] = "project_level, itemDetails, userGroup,".$_GET['expand'];
             $post = \Yii::$app->request->post();
             
             $model = new $this->modelClass;
@@ -150,6 +152,9 @@ class TagsController extends ApiController
                         $validate[$key]['id'] = $tag->id;
                         
                         foreach($post['tag_assignment'] as $i => $v) {
+                            if(!isset($v['notification_frequency']) && !(isset($v['process_stage_from']) || isset($v['notification_status'])))
+                                continue;
+                            
                             unset($temp);
                             unset($tagAssignmentModel);
                             $temp['user_id'] = (int) $v['user_id'];
@@ -260,13 +265,17 @@ class TagsController extends ApiController
                         if(isset($v['process_stage_to']['id']))
                             $tagAssignmentModel->process_stage_to = (int) $v['process_stage_to']['id'];
                         
-                        $tagAssignmentModel->mandatory = (int) $v['mandatory'];
-                        $tagAssignmentModel->notification_frequency = $v['notification_frequency']['id'];
+                        if(isset($v['mandatory']))
+                            $tagAssignmentModel->mandatory = (int) $v['mandatory'];
+                        else
+                            $tagAssignmentModel->mandatory = 0;
+                        if(isset($v['notification_frequency']))
+                            $tagAssignmentModel->notification_frequency = $v['notification_frequency']['id'];
                         
-                        if($this->in_array_r('id', 'all', $v['notification_status'])) {
+                        if(isset($v['notification_status']) && $this->in_array_r('id', 'all', $v['notification_status'])) {
                             $tagAssignmentModel->notification_status = "all";
                         }
-                        else if($this->in_array_r('id', 'assigned', $v['notification_status'])) {
+                        else if(isset($v['notification_status']) && $this->in_array_r('id', 'assigned', $v['notification_status'])) {
                             $tagAssignmentModel->notification_status = "assigned";
                         }
                         else
@@ -274,13 +283,14 @@ class TagsController extends ApiController
                         
                         if(!$tagAssignmentModel->save()) {
                             $hasError = true;
+                            return $tagAssignmentModel;
                         }
 
                         $notification_status = [];
                         
                         \backend\models\TagUserNotificationStatus::deleteAll(['tag_id' => $model->id, 'tag_assignment_id' => $tagAssignmentModel->id]);
                         
-                        if(!$tagAssignmentModel->notification_status) {
+                        if(isset($v['notification_status']) && !$tagAssignmentModel->notification_status) {
                             foreach($v['notification_status'] as $status) {
                                 if(!in_array($status['id'], ['all', 'assigned'])) {
                                     unset($tagNotificationStatus);

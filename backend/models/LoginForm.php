@@ -11,6 +11,8 @@ class LoginForm extends Model
 {
     public $username;
     public $password;
+    public $device;
+    public $location;
     public $rememberMe = true;
 
     private $_user = false;
@@ -23,6 +25,7 @@ class LoginForm extends Model
         return [
             // username and password are both required
             [['username', 'password'], 'required'],
+            [['device', 'location'], 'safe'],
             // rememberMe must be a boolean value
             ['rememberMe', 'boolean'],
             // password is validated by validatePassword()
@@ -57,6 +60,9 @@ class LoginForm extends Model
         if ($this->validate()) {
             $userDetails = Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
             
+            $roleObj = Roles::find()->andWhere(['id' => \yii::$app->user->identity->role])->one();
+            \yii::$app->session->set('user.role_details', $roleObj);
+            
             $authKey = \Yii::$app->session->get('user.auth_key');
             
             $authToken = new UserTokens();
@@ -67,34 +73,39 @@ class LoginForm extends Model
             
             $authToken->login_ip = Yii::$app->getRequest()->getUserIP();
             
-            // Check if similar ip detected by system in last 6 months
-            $locationDetails = UserTokens::find()
+            if(!$this->location && $authToken->login_ip != "::1") {
+                
+                // Check if similar ip detected by system in last 6 months
+                $locationDetails = UserTokens::find()
                         ->andWhere(['login_ip' => $authToken->login_ip])
                         ->andWhere("created_on > ".strtotime("-6 months"))
                         ->andWhere("login_location != 'Not Available'")
                         ->orderBy("created_on DESC")
                         ->one();
-            
-            if(!$locationDetails) {
-                $locationDetails = unserialize(file_get_contents('http://www.geoplugin.net/php.gp?ip='.$authToken->login_ip));
                 
-                if(empty($locationDetails['geoplugin_region'])) {
-                    $location = "Not Available";
+                if(!$locationDetails) {
+                    $locationDetails = unserialize(file_get_contents('http://www.geoplugin.net/php.gp?ip='.$authToken->login_ip));
+
+                    if(empty($locationDetails['geoplugin_region'])) {
+                        $location = "Not Available";
+                    }
+                    else
+                        $location = $locationDetails['geoplugin_region']." (".$locationDetails['geoplugin_countryName'].")";
                 }
-                else
-                    $location = $locationDetails['geoplugin_region']." (".$locationDetails['geoplugin_countryName'].")";
+                else {
+                    $location = $locationDetails->login_location;
+                }
+                
+                $authToken->login_location = $location;
+                
             }
-            else {
-                $location = $locationDetails->login_location;
-            }
+            else
+                $authToken->login_location = $this->location['lat'].",".$this->location['long'];
             
-            $authToken->login_location = $location;
-            
-            $authToken->request_from = "webapp";
+            $authToken->request_from = $this->device?$this->device:"webapp";
             $authToken->expire_on = $authToken->created_on+\yii::$app->params['tokenExpiryTime'];
             
             $authToken->save();
-            
             return $userDetails;
         } else {
             return false;

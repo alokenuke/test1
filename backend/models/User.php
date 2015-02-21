@@ -28,9 +28,9 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_DELETED = 2;
     const STATUS_NOTACTIVE = 0;
     const STATUS_ACTIVE = 1;
-    const ROLE_USER = 0;
-    public $auth_key = "";
-	public $newPassword = "";
+    public $auth_key;
+    public $role_details;
+    public $newPassword = "";
     public $company;
     
     /**
@@ -62,7 +62,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function rules()
     {
-        $company = null;
+        $company = 0;
         if(!\yii::$app->user->isGuest)
             $company = \yii::$app->user->identity->company_id;
                 
@@ -74,6 +74,7 @@ class User extends ActiveRecord implements IdentityInterface
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_NOTACTIVE, self::STATUS_DELETED]],
             ['photo','string'],
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
+            ['company_id', 'default', 'value' => $company],
             ['created_date', 'default', 'value' => date("Y-m-d H:i:s")],
             ['role', 'in', 'range' => self::getRoleIds()],
             [['rec_notification', 'password_reset_token', 'last_login', 'photo', 'contact_number', 'designation'], 'safe']
@@ -122,6 +123,13 @@ class User extends ActiveRecord implements IdentityInterface
         parent::afterSave($insert, $changedAttributes);
     }
     
+    public function afterFind() {
+        
+        $this->getRoleDetails();
+        
+        parent::afterFind();
+    }
+    
     public static function getRoleIds() {
         $roleIds = self::getArray(Roles::find()->select("id")->andWhere(["status" => 1])->all(), "id");
         
@@ -159,11 +167,15 @@ class User extends ActiveRecord implements IdentityInterface
             $identity = static::findOne(['id' => $userToken->user_id, 'status' => self::STATUS_ACTIVE]);
            
             if($identity) {
+                if(\yii::$app->session->get('user.role_details')->type=='Site') {
+                    
+                    return $identity;
+                }
                 $company = \backend\models\Company::find()
                         ->andWhere(['id' => $identity->company_id, 'company_status' => 1])
-                        ->andWhere('expiry_date > '.time())
+                        ->andWhere(['>', 'expiry_date', date("Y-m-d")])
                         ->one();
-                            
+                
                 if($company) {
                     return $identity;
                 }
@@ -176,16 +188,15 @@ class User extends ActiveRecord implements IdentityInterface
             \Yii::$app->user->logout();
     }
     
-    // default scope to check company_id
-//    public static function find()
-//    {
-//        if(isset(\yii::$app->user->identity))
-//        {
-//            return parent::find()->where(['user.company_id' => \yii::$app->user->identity->company_id])->andWhere(['<>', 'user.status', self::STATUS_DELETED]);
-//        }
-//        else
-//            return parent::find();
-//    }
+    //default scope to check company_id
+    public static function find()
+    {
+        if(isset(\yii::$app->user->identity) && \yii::$app->user->identity->company_id > 0)
+            return parent::find()->where(['user.company_id' => \yii::$app->user->identity->company_id])->andWhere(['<>', 'user.status', self::STATUS_DELETED]);
+        else
+            return parent::find()->andWhere(['<>', 'user.status', self::STATUS_DELETED]);
+        
+    }
 
     /**
      * Finds user by username
@@ -245,6 +256,7 @@ class User extends ActiveRecord implements IdentityInterface
     }
     
     public function fields() {
+        
         return [
             'id',
             'first_name',
@@ -255,7 +267,8 @@ class User extends ActiveRecord implements IdentityInterface
                 $role = $this->roles;
                 if($role)
                     return $role->role_name;
-            },            'email',
+            },
+            'email',
             'username',
             'contact_number',
             'designation',
@@ -290,7 +303,7 @@ class User extends ActiveRecord implements IdentityInterface
             'company'
         ];
     }
-
+    
     /**
      * Finds out if password reset token is valid
      *
@@ -323,6 +336,25 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $this->generateAuthKey();
         return $this->auth_key;
+    }
+    
+    /**
+     * @inheritdoc
+     */
+    public function getRoleDetails()
+    {
+        if(!\Yii::$app->session->get('user.role_details')) {
+            
+            $role = "";
+            if(\yii::$app->user->identity)
+                $role = \yii::$app->user->identity->role;
+            
+            $this->role_details = Roles::find()->andWhere(['id' => ($role?$role:$this->role)])->one();
+            \Yii::$app->session->set('user.role_details',$this->role_details);
+        }
+        else
+            $this->role_details = \Yii::$app->session->get('user.role_details');
+        return $this->role_details;
     }
     
     /**
@@ -405,6 +437,15 @@ class User extends ActiveRecord implements IdentityInterface
     }
     
     public function actDelete() {
+        
+        $roleObj = Roles::findOne($this->role);
+        
+        if($roleObj->role_name=='Super Admin') {
+            return "This user can't be removed.";
+        }
+        else if($this->id == \yii::$app->user->id)
+            return "You cannot remove yourself.";
+        
         $this->status = 2;
         $return = $this->save(FALSE);
         return $return;

@@ -27,7 +27,9 @@
                      </a>
                 </li>
             </ul>
+            <?php if(\yii::$app->user->identity->lastTokens) { ?>
             <div class="last-login">Last login : <span class="date-time text-muted"><?php echo date("d M Y H:i:s", \yii::$app->user->identity->lastTokens->created_on); ?></span></div>
+            <?php } ?>
         </div>
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -54,7 +56,8 @@
                             ]);
                         ?>
                     <?php } ?>
-
+                <?php
+                if(\yii::$app->user->identity->role_details->type=='Client') { ?>
                 <ul class="nav navbar-nav navbar-right">
                     <li>
                         <div class="col-xs-12 pull-right">
@@ -69,7 +72,7 @@
                         </div>
                     </li>
                 </ul>
-
+                <?php } ?>
             </nav><!--/.nav-collapse -->
         </div>
     </div><!--/nav-container-->

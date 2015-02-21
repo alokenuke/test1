@@ -4,6 +4,7 @@ namespace backend\controllers;
 use yii\filters\auth\QueryParamAuth;
 use yii\rest\ActiveController;
 use yii\data\ActiveDataProvider;
+use yii\filters\AccessControl;
 
 /**
  * Class ApiController
@@ -14,7 +15,7 @@ class ApiController extends ActiveController
     public $serializer;
     public $identity;
     public $modelClass;
-    
+        
     /**
      * @inheritdoc
      */
@@ -57,7 +58,7 @@ class ApiController extends ActiveController
     public function init() {
         
         $this->identity = json_decode(\Yii::$app->getRequest()->getCookies()->getValue('_identity'));
-                
+        
         if(!isset($_GET['access-token']) && isset($this->identity[1]))
             $_GET['access-token'] = $this->identity[1];
         
@@ -71,10 +72,44 @@ class ApiController extends ActiveController
     public function behaviors()
     {
         $behaviors = parent::behaviors();
-        $behaviors['authenticator'] = [
-            'class' => QueryParamAuth::className(),
-        ];
+        
+        if(\yii::$app->requestedAction->id!='login')
+            $behaviors['authenticator'] = [
+                'class' => QueryParamAuth::className(),
+            ];
         return $behaviors;
+    }
+    
+    public function actionLogin()
+    {
+        return "hello";
+        $model = new \backend\models\LoginForm();
+        
+        if ($model->load(\yii::$app->request->post()) && $model->login()) {
+            return [
+                'token' => \yii::$app->user->identity->auth_key,
+            ];
+        }
+        else {
+            $model->validate();
+        }
+        return $model;
+    }
+
+    public function actionLogout()
+    {
+        $authKey = \Yii::$app->session->get('user.auth_key');
+        $userId = \yii::$app->user->id;
+        
+        \yii::$app->user->logout();
+        
+        $authToken = \backend\models\UserTokens::findOne(['token' => $authKey, 'user_id' => $userId, 'request_from' => 'webapp']);
+        
+        if($authToken) {
+            $authToken->expiry_status = 1;
+            $authToken->expire_on = time();
+            $authToken->save();            
+        }
     }
     
     public function actionGettoken() {

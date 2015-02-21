@@ -57,8 +57,7 @@ class Roles extends \yii\db\ActiveRecord
     public static function find()
     {
         $query = parent::find()->andWhere(['<>', 'status', '2']);
-        
-        if(!\yii::$app->user->isGuest)
+        if(isset(\yii::$app->user->id) && \yii::$app->user->identity->company_id > 0)
             $query = $query->where(['company_id' => \yii::$app->user->identity->company_id]);
         
         return $query;
@@ -142,6 +141,11 @@ class Roles extends \yii\db\ActiveRecord
     }
     
     public function actDelete() {
+        
+        if($this->role_name=='Super Admin') {
+            return "This user can't be removed.";
+        }
+        
         $this->status = 2;
         return $this->save();
     }

@@ -15,7 +15,7 @@ class TimeAttendanceLogController extends ApiController
     public function init() {
         $this->modelClass = 'backend\models\TimeattendanceLog';
         
-        $this->partialMatchFields = [''];
+        $this->partialMatchFields = ['tag_name', 'tag_description'];
         
         parent::init();
     }
@@ -31,6 +31,8 @@ class TimeAttendanceLogController extends ApiController
             
             if(isset($post['select']))
                $query->select($select);
+            
+            $query->joinWith("timeattendance");
 
             if(isset($post['search'])) {
                 foreach($post['search'] as $key => $val)
@@ -49,6 +51,9 @@ class TimeAttendanceLogController extends ApiController
                                 $val['to_date'] = date("Y-m-d", strtotime($val['to_date'])+86399);
                                 $query->andWhere(['<=', 'created_date', $val['to_date']]);
                             }
+                        }
+                        else if($key=='usergroup') {
+                            $query->andWhere(['user_group_id' => $val['id']]);
                         }
                         else if($key=="employee_name") {
                             $query->joinWith("user");

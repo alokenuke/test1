@@ -28,7 +28,7 @@ use \Yii;
  */
 class Tags extends \yii\db\ActiveRecord
 {
-    const STATUS_DELETED = 0;
+    const STATUS_DELETED = 2;
     const STATUS_ACTIVE = 1;
     
     /**
@@ -45,7 +45,7 @@ class Tags extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['uid', 'project_id', 'tag_name', 'tag_description', 'project_level_id', 'user_group_id'], 'required'],
+            [['uid', 'project_id', 'tag_name', 'project_level_id', 'user_group_id'], 'required'],
             [['project_id', 'project_level_id', 'user_group_id', 'company_id', 'tag_status', 'created_by'], 'integer'],
             [['created_date', 'modified_date'], 'safe'],
             
@@ -242,7 +242,8 @@ class Tags extends \yii\db\ActiveRecord
             'userGroup',
             'tagAssignment',
             'relatedTags',
-			'tagActivityLog'        ];
+            'tagActivityLog'
+        ];
     }
     
     /**

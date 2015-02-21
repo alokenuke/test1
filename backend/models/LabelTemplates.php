@@ -47,9 +47,10 @@ class LabelTemplates extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['template_name', 'company_id', 'print_type', 'logo'], 'required'],
+            [['template_name', 'company_id', 'print_type', 'logo', 'checked_labels'], 'required'],
             [['company_id', 'page_width', 'page_height', 'logo_width', 'logo_height', 'font_size', 'top_margin', 'bottom_margin', 'right_margin', 'left_margin', 'num_label_horizontal', 'num_label_vertical', 'hor_label_spacing', 'ver_label_spacing'], 'integer'],
             [['cal_label_width', 'cal_label_height'], 'number'],
+            //[['checked_labels'], 'string', 'max' => 512],
             [['template_name'], 'string', 'max' => 50],
             [['print_type', 'logo'], 'string', 'max' => 100],
             ['company_id', 'default', 'value' => \yii::$app->user->identity->company_id],
@@ -67,6 +68,9 @@ class LabelTemplates extends \yii\db\ActiveRecord
     
     public function beforeSave($insert)
     {
+        
+        $this->checked_labels = json_encode($this->checked_labels);
+        
         if($this->logo) {
             $fileManager = new FileManager();
             
@@ -125,6 +129,11 @@ class LabelTemplates extends \yii\db\ActiveRecord
             'cal_label_width',
             'cal_label_height',
             'print_type',
+            'checked_labels' => function() {
+                if($this->checked_labels) {
+                    return json_decode($this->checked_labels);
+                }
+            },
             'logo' => function() {
                 if($this->logo) {
                     $fileManager = new FileManager();

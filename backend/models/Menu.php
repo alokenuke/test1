@@ -37,6 +37,15 @@ class Menu extends \yii\db\ActiveRecord
         ];
     }
     
+    public static function find() {
+        
+        if(!\yii::$app->user->isGuest && \yii::$app->session->get('user.role_details')->type) {
+            return parent::find()->andWhere(['type' => \yii::$app->session->get('user.role_details')->type]);
+        }
+        else
+            return parent::find();
+    }
+    
     public static function getMenu()
     {
         $result = static::getMenuRecrusive(0);
@@ -45,13 +54,12 @@ class Menu extends \yii\db\ActiveRecord
 
     private static function getMenuRecrusive($parent)
     {
-
+        
         $items = static::find()
-            ->where(['parent_id' => $parent])
-            ->andWhere(['status' => 1])
+            ->andWhere(['parent_id' => $parent, 'status' => 1])
             ->orderBy("position")
             ->all();
-
+        
         $result = []; 
 
         foreach ($items as $item) {

@@ -54,11 +54,57 @@ class FilemanagerController extends Controller
         return $filename;
     }
     
+    public function actionUploadimage() {
+        
+        $uploadedFile = $_FILES['upload'];
+        
+        $type = str_replace("image/", "", $uploadedFile['type']);
+        
+        if(in_array($type, ['jpeg', 'jpg', 'gif', 'png'])) {
+            
+            if($type=='jpeg')
+                $type = 'jpg';
+            
+            $fileManager = new \backend\models\FileManager();
+            
+            $filename = uniqid().".".$type;
+            
+            $filePath = $fileManager->getPath("browse"). "/" . $filename;
+            
+            move_uploaded_file($uploadedFile['tmp_name'], $filePath);
+            
+            $imageUrl = "/filemanager/getimage?type=".  base64_encode("browse")."&file=".$filename;
+            
+            // Required: anonymous function reference number as explained above.
+            $funcNum = $_GET['CKEditorFuncNum'] ;
+            // Optional: instance name (might be used to load a specific configuration file or anything else).
+            $CKEditor = $_GET['CKEditor'] ;
+            // Optional: might be used to provide localized messages.
+            $langCode = $_GET['langCode'] ;
+
+            // Usually you will only assign something here if the file could not be uploaded.
+            $message = '';
+
+            echo "<script type='text/javascript'>window.parent.CKEDITOR.tools.callFunction($funcNum, '$imageUrl', '$message');</script>";
+            
+            return ;
+        }
+        else {
+            Yii::$app->getResponse()->setStatusCode(422, 'Invalid image format.');
+            return 'error';
+        }
+    }
+    
     public function actionDownload() {
         $type = base64_decode($_GET['type']);
         $filename = $_GET['file'];
                 
-        $fileManager = new \backend\models\FileManager();
+        $company = "";
+        
+        if(isset($_GET['company']) && isset($_GET['company']) > 0)
+            $company = $_GET['company'];
+        
+        $fileManager = new \backend\models\FileManager($company);
         
         $filePath = $fileManager->getPath($type);
         
@@ -80,7 +126,12 @@ class FilemanagerController extends Controller
         $type = base64_decode($_GET['type']);
         $filename = $_GET['file'];
         
-        $fileManager = new \backend\models\FileManager();
+        $company = "";
+        
+        if(isset($_GET['company']) && isset($_GET['company']) > 0)
+            $company = $_GET['company'];
+        
+        $fileManager = new \backend\models\FileManager($company);
         
         $filePath = $fileManager->getPath($type);
         

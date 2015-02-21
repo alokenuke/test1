@@ -78,6 +78,64 @@ class ReportsController extends ApiController
         }
     }
     
+    // Get list of tags for label printing
+    public function actionTimeattendancelabels() {
+        if (!$_POST) {
+            
+            $_GET['expand'] = "project_level, processObj";
+            
+            $post = \Yii::$app->request->post();
+            
+            $model = new \backend\models\Timeattendance();
+            
+            $query = $model->find();
+            
+            if(isset($post['search'])) {
+                foreach($post['search'] as $key => $val) {
+                    if($key=="date_range") {
+                        if(isset($val['from_date']) && isset($val['to_date'])) {
+                            $val['from_date'] = date("Y-m-d H:i:s", strtotime($val['from_date']));
+                            $val['to_date'] = date("Y-m-d", strtotime($val['to_date']));
+                            $query->andWhere(['between', 'created_date', $val['from_date'], $val['to_date']]);
+                        }
+                        else if(isset($val['from_date'])) {
+                            $val['from_date'] = date("Y-m-d", strtotime($val['from_date']));
+                            $query->andWhere(['>=', 'created_date', $val['from_date']]);
+                        }
+                        else if(isset($val['to_date'])) {
+                            $val['to_date'] = date("Y-m-d", strtotime($val['to_date']));
+                            $query->andWhere(['<=', 'created_date', $val['to_date']]);
+                        }
+                    }
+                    else if(is_array ($val)) {
+                        if(isset($val['project']))
+                            $query->where(['project_id' => $val['project']['id']]);
+                    }
+                    else if(isset($val)) {
+                        if(in_array($key, $this->partialMatchFields))
+                            $query->andWhere(['like', $key, $val]);
+                        else
+                            $query->andWhere([$key => $val]);
+                    }
+                }
+            }
+            
+            $pageLimit = 20;
+            
+            try {
+                $provider = new ActiveDataProvider ([
+                    'query' => $query,
+                    'pagination'=> false,
+                ]);
+            } catch (Exception $ex) {
+                throw new \yii\web\HttpException(500, 'Internal server error');
+            }
+            return $provider;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
     public function actionSearch() {
         if (!$_POST) {
             
@@ -199,8 +257,10 @@ class ReportsController extends ApiController
     
     public function actionGenerateTagReports() {
         if (!$_POST) {
-            
+            error_reporting(0);
             $post = \Yii::$app->request->post();
+            
+            $_GET['expand'] = "project_level,itemObj,tagActivityLog";
             
             $model = new $this->modelClass;
             
@@ -218,34 +278,172 @@ class ReportsController extends ApiController
                             $query->where([$key => $val]);
                     }
             }
-                       
-            if(isset($post['excludeProjects'])) {
-                $projectIds = [];
-                foreach($post['excludeProjects'] as $project)
-                    $projectIds[] = $project['id'];
-                
-                $query->andWhere(['not in', 'id', $projectIds]);
-            }
-            
-            $pageLimit = 20;
-            if(isset($post['sort']))
-                $_GET['sort'] = $post['sort'];
-            if(isset($post['page']))
-                $_GET['page'] = $post['page'];
-            if(isset($post['limit']))
-                $pageLimit = $post['limit'];
             
             try {
                 $provider = new ActiveDataProvider ([
-                    'query' => $query,
-                    'pagination'=>array(
-                        'pageSize'=>$pageLimit
-                    ),                        
+                    'query' => $query                        
                 ]);
             } catch (Exception $ex) {
                 throw new \yii\web\HttpException(500, 'Internal server error');
             }
-            return $provider;
+            
+            $serializer = new \backend\models\CustomSerializer();
+            
+            $global_task_array = $serializer->serialize($provider);
+            
+            $phpExcel = new \backend\models\GenerateExcel();
+            
+            $phpExcel->createWorksheet();
+            $phpExcel->setDefaultFont('Calibri', 13);
+
+            $default = array(
+                array('label' => 'Sr.', 'width' => 'auto'),
+                array('label' => 'Type', 'width' => 'auto'),
+                array('label' => 'UID', 'width' => 'auto'),
+                array('label' => 'Tag Name', 'width' => 'auto'),
+                array('label' => 'Project Level', 'width' => 'auto'),
+                array('label' => 'Item Type', 'width' => 'auto'),
+                array('label' => 'Tag Description', 'width' => 'auto'),
+                array('label' => 'Product Code', 'width' => 'auto'),
+                array('label' => 'Last Status', 'width' => 'auto'),
+                array('label' => 'Created Date', 'width' => 'auto')
+            );
+
+            $phpExcel->addTableHeader($default, array('name' => 'Cambria', 'bold' => true));
+
+            $i = 1;
+            $phpExcel->setDefaultFont('Calibri', 12);
+            foreach ($global_task_array as $raw) {
+                $itemName = "";
+                foreach($raw['itemObj'] as $key => $item) {
+                    if($key)
+                        $itemName .= " > ";
+                    $itemName .= $item['item_name'];
+                }
+                $lastStatus = "Not Started Yet";
+                if($raw['tagActivityLog']['stageInfo'])
+                    $lastStatus = $raw['tagActivityLog']['stageInfo']['process_name']." - ".(is_object($raw['tagActivityLog']['answer']?$raw['tagActivityLog']['answer']['process_name']:$raw['tagActivityLog']['answer']))."\n By:".$raw['tagActivityLog']['loggedBy']['first_name']." ".$raw['tagActivityLog']['loggedBy']['last_name']."\n at ".$raw['tagActivityLog']['logged_date'];
+                
+                $data = array(
+                    $i++,
+                    $raw['type'],
+                    $raw['uid'],
+                    $raw['tag_name'],
+                    implode(" > ", $raw['project_level']),
+                    $itemName,
+                    $raw['tag_description'],
+                    $raw['product_code'],
+                    $lastStatus,
+                    $raw['created_date'],
+                );
+                $phpExcel->addTableRow($data);
+            }
+            
+            $phpExcel->addTableFooter();
+            /* * ******************************************** */
+
+            //-> Create and add the sheets and also check if the form type is pre-defined or custom
+            $s = 1;
+            foreach ($global_task_array as $task) {
+                if ($task['Task']['form_type'] == 'drawing') {// if condition end here
+                   if(isset($task['Drawing']) && (count($task['Drawing']) > 0)){ 
+                    //define table cells
+                    $pre_default = array(
+                        array('label' => ('Id.'), 'width' => '10'),
+                        array('label' => ('Employee'), 'width' => '18'),
+                        array('label' => ('Revision'), 'width' => '18'),
+                        array('label' => ('Status'), 'width' => '18'),
+                        array('label' => ('Time'), 'width' => '18'),
+                        array('label' => ('Comment'), 'width' => '20')
+                    );
+                    $mysheet = $phpExcel->addSheet($task['Task']['unique_code'], $s++);
+                // heading
+                    $phpExcel->addTableHeader($pre_default, array('name' => 'Cambria', 'bold' => true));
+                    $phpExcel->setDefaultFont('Calibri', 12);
+                    if (isset($task['Drawing'])) {
+                        foreach ($task['Drawing'] as $index => $raw) {
+                            $data = array(
+                                $index + 1,
+                                $raw['DrawingLog']['emp_name'],
+                                $raw['DrawingLog']['revision'],
+                                $raw['DrawingLog']['status'],
+                                $this->Time->format('d M Y h:iA', $raw['DrawingLog']['created'], null, $task['Timezone']['name']) . ' (' . $task['Timezone']['name'] . ')',
+                                $raw['DrawingLog']['comment'],
+                            );
+                            $phpExcel->addTableRow($data);
+                        }
+                    }
+                    $phpExcel->addTableFooter();
+                   }
+                }
+            }
+            $filename = "temp/TagReport-". date("d-m-Y_").\yii::$app->session->id.".xlsx";
+            $phpExcel->output($filename, false, 'S');
+            return $filename;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
+    public function actionGenerateTagReportsById() {
+        if (!$_POST) {
+            error_reporting(0);
+            $post = \Yii::$app->request->post();
+            
+            $phpExcel = new \backend\models\GenerateExcel();
+            
+            $phpExcel->createWorksheet();
+            $phpExcel->setDefaultFont('Calibri', 13);
+
+            $default = array(
+                array('label' => 'Sr.', 'width' => 'auto'),
+                array('label' => 'Status', 'width' => 'auto'),
+                array('label' => 'Comments', 'width' => 'auto'),
+                array('label' => 'Attachments', 'width' => 'auto'),
+                array('label' => 'Activity Location', 'width' => 'auto'),
+                array('label' => 'Logged By', 'width' => 'auto')
+            );
+
+            $phpExcel->addTableHeader($default, array('name' => 'Cambria', 'bold' => true));
+
+            $phpExcel->setDefaultFont('Calibri', 12);
+            
+            $phpExcel->addTableFooter();
+            /* * ******************************************** */
+
+            //-> Create and add the sheets and also check if the form type is pre-defined or custom
+            $index = 0;
+            $files ;
+            foreach ($post as $data) {
+                
+                foreach ($data as $dat) {
+                    if (isset($dat['attachments']) && is_array($dat['attachments'])) {
+
+                        foreach ($dat['attachments'] as $attach) {
+                            $files .= $attach['filename'] . "\n";
+                        }
+                    } else {
+                        $files = 'No attachments available';
+                    }
+
+                    $record = array(
+                        $index + 1,
+                        $dat['stageInfo']['process_name'] . ' ' . $dat['answer']['rocess_name'],
+                        $dat['comment'],
+                        $files,
+                        $dat['location'] . "\n" . $dat['device'],
+                        $dat['user']['first_name'] . ' ' . $dat['user']['last_name'] . "\n" .
+                        $dat['logged_date']
+                    );
+                    $phpExcel->addTableRow($record);
+                }
+            }
+
+            $phpExcel->addTableFooter();
+            
+            $filename = "temp/TagReportByID-". date("d-m-Y_").\yii::$app->session->id.".xlsx";
+            $phpExcel->output($filename, false, 'S');
+            return $filename;
         } else {
             throw new \yii\web\HttpException(404, 'Invalid Request');
         }

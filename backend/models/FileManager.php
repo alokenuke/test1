@@ -11,8 +11,11 @@ class FileManager extends Model
     public $company, $file_type, $filename, $destination;
     private $_user;
     
-    public function __construct() {
-        $this->company = \yii::$app->user->identity->company_id;
+    public function __construct($company="") {
+        if($company)
+            $this->company = $company;
+        else
+            $this->company = \yii::$app->user->identity->company_id;
     }
     
     public function getLocalPath($type) {
@@ -27,6 +30,8 @@ class FileManager extends Model
             "Attendanceqrcode" => "attendanceTagImages/qrCode",
             "user_image" => "userImages",
             "attachments" => "attachments",
+            "temp" => "temp",
+            "browse" => "browse",
         ];
         return $pathConstants[$type];
     }

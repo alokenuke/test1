@@ -109,7 +109,7 @@ class TagProcessController extends ApiController
         }
     }
     
-    public function actionSavepositions() {
+    public function actionSavepositionlevels() {
         if (!$_POST) {
             
             $post = \Yii::$app->request->post("Process");
@@ -135,6 +135,16 @@ class TagProcessController extends ApiController
             foreach($child as $key => $val) {
                 if($model = \backend\models\TagProcess::findOne(['id' => $val['id'], ['>', 'parent_id', 0]])) {
                     $model->position = $key;
+                    
+                    $params = [];
+                    if(isset($val['flagDefault']))
+                        $params['flagDefault'] = $val['flagDefault'];
+                    if(isset($val['flagCompletion']))
+                        $params['flagCompletion'] = $val['flagCompletion'];
+                    if(isset($val['flagHierarchy']))
+                        $params['flagHierarchy'] = $val['flagHierarchy'];
+                    
+                    $model->params = json_encode($params);
                     $result[] = $model->save();
                 }
                 $this->saveChild($val['tree'], $val['id']);

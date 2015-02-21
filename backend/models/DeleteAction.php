@@ -31,10 +31,15 @@ class DeleteAction extends \yii\rest\DeleteAction
             call_user_func($this->checkAccess, $this->id, $model);
         }
         
-        if ($model->actDelete() === false) {
+        $result = $model->actDelete();
+        
+        if ($result === false) {
             throw new ServerErrorHttpException('Failed to delete the object for unknown reason.');
         }
-
+        else if(is_object ($result)) {
+            Yii::$app->getResponse()->setStatusCode(422);
+            return $result;
+        }
         Yii::$app->getResponse()->setStatusCode(204);
     }
 }
