@@ -37,7 +37,7 @@ class ChangePassword extends Model
     public function resetPassword()
     {
         $user = $this->_user;
-        $user->password = $this->password;
+        $user->password = $user->setPassword($this->new_password);
         $user->removePasswordResetToken();
 
         return $user->save();
@@ -47,7 +47,7 @@ class ChangePassword extends Model
     {
         if (!$this->hasErrors()) {
             $user = \yii::$app->user->identity;
-            if (!$user || !$user->validatePassword($this->password)) {
+            if (!$user || !$user->validatePassword($this->old_password)) {
                 $this->addError($attribute, 'Incorrect old password.');
             }
         }

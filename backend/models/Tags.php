@@ -242,7 +242,9 @@ class Tags extends \yii\db\ActiveRecord
             'userGroup',
             'tagAssignment',
             'relatedTags',
-            'tagActivityLog'
+            'tagActivityLog',
+            'company',
+            'project'
         ];
     }
     

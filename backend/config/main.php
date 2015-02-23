@@ -21,7 +21,7 @@ return [
         'response' => [
             'class' => 'yii\web\Response',
             'on beforeSend' => function ($event) {
-                if (isset($response) && $response->data !== null && isset($response->data["statusCode"])) {
+                if (isset($response) && $response->data && $response->format != 'html') {
                     $response->data["statusCode"] = $response->statusCode;
                 }
             },
@@ -51,6 +51,7 @@ return [
             'rules' => [
 		    ['class' => 'yii\rest\UrlRule', 'controller' => ['api', 'company', 'membership', 'timeattendance', 'users', 'userlevels', 'usergroups', 'roles', 'items', 'tags', 'labeltemplates', 'reporttemplates', 'projects', 'projectlevel', 'tagprocess', 'company'], 'pluralize'=>false, 'extraPatterns' => ['GET search' => 'search']],
 		    'api/fields' => 'api/fields',
+                    'reportsdownload/print-tag-report/<tagId:\d+>-<reportTemplate:\d+>' => 'reportsdownload/print-tag-report',
                     'dashboard' => 'site/dashboard',
                     '<controller>/<action>' => '<controller>/<action>',
                     '<controller:\w+>/' => '<controller>/index',

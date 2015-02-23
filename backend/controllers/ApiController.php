@@ -73,7 +73,7 @@ class ApiController extends ActiveController
     {
         $behaviors = parent::behaviors();
         
-        if(\yii::$app->requestedAction->id!='login')
+        if(\yii::$app->requestedAction->id!='login' && \yii::$app->requestedAction->id!='request-password-reset')
             $behaviors['authenticator'] = [
                 'class' => QueryParamAuth::className(),
             ];
@@ -82,7 +82,6 @@ class ApiController extends ActiveController
     
     public function actionLogin()
     {
-        return "hello";
         $model = new \backend\models\LoginForm();
         
         if ($model->load(\yii::$app->request->post()) && $model->login()) {
@@ -93,6 +92,22 @@ class ApiController extends ActiveController
         else {
             $model->validate();
         }
+        return $model;
+    }
+    
+    public function actionRequestPasswordReset()
+    {
+        $model = new \backend\models\PasswordResetRequestForm();
+        if ($model->load(\yii::$app->request->post()) && $model->validate()) {
+            if ($model->sendEmail()) {
+                return ['message' => 'Check your email for further instructions.'];
+            } else {
+                return ['message' => 'Sorry, we are unable to reset password for email provided.'];
+            }
+        }
+        else
+            $model->validate();
+        
         return $model;
     }
 

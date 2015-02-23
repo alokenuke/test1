@@ -448,4 +448,153 @@ class ReportsController extends ApiController
             throw new \yii\web\HttpException(404, 'Invalid Request');
         }
     }
+    
+    public function actionGenerateTimeAttendanceReports() {
+        if (!$_POST) {
+            error_reporting(0);
+            $post = \Yii::$app->request->post();
+            
+            $_GET['expand'] = "user,timeattendance,project_level";
+            
+            $model = new \backend\models\TimeattendanceLog();
+            
+            $query = $model->find();
+            
+            if(isset($post['select']))
+               $query->select($select);
+            
+            $query->joinWith("timeattendance");
+
+            if(isset($post['search'])) {
+                foreach($post['search'] as $key => $val)
+                    if(isset($val)) {
+                        if($key=="date_range") {
+                            if(isset($val['from_date']) && isset($val['to_date'])) {
+                                $val['from_date'] = date("Y-m-d H:i:s", strtotime($val['from_date']));
+                                $val['to_date'] = date("Y-m-d", strtotime($val['to_date'])+86399);
+                                $query->andWhere(['between', 'created_date', $val['from_date'], $val['to_date']]);
+                            }
+                            else if(isset($val['from_date'])) {
+                                $val['from_date'] = date("Y-m-d", strtotime($val['from_date']));
+                                $query->andWhere(['>=', 'created_date', $val['from_date']]);
+                            }
+                            else if(isset($val['to_date'])) {
+                                $val['to_date'] = date("Y-m-d", strtotime($val['to_date'])+86399);
+                                $query->andWhere(['<=', 'created_date', $val['to_date']]);
+                            }
+                        }
+                        else if($key=='usergroup') {
+                            $query->andWhere(['user_group_id' => $val['id']]);
+                        }
+                        else if($key=="employee_name") {
+                            $query->joinWith("user");
+                            $query->andWhere("user.first_name LIKE :name OR user.last_name LIKE :name", ['name' => "%$val%"]);
+                        }
+                        else if(in_array($key, $this->partialMatchFields))
+                            $query->andWhere(['like', $key, $val]);
+                        else
+                            $query->andWhere([$key => $val]);
+                    }
+            }
+            
+            try {
+                $provider = new ActiveDataProvider ([
+                    'query' => $query                        
+                ]);
+            } catch (Exception $ex) {
+                throw new \yii\web\HttpException(500, 'Internal server error');
+            }
+            
+            $serializer = new \backend\models\CustomSerializer();
+            
+            $global_task_array = $serializer->serialize($provider);
+                        
+            $phpExcel = new \backend\models\GenerateExcel();
+            
+            $phpExcel->createWorksheet();
+            $phpExcel->setDefaultFont('Calibri', 13);
+
+            $default = array(
+                array('label' => 'Sr.', 'width' => 'auto'),
+                array('label' => 'Project Name', 'width' => 'auto'),
+                array('label' => 'UID', 'width' => 'auto'),
+                array('label' => 'Tag Name', 'width' => 'auto'),
+                array('label' => 'Tag Description', 'width' => 'auto'),
+                array('label' => 'Project Level', 'width' => 'auto'),
+                array('label' => 'Employee Name', 'width' => 'auto'),
+                array('label' => 'Geolocation', 'width' => 'auto'),
+                array('label' => 'Login Time', 'width' => 'auto'),
+                array('label' => 'Logout Time', 'width' => 'auto'),
+                array('label' => 'Hours Logged', 'width' => 'auto')
+            );
+
+            $phpExcel->addTableHeader($default, array('name' => 'Cambria', 'bold' => true));
+
+            $i = 1;
+            $phpExcel->setDefaultFont('Calibri', 12);
+            foreach ($global_task_array as $raw) {
+                
+                $location = json_decode($raw['location']);
+                
+                $data = array(
+                    $i++,
+                    $raw['timeattendance']['project_name'],
+                    $raw['timeattendance']['uid'],
+                    $raw['timeattendance']['tag_name'],
+                    $raw['timeattendance']['tag_description'],
+                    implode(" > ", $raw['project_level']),
+                    $raw['user']['first_name']." ".$raw['user']['last_name'],
+                    "Latitude: ".$location['lat']."\n"."Longitude: ".$location['long'],
+                    $raw['login_time'],
+                    $raw['logout_time'],
+                    $raw['hours_logged'],
+                );
+                $phpExcel->addTableRow($data);
+            }
+            
+            $phpExcel->addTableFooter();
+            /* * ******************************************** */
+
+            //-> Create and add the sheets and also check if the form type is pre-defined or custom
+            $s = 1;
+//            foreach ($global_task_array as $task) {
+//                if ($task['Task']['form_type'] == 'drawing') {// if condition end here
+//                   if(isset($task['Drawing']) && (count($task['Drawing']) > 0)){ 
+//                    //define table cells
+//                    $pre_default = array(
+//                        array('label' => ('Id.'), 'width' => '10'),
+//                        array('label' => ('Employee'), 'width' => '18'),
+//                        array('label' => ('Revision'), 'width' => '18'),
+//                        array('label' => ('Status'), 'width' => '18'),
+//                        array('label' => ('Time'), 'width' => '18'),
+//                        array('label' => ('Comment'), 'width' => '20')
+//                    );
+//                    $mysheet = $phpExcel->addSheet($task['Task']['unique_code'], $s++);
+//                // heading
+//                    $phpExcel->addTableHeader($pre_default, array('name' => 'Cambria', 'bold' => true));
+//                    $phpExcel->setDefaultFont('Calibri', 12);
+//                    if (isset($task['Drawing'])) {
+//                        foreach ($task['Drawing'] as $index => $raw) {
+//                            $data = array(
+//                                $index + 1,
+//                                $raw['DrawingLog']['emp_name'],
+//                                $raw['DrawingLog']['revision'],
+//                                $raw['DrawingLog']['status'],
+//                                $this->Time->format('d M Y h:iA', $raw['DrawingLog']['created'], null, $task['Timezone']['name']) . ' (' . $task['Timezone']['name'] . ')',
+//                                $raw['DrawingLog']['comment'],
+//                            );
+//                            $phpExcel->addTableRow($data);
+//                        }
+//                    }
+//                    $phpExcel->addTableFooter();
+//                   }
+//                }
+//            }
+            $filename = "temp/TimeAttendanceReport-". date("d-m-Y_").\yii::$app->session->id.".xlsx";
+            $phpExcel->output($filename, false, 'S');
+            return $filename;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
 }

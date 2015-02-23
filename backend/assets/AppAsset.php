@@ -47,5 +47,20 @@ class AppAsset extends AssetBundle
         'backend\assets\AngularAsset',
         'backend\assets\AngularUiAsset',
     ];
+    
+    public function registerAssetFiles($view)
+    {
+        if(!\yii::$app->user->isGuest) {
+            if(\yii::$app->session->get('user.role_details')->type=='Site') {
+                $this->js = [];
+                
+                $this->js[] = "js/services.js";
+                $this->js[] = "js/admin.js"; 
+            }
+        }
+                    
+        parent::registerAssetFiles($view);
+    }
+    
 }
 
