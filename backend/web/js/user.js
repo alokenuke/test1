@@ -187,8 +187,15 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
     
     var errorCallback = function (data) {
         if(data.status!=401) {
-            alertService.add('error', "Error in processing your request. Please try again.");
+            if(typeof data !== 'object')
+            {
+                alertService.clearAll();
+                alertService.add("error", data);
+            }
+            else
+                alertService.add('error', "Error in processing your request. Please try again.");
         }
+
     };
     
     var params = {'search': $scope.$search, 'sort': $scope.sortBy, 'page':$scope.currentPage, 'limit': $scope.numPerPage};
@@ -251,10 +258,17 @@ app.controller('UserIndex', ['$scope', 'rest', '$location', '$route','$routePara
            updateUserList();
         }
         
-         var errorCallback = function (data) {
+        var errorCallback = function (data) {
             if(data.status!=401) {
-                alertService.add('error', "Error in processing your request. Please try again.");
+                if(typeof data !== 'object')
+                {
+                    alertService.clearAll();
+                    alertService.add("error", data);
+                }
+                else
+                    alertService.add('error', "Error in processing your request. Please try again.");
             }
+                
         };
         
         $scope.setPageLimit = function(){

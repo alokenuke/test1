@@ -9,17 +9,17 @@
                             Create Tag Process Type
                         </button>
                         <div class='row' style='padding:20px;'>
-                            <div class="alert alert-info" ng-if="flagUpdatedPosition">
+                            <div class="alert alert-info" ng-if="flagUpdatedLevels" style="position: sticky; z-index: 9999; top: 0px;">
                                 <span>
-                                    We have noted the updates in level positions. Click 'Save Now' to save. 
-                                    <button ng-disabled="loadingSaveLevelPosition" class='btn btn-primary' ng-click="saveProcessPosition()">
-                                        <span ng-if="loadingSaveLevelPosition">
+                                    We have noted the updates in process positions or modification in flag (default or completion). Click 'Save Now' to save all updates. 
+                                    <button ng-disabled="loadingSaveLevels" class='btn btn-primary' ng-click="saveProcessLevels()">
+                                        <span ng-if="loadingSaveLevels">
                                             <i class="fa fa-refresh"></i> Saving..
                                         </span>
-                                        <span ng-if="!loadingSaveLevelPosition">Save Now</span>
+                                        <span ng-if="!loadingSaveLevels">Save Now</span>
                                     </button>
-                                    <button ng-hide="loadingSaveLevelPosition" class='btn btn-primary' ng-click="resetLevels()">
-                                        Reset Levels
+                                    <button ng-hide="loadingSaveLevels" class='btn btn-primary' ng-click="resetLevels()">
+                                        Revert Updates
                                     </button>
                                 </span>
                             </div>
@@ -35,7 +35,7 @@
                                                     <div click-to-edit="item" template-url="editFlow.html" editable-field="item.process_name"></div>
                                                 </div>
                                                 <ol ui-tree-nodes="options" ng-model="item.tree" ng-hide="collapsed" class="slide">
-                                                    <li ng-repeat="item in item.tree" ui-tree-node>
+                                                    <li ng-repeat="item in item.tree" ui-tree-node ng-class="{'has-error': (item.type!='3' && item.type!='5'?(item.tree.length<2 || (!item.flagDefault || !item.flagCompletion)):false)}">
                                                         <div ui-tree-handle ng-class="'level-'+(this.depth()-1)">
                                                             <div click-to-edit="item" template-url="editStage.html" editable-field="item.process_name">
                                                             </div>
@@ -48,6 +48,15 @@
                                                                 <ol ui-tree-nodes ng-model="item.tree"></ol>
                                                             </li>
                                                         </ol>
+                                                        <div class="pl-10" ng-if="item.type!='3' && item.type!='5'">
+                                                            <div ng-show="item.tree.length<2">
+                                                                <strong>Error: </strong>
+                                                                This process should have at least 2 options (1 for default and 1 for completion flag.
+                                                            </div>
+                                                            <div ng-show="!(item.flagDefault && item.flagCompletion) && item.tree.length >1">
+                                                                <strong>Error: </strong> This process do not have default OR completion flag.
+                                                            </div>
+                                                        </div>
                                                     </li>
                                                 </ol>
                                             </li>
@@ -109,8 +118,8 @@
             <a class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
                 <span class="fa fa-pencil"></span>
             </a>
-            <a class="pull-right btn btn-primary btn-xs" nodrag style="margin-right: 8px;" ng-click="view.hCompulsory = !view.hCompulsory" tooltip-html-unsafe="{{$parent.tooltip.hierarchy_compulsory}}" >
-                <span class="fa fa-question-circle"></span> Hierarchy C. <sapn class="fa fa-check-square" ng-if="view.hCompulsory"></span>
+            <a class="pull-right btn btn-primary btn-xs" nodrag style="margin-right: 8px;" ng-click="$parent.setFlag(view, 'hierarchy')" tooltip-html-unsafe="{{$parent.tooltip.hierarchy_compulsory}}" >
+                <span class="fa fa-question-circle"></span> Hierarchy C. <i class="fa fa-check-square" ng-if="view.flagHierarchy"></i>
             </a>
         </div>
         <div ng-show="view.editorEnabled" class="slide">
@@ -126,14 +135,18 @@
 </script>
 <script type="text/ng-template" id="editStage.html">
     <div class="click-to-edit">
-        <div ng-hide="view.editorEnabled"><a class="btn btn-success btn-xs" ng-click="$parent.toggle($parent)">
-            <span class="fa" ng-class="{'fa-chevron-right': $parent.collapsed, 'fa-chevron-down': !$parent.collapsed}"></span></a>
-            {{view.editableValue}}
+        <div ng-hide="view.editorEnabled">
+            <a class="btn btn-success btn-xs" ng-click="$parent.toggle($parent)">
+                <span class="fa" ng-class="{'fa-chevron-right': $parent.collapsed, 'fa-chevron-down': !$parent.collapsed}"></span>
+            </a>
+            {{$parent.$index+1}}. &nbsp; &nbsp;{{view.editableValue}}
             (<u>{{process_stage_type[view.type]}}</u>)
             <a class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this status? This action cannot be undone."><span class="fa fa-trash"></span></a>
-            <a ng-if="view.type!='3' && view.type!='5'" class="pull-right btn btn-primary btn-xs" nodrag ng-click="$parent.newSubItem($parent, '')" style="margin-right: 8px;">
-                <span class="fa fa-plus"></span>
-            </a>
+            <span ng-click="$parent.newSubItem($parent, '')">
+                <a class="pull-right btn btn-primary btn-xs" ng-if="view.type!='3' && view.type!='5'" nodrag  style="margin-right: 8px;">
+                    <span class="fa fa-plus"></span>
+                </a>
+            </span>
             <a class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
                 <span class="fa fa-pencil"></span>
             </a>
@@ -145,6 +158,7 @@
         <div ng-show="view.editorEnabled" class="slide">
             <form class="form-inline" ng-submit="$parent.saveItem($parent, view.editableValue);" ng-attr-id="{{ 'frmEditable-' + $id }}">
                 <div class="form-group">
+                    {{$parent.$index+1}}. &nbsp; &nbsp;
                     <input type="text" class="form-control" placeholder="Level Name" ng-required="true" ng-model="view.editableValue"/>
                     <select class="form-control form-control-small" ng-model="view.type" ng-options="k as v for (k,v) in process_stage_type" ng-required="true" ng-disabled="view.id!=null">
                         <option value=''>--Select option type--</option>
@@ -162,8 +176,8 @@
             <span class="btn btn-success btn-xs">&nbsp;{{$parent.$index+1}}&nbsp;</span>
             <span class="mt-5">{{view.editableValue}}</span>
             <span class="setFlagBox pl-10">
-                <button type="button" class="btn btn-primary btn-xs" ng-class="{'showFlag': view.flagDefault, 'hide': view.flagCompletion}" ng-click="view.flagDefault = !view.flagDefault"><i class="fa fa-check-square" ng-if="view.flagDefault"></i> Default Flag</button>
-                <button type="button" class="btn btn-primary btn-xs" ng-class="{'showFlag': view.flagCompletion, 'hide': view.flagDefault}" ng-click="view.flagCompletion = !view.flagCompletion"><i class="fa fa-check-square" ng-if="view.flagCompletion"></i> Completion Flag</button>
+                <button type="button" class="btn btn-primary btn-xs" ng-class="{'showFlag': $parent.getFlag($parent, 'default'), 'hide': $parent.getFlag($parent, 'completion')}" ng-click="$parent.setFlag($parent, 'default')"><i class="fa fa-check-square" ng-if="$parent.getFlag($parent, 'default')"></i> Default Flag</button>
+                <button type="button" class="btn btn-primary btn-xs" ng-class="{'showFlag': $parent.getFlag($parent, 'completion'), 'hide': $parent.getFlag($parent, 'default')}" ng-click="$parent.setFlag($parent, 'completion')"><i class="fa fa-check-square" ng-if="$parent.getFlag($parent, 'completion')"></i> Completion Flag</button>
             </span>
             <span class="pull-right">
                 <a class="btn btn-primary btn-xs" nodrag ng-click="enableEditor(this)">

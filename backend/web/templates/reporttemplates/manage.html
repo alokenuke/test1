@@ -1,0 +1,123 @@
+<script type="text/javascript" src="/js/ckeditor/ckeditor.js"></script>
+<div role="tabpanel" class="tab-pane col-xs-12 active" id="List_Tags">
+     <div class="row">
+        <div class="col-xs-12 search-box mb-sm-large">
+            <form ng-submit="saveTemplate()" id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form">
+                <div class='row'>
+                    <div class="col-md-2 col-lg-2">
+                        <button type="button" class="btn btn-primary" ng-click="report_template = {}">Add New Template</button>
+                    </div>
+                    <div class="col-md-3 col-lg-2">
+                        <select class="form-control" ng-model="report_template" ng-options="report_template.template_name for report_template in templates"
+                                ng-change="paper_size=(report_template.page_width==216 && report_template.page_height==279?'letter':(report_template.page_width==210 && report_template.page_height==297?'a4':'custom'))">
+                        </select>
+                    </div>
+                    <div class="col-md-1" ng-show="report_template.id>0">
+                        <button type="button" class="btn btn-primary" ng-confirm-click="Are you sure to remove this template?" ng-click="deleteTemplate()">Delete Template</button>
+                    </div>
+                </div>
+                <div class="row mt-20">
+                    <div class="col-md-6 col-lg-5">
+                        <h2 class="col-xs-12 search-title mb-20">Paper Format</h2>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Template Name :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" ng-model="report_template.template_name" placeholder="Template Name" ng-required="true" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Paper Size :</label>
+                            <div class="col-sm-4">
+                                <select class='form-control' ng-model="paper_size" >
+                                    <option value='custom'>Custom</option>
+                                    <option value="letter">Letter</option>
+                                    <option value='a4'>A4</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Page Width (mm) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" ng-model='report_template.page_width' ng-init="report_template.page_width=0" ng-disabled="paper_size=='letter' || paper_size=='a4'" numbers-only ng-required="true">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Page Height (mm) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" ng-model='report_template.page_height' ng-init="report_template.page_height=0" ng-disabled="paper_size=='letter' || paper_size=='a4'" numbers-only ng-required="true" />
+                            </div>
+                        </div>
+                    </div><!--/.col-md-->
+                    <div class="col-md-6 col-lg-5">
+                        <h2 class="col-xs-12 search-title mb-20"> Paper Margin</h2>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Top Margin (mm) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control"  ng-model='report_template.top_margin' ng-change="calculateLabelHeightWidth()" numbers-only />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Bottom Margin (mm) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control"  ng-model='report_template.bottom_margin' ng-change="calculateLabelHeightWidth()" numbers-only />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Right Margin (mm) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control"  ng-model='report_template.right_margin' ng-change="calculateLabelHeightWidth()" numbers-only />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Left Margin (mm) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control"  ng-model='report_template.left_margin' ng-change="calculateLabelHeightWidth()" numbers-only />
+                            </div>
+                        </div>
+                    </div><!--/.col-md-->
+                </div><!--/row-->
+                <div class="col-xs-12 search-box mb-20">
+                    <div class="row">
+                        <h2 class="col-xs-12 search-title clickable" ng-click="variableBox=!variableBox;">
+                            Placeholder Variables:
+                            <button class="pull-right btn icon-btn">
+                                <i ng-class="{'fa fa-sort-desc fa-2x': !variableBox,'fa fa-sort-asc fa-2x': variableBox}"></i>
+                            </button>
+                        </h2>
+                    </div><!--/row-->
+                    <div class="row pb-20 mt-10 slide" ng-hide="variableBox">
+                        <div class="pull-left mr-10 pl-20"><strong>Tag Name:</strong> [[tag_name]],</div>
+                        <div class="pull-left mr-10 pl-20"><strong>QR Code Image:</strong> [[image_qr_code]],</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Bar Code Image:</strong> [[image_bar_code]],</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Company Name:</strong> [[company_name]],</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Client Location:</strong> [[client_location]],</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Main Contractor:</strong> [[main_contractor]],</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Project Name:</strong> [[project_name]],</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Project Address:</strong> [[project_address]],</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Project Area:</strong> [[area]],</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Project Level:</strong> [[project_level]],</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Items:</strong> [[items]],</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Process:</strong> [[process]],</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Unique Code:</strong> [[unique Code]],</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Tag Description:</strong> [[tag_description]]</div>
+                    </div><!--/row-->
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <textarea ng-model="report_template.content" id="content" ck-editor></textarea>
+                    </div>
+                </div>
+                <div class="row mt-20">
+                   <div class="col-sm-10 text-center">
+                       <button class="btn btn-primary mb-sm-5" type="submit">Save</button>
+                   </div> 
+                </div>
+            </form>
+        </div><!--/search-tag-box-->
+    </div><!--/row-->
+</div>
+<style>
+    input[type=number] {-moz-appearance: textfield;}
+    ::-webkit-inner-spin-button { -webkit-appearance: none;}
+    ::-webkit-outer-spin-button { -webkit-appearance: none;}
+</style>

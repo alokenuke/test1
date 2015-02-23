@@ -1,0 +1,37 @@
+<div role="tabpanel" class="tab-pane col-xs-12 active" id="List_Tags">
+    <a href="/#/add-role" class="btn btn-primary row">Add New Role</a>
+    <div class="row mt-15">
+        <div class="">
+            <div class="table-responsive table-responsive-cust">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">ID</th>
+                            <th class="text-center">Role Name</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="role in roles">
+                            <td class="text-center">{{role.id}}</td>
+                            <td>{{role.role_name}}</td>
+                            <td class="text-center">
+                                <p ng-bind-html="(role.status == '1'?'<span class=\'btn btn-success\'>Active</span>':'<span class=\'btn btn-danger\'>Not Active</span>')"></p>
+                            </td>
+                            <td class="text-center">
+<a href="/#/roles/update/{{role.id}}" class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pull-right">                    
+                        <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
+                        <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px" ng-change="setPageLimit()" ng-model="numPerPage" ng-options="k as v for (k,v) in page_dropdown">
+                        </select>
+                </div>
+            </div>
+        </div>          
+    </div><!--/row-->
+</div>

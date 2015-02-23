@@ -118,8 +118,15 @@ app.controller('TimeAttendance', ['$scope', 'rest', '$location', '$route','$rout
         
         var errorCallback = function (data) {
             if(data.status!=401) {
-                alertService.add('error', "Error in processing your request. Please try again.");
+                if(typeof data !== 'object')
+                {
+                    alertService.clearAll();
+                    alertService.add("error", data);
+                }
+                else
+                    alertService.add('error', "Error in processing your request. Please try again.");
             }
+                
         };
         
         updateTagList();
@@ -137,11 +144,15 @@ app.controller('TimeAttendanceForm', ['$scope', 'rest', '$location', '$route','$
         $scope.tooltip = tooltip;
         
         breadcrumbsService.clearAll();
-        breadcrumbsService.setTitle("Create Attendance Tag");
-        breadcrumbsService.headTitle("Create Attendance Tag");
+        var title = "Create";
+        if($routeParams.id) {
+            title = "Update";
+        }
+        breadcrumbsService.setTitle(title+" Attendance Tag");
+        breadcrumbsService.headTitle(title+" Attendance Tag");
         breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/timeattendance", "Attendance Tags");
-        breadcrumbsService.add("/#/timeattendance/create", "Create Tag");
+        breadcrumbsService.add("", title + " Tag");
         
         $scope.search = {};
         $scope.projectlevels = [];
@@ -179,7 +190,7 @@ app.controller('TimeAttendanceForm', ['$scope', 'rest', '$location', '$route','$
         if($routeParams.id) {
             var selectedItem = $routeParams.id;
             $scope.tagLoading = true;
-            $http.get("/timeattendance/"+selectedItem+"?expand=projectLevelObj,userGroup,timeAttendanceAssignmentObj").success(function(data) {
+            $http.get("/timeattendance/"+selectedItem+"?expand=project_level,userGroup,timeAttendanceAssignmentObj").success(function(data) {
                 
                 $scope.search.project = {'id': data.project_id, 'project_name': data.project_name};
                 $scope.tagDetails.project_id = $scope.search.project.id;
@@ -291,8 +302,15 @@ app.controller('TimeAttendanceForm', ['$scope', 'rest', '$location', '$route','$
         
         var errorCallback = function (data) {
             if(data.status!=401) {
-                alertService.add('error', "Error in processing your request. Please try again.");
+                if(typeof data !== 'object')
+                {
+                    alertService.clearAll();
+                    alertService.add("error", data);
+                }
+                else
+                    alertService.add('error', "Error in processing your request. Please try again.");
             }
+                
         };
         
         rest.setData("projects/getall", ['id', 'project_name'], {'project_status': null}).success(function(data) {
@@ -340,8 +358,15 @@ app.controller('TimeAttendanceView', ['$scope', 'rest', '$location', '$route','$
         
         var errorCallback = function (data) {
             if(data.status!=401) {
-                alertService.add('error', "Error in processing your request. Please try again.");
+                if(typeof data !== 'object')
+                {
+                    alertService.clearAll();
+                    alertService.add("error", data);
+                }
+                else
+                    alertService.add('error', "Error in processing your request. Please try again.");
             }
+                
         };
                 
         $scope.delete = function (id) {
@@ -359,11 +384,11 @@ app.controller('TimeAttendanceView', ['$scope', 'rest', '$location', '$route','$
             isopen: false
         };
 		
-        $http.post("/timeattendance-log/search?expand=loggedBy",{'search': {'tag_id':$routeParams.id}}).success(function(data) {
+        $http.post("/timeattendance-log/search?expand=user",{'search': {'tag_id':$routeParams.id}}).success(function(data) {
             $scope.activity = data.items;
         });
         
-        $http.get("/timeattendance/"+$routeParams.id+"?expand=projectLevelObj,userGroup,timeattendanceAssignmentObj").success(function(data) {
+        $http.get("/timeattendance/"+$routeParams.id+"?expand=project_level,userGroup,timeAttendanceAssignmentObj").success(function(data) {
             $scope.tagAnalytic = data;
             breadcrumbsService.setTitle("Time Attendance Logs: "+data.tag_name);
         });

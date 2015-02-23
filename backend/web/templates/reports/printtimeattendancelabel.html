@@ -2,14 +2,14 @@
 <div role="tabpanel" class="tab-pane col-xs-12 active" id="List_Tags">
     <div class="row">
         <div class="col-xs-12 search-box mb-sm-large">
-            <form id="form" class="form-wrapper form-horizontal form-horizontal-type1 slide" role="form">
+            <form id="frmLabelFilter" class="form-wrapper form-horizontal form-horizontal-type1 slide" role="form" ng-submit="viewLabels()">
                 <div class="row">
                     <div class="col-md-6 col-lg-5">
                         <div class="form-group">
                             <label class="col-sm-4 control-label text-right">Project Name :</label>
                             <div class="col-sm-6 multi-level">
-                                <ui-select ng-model="project.selected"
-                                           theme="bootstrap" ng-if="projects.length>0" class="last-child">
+                                <ui-select ng-model="search.project"
+                                           theme="bootstrap" ng-if="projects.length>0" class="last-child" ng-required="true">
                                     <ui-select-match placeholder="Select a project...">{{$select.selected.project_name}}</ui-select-match>
                                     <ui-select-choices repeat="project in projects | filter: $select.search"
                                                        refresh-delay="0">
@@ -81,50 +81,11 @@
                     </div>
                     <div class="col-md-6 col-lg-7">
                         <div class="form-group">
-                            <label class="col-sm-4 col-lg-3 control-label text-right">Item:</label>
-                            <div class="col-sm-6 multi-level">
-                                <ui-select ng-repeat="item in items"  ng-model="tag_item[$index].selected"
-                                           theme="bootstrap" ng-disabled="disabled" class="{{((items.length - 1) === $index ? 'last-child ' : '')}}">
-                                    <ui-select-match placeholder="Select item">{{$select.selected.item_name}}</ui-select-match>
-                                    <ui-select-choices repeat="i in item | filter: $select.search"
-                                                       refresh-delay="0">
-                                        <div ng-bind-html="i.item_name" ng-click="updateSelectBox('items', search.project_id, $parent.$index, i.id)"></div>
-                                    </ui-select-choices>
-                                </ui-select>
-                                <div ng-hide="items.length">
-                                    <a ng-href="/#/tagitems">No Item available.</a>
-                                </div>
-                                <input type="hidden" ng-model="search.tag_item_id" />
-                            </div>
-                        </div>
-                    </div>
-                </div><!--/row-->
-
-                <div class="row">
-                    <div class="col-md-6 col-lg-5">
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">Product Code :</label>
-                            <div class="col-sm-6">
-                                <input type="text" ng-model="search.product_code" class="form-control" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-7">
-                        <div class="form-group">
-                            <label class="col-sm-4 col-lg-3 control-label text-right">Process Flow:</label>
-                            <div class="col-sm-6 multi-level">
-                                <ui-select ng-repeat="process in processes"  ng-model="tag_process[$index].selected"
-                                           theme="bootstrap" ng-disabled="disabled" class="{{((processes.length - 1) === $index ? 'last-child ' : '')}}">
-                                    <ui-select-match placeholder="Select process">{{$select.selected.process_name}}</ui-select-match>
-                                    <ui-select-choices repeat="p in process | filter: $select.search"
-                                                       refresh-delay="0">
-                                        <div ng-bind-html="p.process_name" ng-click="updateSelectBox('processes', search.project_id, $parent.$index, p.id)"></div>
-                                    </ui-select-choices>
-                                </ui-select>
-                                <div ng-hide="processes.length">
-                                    <a ng-href="/#/tag-process-flow">No process available.</a>
-                                </div>
-                                <input type="hidden" ng-model="search.tag_process_id" />
+                            <label class="col-sm-4 col-lg-3 control-label text-right">Print Type</label>
+                            <div class="col-sm-8 multi-level">
+                                <label class="mr-10"> <input type="radio" ng-model="print_type" value="nfc_code" /> NFC Code</label>
+                                <label class="mr-10"> <input type="radio" ng-model="print_type" value="bar_code" /> Bar Code </label>
+                                <label> <input type="radio" ng-model="print_type" value="qr_code" ng-init="print_type='qr_code'" /> QR Code </label>
                             </div>
                         </div>
                     </div>
@@ -165,25 +126,98 @@
                 <div class="row">
                     <div class="col-md-6 col-lg-5">
                         <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">Tag Type :</label>
+                            <label class="col-sm-4 control-label text-right">Print Template:</label>
                             <div class="col-sm-6">
-                                <select class="form-control" ng-model="search.type">
-                                    <option value="">-- Tag Type --</option>
-                                    <option value="sT">Simple Tags (sT)</option>
-                                    <option value="mT">Master Tags (mT)</option>
-                                </select>
+                                <select class="form-control" ng-model="print.label_template" ng-required="true"
+                                    ng-options="template.template_name for template in templates">
+                               </select>
                             </div>
                         </div>
                     </div>
-                </div><!--/row-->
-                
+                </div>
                 <div class="row mt-20">
                     <div class="col-sm-10 text-center">
-                        <button class="btn btn-primary mb-sm-5" ng-click="generateReports()">Generate</button>
-                        <button class="btn btn-primary mb-sm-5" ng-click="clearSearch();">Clear Filter</button>
+                        <button class="btn btn-primary mb-sm-5" type="submit">View Labels</button>
+                        <button class="btn btn-primary mb-sm-5" type="button" ng-click="clearFilter();">Clear Filter</button>
                     </div> 
                 </div>
             </form>
+            <div id="TaskContentBlock" class="row" ng-if="labels"><!-- .span12 -->
+                <div class="col-sm-12">
+                    <form class="search-box " role="form" ng-submit="printLabel()">
+                        <div class="form-inline">
+                            <div class="mt-10 mb-10 row">
+                                <div class="col-sm-3  print-elm-left-xs mt-5">
+                                    &nbsp;&nbsp;<i class="fa fa-list-alt fa-lg mr-10 mt-5"></i>
+                                    <strong>List Of Time Attendance Tags</strong>
+                                </div>
+                                <div class="col-sm-9 print-elm-right-xs text-right">
+                                    <div class="form-group">
+                                        <label>
+                                            <input type="checkbox" ng-change="checkAll(selectAll)" ng-model="selectAll" /> All 
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <button class="btn btn-primary btn-xs" type="submit"><i class="fa fa-print"></i> Print Label</button>
+                                    </div>
+                                    <div class="form-group">
+                                        <button ng-click="collapsed=!collapsed;" class="pull-right btn icon-btn btn-xs" type="button">
+                                            <i ng-class="{'fa fa-sort-desc fa-2x': !collapsed,'fa fa-sort-asc fa-2x': collapsed}" class="fa fa-sort-desc fa-2x"></i>
+                                        </button>                      
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="body slide" ng-hide="collapsed" id="actionTable">
+                            <div class="row">
+                                <div class="clearfix pl-20" ng-repeat="label in labels" style="border-bottom: 1px solid #ccc;">
+                                    <div class="col-sm-4" ng-if="label.uid">
+                                        <input type="checkbox" ng-model="label.isSelected" ng-change="checkLabel(label)">
+                                        <strong>UID:</strong>{{label.uid}}
+                                        <br><br>
+                                        <img style='width: 15em' ng-src="/filemanager/getimage?type={{basePrintType[print_type]}}&file={{(print_type=='nfc_code'?'nfc':label.uid)}}.png"><br>
+                                        <strong>&nbsp;&nbsp;&nbsp;&nbsp;{{print_type | titlecase}}</strong><br><br>
+                                        <img width="150" height="20" alt="" src="/images/logo.png"><br>
+                                        <strong>www.sitetrack-nfc.com</strong>  
+                                    </div>
+                                    <div class="col-sm-8 mt-15">
+                                        <div>&nbsp;</div>
+                                        <div ng-if="print.label_template.id==0 || print.label_template.checked_labels.company_name">
+                                            <strong>Company Name: </strong>{{company.company_name}}
+                                        </div>
+                                        <div ng-if="print.label_template.id==0 || print.label_template.checked_labels.client_name">
+                                            <strong>Client Name: </strong>{{search.project.client_name}}
+                                        </div>
+                                        <div ng-if="print.label_template.id==0 || print.label_template.checked_labels.client_location">
+                                            <strong>Client Location: </strong>{{search.project.client_address}} {{search.project.client_city}}
+                                        </div>
+                                        <div ng-if="print.label_template.id==0 || print.label_template.checked_labels.main_contractor">
+                                            <strong>Main Contractor: </strong>{{search.project.main_contractor}}
+                                        </div>
+                                        <div ng-if="print.label_template.id==0 || print.label_template.checked_labels.project_name">
+                                            <strong>Project Name: </strong>{{search.project.project_name}}
+                                        </div>
+                                        <div ng-if="print.label_template.id==0 || print.label_template.checked_labels.project_location">
+                                            <strong>Area: </strong>{{search.project.project_location}}
+                                        </div>
+                                        <div ng-if="print.label_template.id==0 || print.label_template.checked_labels.project_level">
+                                            <strong>Project Level:</strong><span ng-repeat="project_level in label.project_level">
+                                                {{project_level}} <strong ng-if="label.project_level.length !== ($index + 1)">&nbsp;>&nbsp;</strong>
+                                            </span>
+                                        </div>
+                                        <div ng-if="print.label_template.id==0 || print.label_template.checked_labels.tag_description">
+                                            <strong>Task Summary: </strong>{{label.tag_description}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pl-20" ng-if="!labels || labels.length==0">
+                                No label available for your search
+                            </div>
+                        </div>
+                    </form>       
+                </div><!-- /label list container -->
+            </div>
         </div><!--/search-tag-box-->
     </div><!--/row-->
 </div><!--/tab-content-->

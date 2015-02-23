@@ -247,7 +247,7 @@
                                <td><input type="text" id="tag-productCode-{{$index}}" class="form-control form-control-small" ng-model="tag.productCode" /></td>
                                <td>
                                    <div class="input-group">
-                                       <input type="text" id="tag-tagDescription-{{$index}}" class="form-control form-control-small" ng-model="tag.tagDescription" />
+                                       <input type="text" id="tag-tagDescription-{{$index}}" class="form-control form-control-small" ng-model="tag.tagDescription" maxlength="100" />
                                        <span class="input-group-btn">
                                            <button ng-click="(tagDetails.tags.length>1?tagDetails.tags.splice($index,1):0)" type="button" class="btn btn-default" style="padding:3px 10px;"><i class="fa fa-trash"></i></button>
                                        </span>

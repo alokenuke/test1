@@ -231,7 +231,7 @@
                                <td><input type="text" id="tag-productCode-{{$index}}" class="form-control form-control-small" ng-model="tagDetails.product_code" /></td>
                                <td>
                                    <div class="input-group">
-                                       <input type="text" id="tag-tagDescription-{{$index}}" class="form-control form-control-small" ng-required='true' ng-model="tagDetails.tag_description" />
+                                       <input type="text" id="tag-tagDescription-{{$index}}" class="form-control form-control-small" ng-model="tagDetails.tag_description" maxlength="100" />
                                    </div>
                                </td>
                            </tr>

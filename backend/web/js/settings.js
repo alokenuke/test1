@@ -187,6 +187,7 @@ app.controller('ManageLabelTemplates', function($scope, rest, $location, alertSe
         alertService.clearAll();
         if($scope.returnAction==false)
             $e.preventDefault();
+        
         if($scope.label_template.id)
             $http.put("/labeltemplates/"+$scope.label_template.id, $scope.label_template).success(function(data) {
                 alertService.add('success', "Template updated successfully.");
@@ -223,6 +224,94 @@ app.controller('ManageLabelTemplates', function($scope, rest, $location, alertSe
     rest.models({}).success(function (data) {
         $scope.templates = data.items;
         $scope.label_template = $scope.templates[0];
+    }).error(errorCallback);
+    
+})
+
+app.controller('ManageReportTemplates', function($scope, rest, $location, alertService, $http, breadcrumbsService, $window, $upload) {
+    rest.path = "reporttemplates";
+    
+    breadcrumbsService.clearAll();
+    breadcrumbsService.setTitle("Manage Report Templates");
+    breadcrumbsService.add("/#/", "Home");
+    breadcrumbsService.add("/#/reporttemplates", "Settings - Report Templates");
+    $scope.paper_size = 'custom';
+    $scope.report_template = {};
+    
+    var errorCallback = function (data) {
+        if(data.status!=401) {
+            alertService.add('error', "Error in processing your request. Please try again.");
+        }
+    };
+    
+    $scope.$watch('paper_size', function(newValue) {
+        if(newValue=='letter')
+        {
+            $scope.report_template.page_width = 216;
+            $scope.report_template.page_height = 279;
+        }
+        else if(newValue=='a4')
+        {
+            $scope.report_template.page_width = 210;
+            $scope.report_template.page_height = 297;
+        }
+        else {
+            $scope.report_template.page_width = 0;
+            $scope.report_template.page_height = 0;
+        }
+    });
+    
+    $scope.deleteTemplate = function() {
+        if(typeof $scope.report_template == 'undefined' || $scope.report_template.length <= 0) {
+            alertService.clearAll();
+            alertService.add('error', "No template selected.");
+        }
+        else {
+            $scope.$apply(function(){
+                var index = $scope.templates.indexOf($scope.report_template);
+                $scope.templates.splice(index,1);
+                alertService.clearAll();
+                console.log($scope.report_template);
+                rest.deleteById($scope.report_template).success(function() {
+                    alertService.add('success', "Template ("+$scope.report_template.template_name+") removed.");
+                    $scope.report_template = $scope.templates[0];
+                });
+            });
+        }
+    }
+    
+    $scope.previewTemplate = function() {
+        var tabWindowId = window.open('about:blank', '_blank');
+
+        $http.post("/reportsdownload/previewtemplate", $scope.report_template).success(function(response) {
+            tabWindowId.location.href = response;
+        }).error(errorCallback);
+    }
+    
+    $scope.saveTemplate = function($e) {
+        alertService.clearAll();
+        if($scope.returnAction==false)
+            $e.preventDefault();
+        if($scope.report_template.id)
+            $http.put("/reporttemplates/"+$scope.report_template.id, $scope.report_template).success(function(data) {
+                alertService.add('success', "Template updated successfully.");
+                $scope.report_template = data;
+            }).error(errorCallback);        
+        else
+            rest.postModel($scope.report_template).success(function(data) {
+                alertService.add('success', "Template created successfully.");
+                $scope.report_template = data;
+            }).error(errorCallback);
+    }
+    
+    $scope.removePhoto = function() {
+        $scope.report_template.logo = null;
+    }
+    
+    rest.models({}).success(function (data) {
+        $scope.templates = data.items;
+        if(typeof $scope.templates[0] != 'undefined')
+            $scope.report_template = $scope.templates[0];
     }).error(errorCallback);
     
 })

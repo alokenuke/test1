@@ -151,7 +151,7 @@ app.controller('ProjectLevel', ['$scope', 'rest', '$location', '$route', '$route
         breadcrumbsService.add("/#/projects", "Projects");
         breadcrumbsService.add("/#/project-levels", "Manage Levels");
 
-        $scope.flagUpdatedPosition = false;
+        $scope.flagUpdatedLevels = false;
         $scope.draggingInitiated = false;
 
         $scope.showProjectsModal = function (scope) {
@@ -187,14 +187,14 @@ app.controller('ProjectLevel', ['$scope', 'rest', '$location', '$route', '$route
 
         $scope.saveLevelPosition = function () {
             alertService.clearAll();
-            $scope.loadingSaveLevelPosition = true;
+            $scope.loadingSaveLevels = true;
             $http.post("/projectlevel/savelevelpositions", {'ProjectLevels': $scope.list}).success(function (data) {
                 alertService.add("success", "Project level saved successfully.");
-                $scope.loadingSaveLevelPosition = false;
-                $scope.flagUpdatedPosition = false;
+                $scope.loadingSaveLevels = false;
+                $scope.flagUpdatedLevels = false;
             }).error(function (data) {
                 console.log(data);
-                $scope.loadingSaveLevelPosition = false;
+                $scope.loadingSaveLevels = false;
                 alertService.add("error", "Error in saving project levels. Please try again.");
             });
         }
@@ -215,7 +215,7 @@ app.controller('ProjectLevel', ['$scope', 'rest', '$location', '$route', '$route
             },
             dropped: function (event) {
                 if ($scope.draggingInitiated) {
-                    $scope.flagUpdatedPosition = true;
+                    $scope.flagUpdatedLevels = true;
                 }
             },
         };
@@ -291,7 +291,7 @@ app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route', '$routeP
     breadcrumbsService.add("/#/", "Home");
     breadcrumbsService.add("/#/tag-process-flow", "Tag Process");
 
-    $scope.flagUpdatedPosition = false;
+    $scope.flagUpdatedLevels = false;
     $scope.draggingInitiated = false;
 
     $scope.showProjectsModal = function (scope) {
@@ -320,21 +320,45 @@ app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route', '$routeP
             alertService.add('error', "Error in processing your request. Please try again.");
         }
     };
-
+    
+    $scope.setFlag = function(scope, type) {
+        $scope.flagUpdatedLevels = true;
+        if(type=='default') {
+            var item = scope.$parent.$parent.$parent.$modelValue;
+            item.flagDefault = scope.$modelValue.id;
+        }
+        else if(type=='completion') {
+            var item = scope.$parent.$parent.$parent.$modelValue;
+            item.flagCompletion = scope.$modelValue.id;
+        }
+        else
+            scope.flagHierarchy = !scope.flagHierarchy;
+    }
+    
+    $scope.getFlag = function(scope, type) {
+        var item = scope.$parent.$parent.$parent.$modelValue;
+        if(type=='default' && item.flagDefault == scope.$modelValue.id) {
+            return item.flagDefault;
+        }
+        else if(type=='completion' && item.flagCompletion == scope.$modelValue.id) {
+            return item.flagCompletion;
+        }
+    }
+    
     $scope.resetLevels = function () {
         $route.reload();
     }
 
-    $scope.saveProcessPosition = function () {
+    $scope.saveProcessLevels = function () {
         alertService.clearAll();
-        $scope.loadingSaveLevelPosition = true;
-        $http.post("/tagprocess/savepositions", {'Process': $scope.list}).success(function (data) {
+        $scope.loadingSaveLevels = true;
+        $http.post("/tagprocess/savepositionlevels", {'Process': $scope.list}).success(function (data) {
             alertService.add("success", "Project level saved successfully.");
-            $scope.loadingSaveLevelPosition = false;
-            $scope.flagUpdatedPosition = false;
+            $scope.loadingSaveLevels = false;
+            $scope.flagUpdatedLevels = false;
         }).error(function (data) {
             console.log(data);
-            $scope.loadingSaveLevelPosition = false;
+            $scope.loadingSaveLevels = false;
             alertService.add("error", "Error in saving project levels. Please try again.");
         });
     }
@@ -353,7 +377,7 @@ app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route', '$routeP
         },
         dropped: function (event) {
             if ($scope.draggingInitiated) {
-                $scope.flagUpdatedPosition = true;
+                $scope.flagUpdatedLevels = true;
                 $scope.draggingInitiated = false;
             }
         },

@@ -72,10 +72,9 @@ app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParam
             updateTagList();
         };
         
-        $scope.deleteTag = function (id) {
-            rest.deleteById({id: id}).success(function () {
-                $location.path('/tags');
-                $route.reload();
+        $scope.deleteTag = function (data, $index) {
+            rest.deleteById(data).success(function () {
+                $scope.data.splice($index,1);
             }).error(errorCallback);
         }
         
@@ -141,6 +140,21 @@ app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParam
             }
         }
         
+        $scope.printSelectedTags = function() {
+            var selectedTags = [];
+            
+            angular.forEach($scope.data, function(val) {
+                if(val.isSelected)
+                    selectedTags.push(val.id);
+            });
+            
+            $http.post("reportsdownload/print-tag-reports", {'tags': selectedTags, 'reportTemplate': $scope.print.report_template}).success(function(data) {
+                var tabWindowId = window.open("_new");
+                tabWindowId.location.href = data;
+            }).error(function(data) {errorCallback(data)});
+            
+        }
+        
         var updateTagList = function() {
             if(typeof $scope.search.date_range !== 'undefined') {
                 $monthArr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -164,7 +178,13 @@ app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParam
         
         var errorCallback = function (data) {
             if(data.status!=401) {
-                alertService.add('error', "Error in processing your request. Please try again.");
+                if(typeof data !== 'object')
+                {
+                    alertService.clearAll();
+                    alertService.add("error", data);
+                }
+                else
+                    alertService.add('error', "Error in processing your request. Please try again.");
             }
         };
         
@@ -174,8 +194,8 @@ app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParam
         rest.setData("items/getall", ['id', 'item_name'], {'parent_id': 0}).success(function(data) {$scope.items.push(data.items);});
         rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': 0}).success(function(data) {$scope.processes.push(data.items);});
         rest.setData("usergroups/getall", {}, {}).success(function(data) {$scope.usergroups = data.items;});
-        
-    }])
+        rest.customModelData("reporttemplates/getall", {'ReportTemplates': {'select': ['id', 'template_name']}}).success(function (data) {$scope.templates = data.items;$scope.print = {};$scope.print.report_template = $scope.templates[0];});
+   }])
 
 app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'tooltip', '$modal', '$log', 'alertService',
                 function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, tooltip, $modal, $log, alertService) {
@@ -530,8 +550,15 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
         
         var errorCallback = function (data) {
             if(data.status!=401) {
-                alertService.add('error', "Error in processing your request. Please try again.");
+                if(typeof data !== 'object')
+                {
+                    alertService.clearAll();
+                    alertService.add("error", data);
+                }
+                else
+                    alertService.add('error', "Error in processing your request. Please try again.");
             }
+                
         };
         
         rest.setData("projects/getall", ['id', 'project_name'], {'project_status': null}).success(function(data) {
@@ -641,7 +668,7 @@ app.controller('TagsUpdate', ['$scope', 'rest', '$location', '$route','$routePar
 
                 $scope.tagDetails.project_level_id = data.project_level_id;
                 $scope.search.childlevels = data.projectLevelObj;
-                $scope.projectlevels.splice(1, ($scope.projectlevels.length-1));
+                $scope.projectlevels = [];
                 angular.forEach(data.projectLevelObj, function(v, k){
                     $scope.projectlevels.push([v]);
                 });
@@ -795,8 +822,15 @@ app.controller('TagsUpdate', ['$scope', 'rest', '$location', '$route','$routePar
         
         var errorCallback = function (data) {
             if(data.status!=401) {
-                alertService.add('error', "Error in processing your request. Please try again.");
+                if(typeof data !== 'object')
+                {
+                    alertService.clearAll();
+                    alertService.add("error", data);
+                }
+                else
+                    alertService.add('error', "Error in processing your request. Please try again.");
             }
+                
         };
         
         $scope.$watch('process_stages', function (newVal) {
@@ -1101,8 +1135,15 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
         
         var errorCallback = function (data) {
             if(data.status!=401) {
-                alertService.add('error', "Error in processing your request. Please try again.");
+                if(typeof data !== 'object')
+                {
+                    alertService.clearAll();
+                    alertService.add("error", data);
+                }
+                else
+                    alertService.add('error', "Error in processing your request. Please try again.");
             }
+                
         };
         
         rest.setData("projects/getall", ['id', 'project_name'], {'project_status': null}).success(function(data) {
@@ -1235,7 +1276,7 @@ app.controller('TagsUpdateMaster', ['$scope', 'rest', '$location', '$route','$ro
 
                 $scope.tagDetails.project_level_id = data.project_level_id;
                 $scope.search.childlevels = data.projectLevelObj;
-                $scope.projectlevels.splice(1, ($scope.projectlevels.length-1));
+                $scope.projectlevels = [];
                 angular.forEach(data.projectLevelObj, function(v, k){
                     $scope.projectlevels.push([v]);
                 });
@@ -1423,8 +1464,15 @@ app.controller('TagsUpdateMaster', ['$scope', 'rest', '$location', '$route','$ro
         
         var errorCallback = function (data) {
             if(data.status!=401) {
-                alertService.add('error', "Error in processing your request. Please try again.");
+                if(typeof data !== 'object')
+                {
+                    alertService.clearAll();
+                    alertService.add("error", data);
+                }
+                else
+                    alertService.add('error', "Error in processing your request. Please try again.");
             }
+                
         };
         
         $scope.$watch('process_stages', function (newVal) {
@@ -1475,9 +1523,30 @@ app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParam
         
         var errorCallback = function (data) {
             if(data.status!=401) {
-                alertService.add('error', "Error in processing your request. Please try again.");
-            }
+                if(typeof data !== 'object')
+                {
+                    alertService.clearAll();
+                    alertService.add("error", data);
+                }
+                else
+                    alertService.add('error', "Error in processing your request. Please try again.");
+            }      
         };
+        
+        // Downloadable report (Excel format)
+        $scope.generateReports = function(activity) {
+            if(typeof $routeParams.id == 'undefined' || $routeParams.id <= 0) {
+                alertService.clearAll();
+                alertService.add("error", " Invalid Request!!");
+                return;
+            }
+            
+            var params = {'data': activity};
+            rest.customModelData("reports/generate-tag-reports-by-id", params).success(function (data) {
+                var tabWindowId = window.open("_new");
+                tabWindowId.location.href = data;
+            }).error(errorCallback);
+        }
                 
         $scope.delete = function (id) {
             rest.deleteById({id: id}).success(function () {
@@ -1667,9 +1736,17 @@ app.controller('TagItems', function($scope, rest, $location, $route, $routeParam
     };
     
     var errorCallback = function (data) {
-        alertService.clearAll();
-        alertService.add('error', "Error in processing your request. Please try again.");
-    };
+            if(data.status!=401) {
+                if(typeof data !== 'object')
+                {
+                    alertService.clearAll();
+                    alertService.add("error", data);
+                }
+                else
+                    alertService.add('error', "Error in processing your request. Please try again.");
+            }
+                
+        };
     
     $scope.$search['parent_id']= 0;
     

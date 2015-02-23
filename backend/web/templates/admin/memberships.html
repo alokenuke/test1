@@ -1,0 +1,47 @@
+<div role="tabpanel" class="tab-pane col-xs-12 active" id="List_Tags">
+    <a href="/#/add-membership" class="btn btn-primary row">Add New Membership</a>
+    <div class="row mt-15">
+        <div class="">
+            <div class="table-responsive table-responsive-cust">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">ID</th>
+                            <th class="text-center">Name</th>
+                            <th class="text-center">Limit Active Projects</th>
+                            <th class="text-center">Limit Tags</th>
+                            <th class="text-center">Limit Users	</th>
+                            <th class="text-center">Limit Data</th>
+                            <th class="text-center">Limit Items</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="membership in memberships">
+                            <td class="text-center">{{membership.id}}</td>
+                            <td>{{membership.name}}</td>
+                            <td>{{membership.limit_active_projects}}</td>
+                            <td>{{membership.limit_tags	}}</td>
+                            <td>{{membership.limit_users}}</td>
+                            <td>{{membership.limit_data}}</td>
+                             <td>{{membership.limit_items}}</td>
+                            <td class="text-center">
+                                <p ng-bind-html="(membership.status == '1'?'<span class=\'btn btn-success\'>Active</span>':'<span class=\'btn btn-danger\'>Not Active</span>')"></p>
+                            </td>
+                            <td class="text-center">
+<a href="/#/membership/update/{{membership.id}}" class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                <button type="button" ng-confirm-click="Are you sure to remove this membership?" title="Click to remove." ng-click="removeMembership(membership, $index)"><i class="fa fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pull-right">                    
+                        <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
+                        <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px" ng-change="setPageLimit()" ng-model="numPerPage" ng-options="k as v for (k,v) in page_dropdown">
+                        </select>
+                </div>
+            </div>
+        </div>          
+    </div><!--/row-->
+</div>

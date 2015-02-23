@@ -5,7 +5,7 @@
     </div>
     <div class="row mt-10">
         <div class="col-xs-12 search-box mb-sm-large">
-            <div class="">
+            <div class="mt-10">
                 <div class="col-sm-9">
                     <div class="row">
                         <div class="col-md-6">
@@ -180,8 +180,8 @@
             <div style="padding:10px;" class="row">
                 <div class="col-xs-12 search-box mb-sm-large">
                     <div class="row">
-                        <h2 class="col-xs-12 search-title">Assigned Users and Process
-                            <button class="pull-right btn icon-btn" ng-click="showSearchBox=!showSearchBox;">
+                        <h2 class="col-xs-12 search-title clickable" ng-click="showSearchBox=!showSearchBox;">Assigned Users and Process
+                            <button class="pull-right btn icon-btn">
                                 <i ng-class="{'fa fa-sort-desc fa-2x': !showSearchBox,'fa fa-sort-asc fa-2x': showSearchBox}"></i>
                             </button>
                         </h2>
@@ -257,8 +257,7 @@
         </div><!--/shadow-box-->
         <div class="wrapper mt-10 mt-xs-large">
             <button class="btn icon-btn btn-lg pull-left activity-btn"><i class="fa fa-list-alt fa-lg mr-10 "></i>Activity Log List</button>
-    <!--        <button class="btn btn-primary btn-lg pull-right"><i class="fa fa-download mr-10 fa-lg"></i>Download Report</button>
-            <button class="btn btn-primary btn-lg pull-right mr-10"><i class="fa fa-print mr-10 fa-lg"></i>Print Report</button>-->
+            <button class="btn btn-primary btn-lg pull-right" ng-click="generateReports(activity)"><i class="fa fa-download mr-10 fa-lg"></i>Download Report</button>
         </div> 
         <div class="wrapper mt-20">
             <div class="table-responsive table-responsive-cust">

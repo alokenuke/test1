@@ -16,6 +16,7 @@ appServices.factory('alertService', function($rootScope, $timeout) {
         window.scrollTo(0, 0);
         $timeout(function(){
             angular.element("#alertMessages .alert:nth-child("+alertPos+")").remove();
+            $rootScope.alerts.splice(alertPos, 1);
         }, 5000);
     };
 
@@ -69,7 +70,7 @@ appServices.directive('numbersOnly', function(){
            // this next if is necessary for when using ng-required on your input. 
            // In such cases, when a letter is typed first, this parser will be called
            // again, and the 2nd time, the value will be undefined
-           if (inputValue == undefined) return '' 
+           if (inputValue == undefined || inputValue == null) return '' 
            if(max) {
                var transformedInput = inputValue.replace(/[^0-9+.]/g, ''); 
                if(transformedInput.length>max)
@@ -220,4 +221,58 @@ appServices.directive('openlightbox',
                 $scope.disableEditor();
         }
     };
+});
+
+appServices.directive('ckEditor', function() {
+  return {
+    require: '?ngModel',
+    link: function(scope, elm, attr, ngModel) {
+      var params = {
+            extraPlugins: 'placeholder',
+            filebrowserImageUploadUrl: '/filemanager/uploadimage',
+            toolbar :
+            [
+                    ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'],
+                    ['spellchecker'],
+                    ['Find','Replace','-','SelectAll','RemoveFormat'],
+                    ['Link', 'Unlink'],
+                    ['Image', 'Table', 'HorizontalRule'],
+                    ['Maximize'],
+                    ['Preview', 'Source'],
+                    ['CreatePlaceholder'],
+                    '/',
+                    ['FontSize', 'Styles','Format', 'Font', 'TextColor', 'Bold', 'Italic','Underline'],
+                    ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
+                    ['NumberedList','BulletedList','-','Blockquote'],
+            ],
+	};
+        
+        if(CKEDITOR.instances[attr.id])
+        {
+            delete CKEDITOR.instances[attr.id];
+        }
+        
+        var ck = CKEDITOR.replace(elm[0], params);
+
+        if (!ngModel) return;
+
+        ck.on('instanceReady', function() {
+          ck.setData(ngModel.$viewValue);
+        });
+
+        function updateModel() {
+            scope.$apply(function() {
+                ngModel.$setViewValue(ck.getData());
+            });
+        }
+
+        ck.on('change', updateModel);
+        ck.on('key', updateModel);
+        ck.on('dataReady', updateModel);
+
+        ngModel.$render = function(value) {
+          ck.setData(ngModel.$viewValue);
+        };
+    }
+  };
 });

@@ -67,6 +67,11 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
             controller: 'ManageLabelTemplates',
         })
         
+        .when('/reporttemplates', {
+            templateUrl: path+'reporttemplates/manage.html',
+            controller: 'ManageReportTemplates',
+        })
+        
         .when('/roles', {
             templateUrl: path+'roles/index.html',
             controller: 'RolesIndex'
@@ -104,6 +109,11 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
         .when('/print-label', {
             templateUrl: path+'reports/printlabel.html',
             controller: 'PrintLabel'
+        })
+        
+        .when('/timeattendance/print-label', {
+            templateUrl: path+'reports/printtimeattendancelabel.html',
+            controller: 'PrintTimeAttendanceLabel'
         })
         
         .when('/users/create', {
@@ -253,9 +263,11 @@ app.controller('ChangePassword', ['$scope', 'rest', 'breadcrumbsService', '$http
     $scope.model = {};
     $scope.serverError = {};
     $scope.change = function(data){
+        $scope.serverError = {};
         $http.post('/users/change-password',{ChangePassword:$scope.model}).success(function() {
             alertService.clearAll();
             alertService.add("success", "Password changed successfully.");
+            $scope.model = {};
         }).error(function(data){ 
             alertService.clearAll();
             angular.forEach(data, function(value) {

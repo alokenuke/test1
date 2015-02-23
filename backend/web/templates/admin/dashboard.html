@@ -1,0 +1,89 @@
+<section class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="content primary-bg-wrapper">
+                <div class="wrapper">
+                    <div class="primary-title-box">
+                        <h3 class="primary-title mt-0">
+                            Active Project : 
+                            <span class="pull-right">
+                                {{stats.projects.count}}
+                            </span>
+                        </h3>
+                    </div>
+                    <div class="primary-title-box">
+                        <h3 class="primary-title mt-0">
+                            Total Tags : 
+                            <span class="pull-right">
+                                {{stats.tags.count}}
+                            </span>
+                        </h3>
+                    </div>
+                    <div class="primary-title-box">
+                        <h3 class="primary-title mt-0">
+                            Total Users : 
+                            <span class="pull-right">
+                                {{stats.users.count}}
+                            </span>
+                        </h3>
+                    </div>
+                    <div class="primary-title-box">
+                        <h3 class="primary-title mt-0">
+                            Total Items : 
+                            <span class="pull-right">
+                                {{stats.items.count}}
+                            </span>
+                        </h3>
+                    </div>
+                    <div class="primary-title-box">
+                        <h3 class="primary-title mt-0">
+                            Data : 
+                            <span class="pull-right">
+                                {{stats.data.count}}
+                            </span>
+                        </h3>
+                    </div>
+                </div><!--/wrapper-->
+                <div class="wrapper">
+                    <div>
+                        <div class="row cust-row">
+                            <div ng-repeat="company in companies" class="projectbox col-md-6 col-lg-4 cust-col">
+                                <div class="box">
+                                    <h5 class="project-title mt-0">
+                                        <strong>Company: <span class="project-name">{{company.company_name}}</span></strong><br />
+                                        <strong>Membership: </strong>{{(company.membership.name?company.membership.name:"Not set")}}
+                                    </h5>
+                                    <ul>
+                                        <li>
+                                            <span class="pull-left">Active Projects</span>
+                                            <span class="pull-right">{{company.stats.projects.count}}</span>
+                                        </li>
+                                        <li>
+                                            <span class="pull-left">Total Tags</span>
+                                            <span class="pull-right">{{company.stats.tags.count}}</span>
+                                        </li>
+                                        <li>
+                                            <span class="pull-left">Total Users</span>
+                                            <span class="pull-right">{{company.stats.users.count}}</span>
+                                        </li>
+                                        <li>
+                                            <span class="pull-left">Total Items</span>
+                                            <span class="pull-right">{{company.stats.items.count}}</span>
+                                        </li>
+                                        <li>
+                                            <span class="pull-left">Data</span>
+                                            <span class="pull-right">{{company.stats.data.count}}</span>
+                                        </li>
+                                    </ul>
+                                </div><!--/box-->
+                            </div>
+                            <h3 ng-if="companies.length ==0" class="cust-col">
+                                No Projects Available <a href="/#/projects/create">Click here to create one.</a>
+                            </h3>
+                        </div><!--/row-->
+                    </div>
+                </div><!--/wrapper-->
+            </div><!--/content-->
+        </div>
+    </div><!--/row-->
+</section>
