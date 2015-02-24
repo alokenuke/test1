@@ -1,193 +1,191 @@
-<div role="tabpanel">
-    <!-- Tab panes -->
-    <div role="tabpanel" class="tab-pane col-xs-12 active" id="List_Tags">
-        <div class="row">
-            <div class="col-xs-12 search-box mb-sm-large">
-                <div class="row">
-                    <h2 class="col-xs-12 search-title clickable" ng-click="showSearchBox = !showSearchBox;">
-                        Search Tags <strong ng-hide="!search.globalSearch">: {{search.globalSearch}}</strong>
-                        <button class="pull-right btn icon-btn">
-                            <i ng-class="{'fa fa-sort-desc fa-2x': showSearchBox,'fa fa-sort-asc fa-2x': !showSearchBox}"></i>
-                        </button>
-                    </h2>
-                </div><!--/row-->
-                <form id="form" class="form-wrapper form-horizontal form-horizontal-type1 slide" role="form" ng-show="showSearchBox">
-                    <div class="row">
-                        <div class="col-md-6 col-lg-5">
-                            <div class="form-group">
-                                <label class="col-sm-4 control-label text-right">Project Name :</label>
-                                <div class="col-sm-6 multi-level">
-                                    <ui-select ng-model="project.selected"
-                                               theme="bootstrap" ng-if="projects.length>0" class="last-child">
-                                        <ui-select-match placeholder="Select a project...">{{$select.selected.project_name}}</ui-select-match>
-                                        <ui-select-choices repeat="project in projects | filter: $select.search"
-                                                           refresh-delay="0">
-                                            <div ng-bind-html="project.project_name" ng-click="updateSelectBox('projectlevels', project.id, 0, 0)"></div>
-                                        </ui-select-choices>
-                                    </ui-select>
-                                    <a href="/#/projects/create" ng-if="projects.length ==0">Create Project First.</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-7">
-                            <div class="form-group">
-                                <label class="col-sm-4 col-lg-3 control-label text-right">Project Level :</label>
-                                <div class="col-sm-8 col-lg-9 multi-level">
-                                    <ui-select ng-repeat="childlevels in projectlevels" ng-model="level[$index]"
-                                               theme="bootstrap" class="{{((projectlevels.length - 1) === $index ? 'last-child ' : '')}}">
-                                        <ui-select-match placeholder="Select a level...">{{$select.selected.level_name}}</ui-select-match>
-                                        <ui-select-choices repeat="level in childlevels | filter: $select.search"
-                                                           refresh-delay="0">
-                                            <div ng-bind-html="level.level_name" ng-click="updateSelectBox('projectlevels', search.project_id, ($parent.$index + 1), level.id)"></div>
-                                        </ui-select-choices>
-                                    </ui-select>
-                                    <div ng-hide="projectlevels.length && search.project_id">
-                                        <a ng-href="/#/projects/levels/{{search.project_id}}" ng-hide="(projectlevels.length && search.project_id) || !search.project_id">Click to manage project levels.</a>
-                                        <span ng-hide="search.project_id">Select a project first</span>
-                                    </div>
-                                    <input type="hidden" ng-model="search.project_level_id" />
-                                </div>
-                            </div>
-                        </div>
-                    </div><!--/row-->
-
-                    <div class="row">
-                        <div class="col-md-6 col-lg-5">
-                            <div class="form-group">
-                                <label class="col-sm-4 control-label text-right">UID :</label>
-                                <div class="col-sm-6">
-                                    <input type="text" class="form-control" ng-model="search.uid" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-7">
-                            <div class="form-group">
-                                <label class="col-sm-4 col-lg-3 control-label text-right">User Group :</label>
-                                <div class="col-sm-6 multi-level">
-                                    <ui-select ng-model="search.usergroup"
-                                               theme="bootstrap" class="last-child">
-                                        <ui-select-match placeholder="Select a group...">{{$select.selected.group_name}}</ui-select-match>
-                                        <ui-select-choices repeat="usergroup in usergroups | filter: $select.search"
-                                                           refresh-delay="0">
-                                            <div ng-bind-html="usergroup.group_name"></div>
-                                        </ui-select-choices>
-                                        <a ng-href="/#/userGroups/project/{{search.project_id}}" ng-hide="(usergroups.length && search.project_id) || !search.project_id">Click to manage project levels.</a>
-                                    </ui-select>
-                                </div>
-                            </div>
-                        </div>
-                    </div><!--/row-->
-
-                    <div class="row">
-                        <div class="col-md-6 col-lg-5">
-                            <div class="form-group">
-                                <label class="col-sm-4 control-label text-right">Tag Name :</label>
-                                <div class="col-sm-6">
-                                    <input type="text" ng-model="search.tag_name" class="form-control" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-7">
-                            <div class="form-group">
-                                <label class="col-sm-4 col-lg-3 control-label text-right">Tag Description :</label>
-                                <div class="col-sm-6">
-                                    <input type="text" ng-model="search.tag_description" class="form-control" />
-                                </div>
-                            </div>
-                        </div>
-                    </div><!--/row-->
-
-                    <div class="row">
-                        <div class="col-md-6 col-lg-5">
-                            <div class="form-group">
-                                <label class="col-sm-4 control-label text-right">Created Between :</label>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <input type="text" style="padding:6px 6px;" name="q" placeholder="From date..." class="form-control search-control" datepicker-popup="{{format}}" ng-model="search.date_range.from_date" is-open="datepickers.fromDate" max-date="today" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" close-text="Close">
-                                        <div class="input-group-btn">
-                                            <button type="button" class="btn btn-primary search-btn" ng-click="openCalendar($event, 'fromDate')"><i class="fa fa-calendar"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="input-group">
-                                        <input type="text" style="padding:6px 6px;" name="q" placeholder="To date..." class="form-control search-control" datepicker-popup="{{format}}" ng-model="search.date_range.to_date" is-open="datepickers.toDate" max-date="today" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" close-text="Close">
-                                        <div class="input-group-btn">
-                                            <button type="button" class="btn btn-primary search-btn" ng-click="openCalendar($event, 'toDate')"><i class="fa fa-calendar"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div><!--/row-->
-
-                    <div class="row mt-20">
-                        <div class="col-sm-10 text-center">
-                            <button class="btn btn-primary mb-sm-5" ng-click="setSearch()">Search</button>
-                            <button class="btn btn-primary mb-sm-5" ng-click="clearSearch();">Clear Search</button>
-                        </div> 
-                    </div>
-                </form>
-            </div><!--/search-tag-box-->
-        </div><!--/row-->
-        <div class="row mt-20">
-            <a href="/#/timeattendance/create" class="btn btn-default add-new-btn"><i class="fa fa-plus-circle fa-1x"></i>Create New Tag</a>
-        </div><!--/row-->
-        <div class="row mt-15">
-            <div class="">
-                <div class="clearfix table-responsive table-responsive-cust">
-                    <div class="pull-right">
-                        <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
-                        <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px" ng-change="setPageLimit()" ng-model="numPerPage" ng-options="k as v for (k,v) in page_dropdown">
-                        </select>
-                    </div>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th class="text-center">S.No</th>
-                                <th class="text-center" style="width: 20%;">Project Level</th>
-                                <th class="text-center">
-                                    <a href="" ng-click="order('uid')">UID <i class="fa fa-sort{{sort.uid}}"></i></a>
-                                </th>
-                                <th class="text-center">
-                                    <a href="" ng-click="order('tag_name')">Tag Name <i class="fa fa-sort{{sort.tag_name}}"></i></a>
-                                </th>
-                                <th class="text-center">
-                                    <a href="" ng-click="order('tag_description')">Tag Description <i class="fa fa-sort{{sort.tag_description}}"></i></a>
-                                </th>
-                                <th class="text-center">Actions</th>
-                                <!-- <th class="text-center"></th> -->
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="dat in data">
-                                <td class="text-center">{{numPerPage * (currentPage - 1) + $index + 1}}</td>
-                                <td class="text-center multi-level">
-                                    <div class="level-item">{{dat.project_name}}</div>
-                                    <div class="level-item" ng-repeat="project_level in dat.project_level" ng-class="{'last-child': dat.project_level.length === ($index + 1)}">
-                                        {{project_level}}
-                                    </div>
-                                </td>
-                                <td class="text-center">{{dat.uid}}</td>
-                                <td class="text-center">{{dat.tag_name}}</td>
-                                <td class="text-center">{{dat.tag_description}}</td>
-                                <td class="text-center">
-                                    <a href="/#/timeattendance/{{dat.id}}" class="btn icon-btn"><i class="fa fa-list-alt fa-lg"></i></a>
-                                    <button class="btn icon-btn" image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}}" type="QXR0ZW5kYW5jZWJhcmNvZGU=" imageUrl="{{dat.uid}}.png" openlightbox><i class="fa fa-barcode fa-lg"></i></button>
-                                    <button class="btn icon-btn"  image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}} " type="QXR0ZW5kYW5jZXFyY29kZQ==" imageUrl="{{dat.uid}}.png" openlightbox><i class="fa fa-qrcode fa-lg"></i></button><br />
-                                    <!--                                    <button class="btn icon-btn"><i class="fa fa-print fa-lg"></i></button>-->
-                                    <a class="btn icon-btn" href="/#/timeattendance/update/{{dat.id}}" ><i class="fa fa-pencil-square-o fa-lg"></i></a>
-                                    <button ng-click="deleteTag(dat, $index)" class="btn icon-btn" ng-confirm-click="Are you sure to delete this tag."><i class="fa fa-trash fa-lg"></i></button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="pull-right">                    
-                        <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
-                        <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px" ng-change="setPageLimit()" ng-model="numPerPage" ng-options="k as v for (k,v) in page_dropdown">
-                        </select>
-                    </div>
-                </div>          
+<div role="tabpanel" class="tab-pane col-xs-12 active" id="List_Tags">
+    <div class="row">
+        <div class="col-xs-12 search-box mb-sm-large">
+            <div class="row">
+                <h2 class="col-xs-12 search-title clickable" ng-click="showSearchBox = !showSearchBox;">
+                    Search Tags <strong ng-hide="!search.globalSearch">: {{search.globalSearch}}</strong>
+                    <button class="pull-right btn icon-btn">
+                        <i ng-class="{'fa fa-sort-desc fa-2x': showSearchBox,'fa fa-sort-asc fa-2x': !showSearchBox}"></i>
+                    </button>
+                </h2>
             </div><!--/row-->
-        </div>
-    </div><!--/tab-content-->
+            <form id="form" class="form-wrapper form-horizontal form-horizontal-type1 slide" role="form" ng-show="showSearchBox">
+                <div class="row">
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">Project Name :</label>
+                            <div class="col-sm-6 multi-level">
+                                <ui-select ng-model="project.selected"
+                                           theme="bootstrap" ng-if="projects.length > 0" class="last-child">
+                                    <ui-select-match placeholder="Select a project...">{{$select.selected.project_name}}</ui-select-match>
+                                    <ui-select-choices repeat="project in projects | filter: $select.search"
+                                                       refresh-delay="0">
+                                        <div ng-bind-html="project.project_name" ng-click="updateSelectBox('projectlevels', project.id, 0, 0)"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <a href="/#/projects/create" ng-if="projects.length == 0">Create Project First.</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-7">
+                        <div class="form-group">
+                            <label class="col-sm-4 col-lg-3 control-label text-right">Project Level :</label>
+                            <div class="col-sm-8 col-lg-9 multi-level">
+                                <ui-select ng-repeat="childlevels in projectlevels" ng-model="level[$index]"
+                                           theme="bootstrap" class="{{((projectlevels.length - 1) === $index ? 'last-child ' : '')}}">
+                                    <ui-select-match placeholder="Select a level...">{{$select.selected.level_name}}</ui-select-match>
+                                    <ui-select-choices repeat="level in childlevels | filter: $select.search"
+                                                       refresh-delay="0">
+                                        <div ng-bind-html="level.level_name" ng-click="updateSelectBox('projectlevels', search.project_id, ($parent.$index + 1), level.id)"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                                <div ng-hide="projectlevels.length && search.project_id">
+                                    <a ng-href="/#/projects/levels/{{search.project_id}}" ng-hide="(projectlevels.length && search.project_id) || !search.project_id">Click to manage project levels.</a>
+                                    <span ng-hide="search.project_id">Select a project first</span>
+                                </div>
+                                <input type="hidden" ng-model="search.project_level_id" />
+                            </div>
+                        </div>
+                    </div>
+                </div><!--/row-->
+
+                <div class="row">
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">UID :</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" ng-model="search.uid" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-7">
+                        <div class="form-group">
+                            <label class="col-sm-4 col-lg-3 control-label text-right">User Group :</label>
+                            <div class="col-sm-6 multi-level">
+                                <ui-select ng-model="search.usergroup"
+                                           theme="bootstrap" class="last-child">
+                                    <ui-select-match placeholder="Select a group...">{{$select.selected.group_name}}</ui-select-match>
+                                    <ui-select-choices repeat="usergroup in usergroups | filter: $select.search"
+                                                       refresh-delay="0">
+                                        <div ng-bind-html="usergroup.group_name"></div>
+                                    </ui-select-choices>
+                                    <a ng-href="/#/userGroups/project/{{search.project_id}}" ng-hide="(usergroups.length && search.project_id) || !search.project_id">Click to manage project levels.</a>
+                                </ui-select>
+                            </div>
+                        </div>
+                    </div>
+                </div><!--/row-->
+
+                <div class="row">
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">Tag Name :</label>
+                            <div class="col-sm-6">
+                                <input type="text" ng-model="search.tag_name" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-7">
+                        <div class="form-group">
+                            <label class="col-sm-4 col-lg-3 control-label text-right">Tag Description :</label>
+                            <div class="col-sm-6">
+                                <input type="text" ng-model="search.tag_description" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                </div><!--/row-->
+
+                <div class="row">
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">Created Between :</label>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <input type="text" style="padding:6px 6px;" name="q" placeholder="From date..." class="form-control search-control" datepicker-popup="{{format}}" ng-model="search.date_range.from_date" is-open="datepickers.fromDate" max-date="today" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" close-text="Close">
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-primary search-btn" ng-click="openCalendar($event, 'fromDate')"><i class="fa fa-calendar"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <input type="text" style="padding:6px 6px;" name="q" placeholder="To date..." class="form-control search-control" datepicker-popup="{{format}}" ng-model="search.date_range.to_date" is-open="datepickers.toDate" max-date="today" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" close-text="Close">
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-primary search-btn" ng-click="openCalendar($event, 'toDate')"><i class="fa fa-calendar"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!--/row-->
+
+                <div class="row mt-20">
+                    <div class="col-sm-10 text-center">
+                        <button class="btn btn-primary mb-sm-5" ng-click="setSearch()">Search</button>
+                        <button class="btn btn-primary mb-sm-5" ng-click="clearSearch();">Clear Search</button>
+                    </div> 
+                </div>
+            </form>
+        </div><!--/search-tag-box-->
+    </div><!--/row-->
+    <div class="row mt-20">
+        <a href="/#/timeattendance/create" class="btn btn-default add-new-btn"><i class="fa fa-plus-circle fa-1x"></i>Create New Tag</a>
+    </div><!--/row-->
+    <div class="row mt-15">
+        <div class="">
+            <div class="clearfix table-responsive table-responsive-cust">
+                <div class="pull-right">
+                    <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
+                    <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px" ng-change="setPageLimit()" ng-model="numPerPage" ng-options="k as v for (k,v) in page_dropdown">
+                    </select>
+                </div>
+                <table class="table table-bordered" id="rt1">
+                    <thead>
+                        <tr>
+                            <th class="text-center">S.No</th>
+                            <th class="text-center" style="width: 20%;">Project Level</th>
+                            <th class="text-center">
+                                <a href="" ng-click="order('uid')">UID <i class="fa fa-sort{{sort.uid}}"></i></a>
+                            </th>
+                            <th class="text-center">
+                                <a href="" ng-click="order('tag_name')">Tag Name <i class="fa fa-sort{{sort.tag_name}}"></i></a>
+                            </th>
+                            <th class="text-center">
+                                <a href="" ng-click="order('tag_description')">Tag Description <i class="fa fa-sort{{sort.tag_description}}"></i></a>
+                            </th>
+                            <th class="text-center">Actions</th>
+                            <!-- <th class="text-center"></th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="dat in data">
+                            <td class="text-center">{{numPerPage * (currentPage - 1) + $index + 1}}</td>
+                            <td class="text-center multi-level">
+                                <div class="level-item">{{dat.project_name}}</div>
+                                <div class="level-item" ng-repeat="project_level in dat.project_level" ng-class="{'last-child': dat.project_level.length === ($index + 1)}">
+                                    {{project_level}}
+                                </div>
+                            </td>
+                            <td class="text-center">{{dat.uid}}</td>
+                            <td class="text-center">{{dat.tag_name}}</td>
+                            <td class="text-center">{{dat.tag_description}}</td>
+                            <td class="text-center">
+                                <a href="/#/timeattendance/{{dat.id}}" class="btn icon-btn"><i class="fa fa-list-alt fa-lg"></i></a>
+                                <button class="btn icon-btn" image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}}" type="QXR0ZW5kYW5jZWJhcmNvZGU=" imageUrl="{{dat.uid}}.png" openlightbox><i class="fa fa-barcode fa-lg"></i></button>
+                                <button class="btn icon-btn"  image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}} " type="QXR0ZW5kYW5jZXFyY29kZQ==" imageUrl="{{dat.uid}}.png" openlightbox><i class="fa fa-qrcode fa-lg"></i></button><br />
+                                <!--                                    <button class="btn icon-btn"><i class="fa fa-print fa-lg"></i></button>-->
+                                <a class="btn icon-btn" href="/#/timeattendance/update/{{dat.id}}" ><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                <button ng-click="deleteTag(dat, $index)" class="btn icon-btn" ng-confirm-click="Are you sure to delete this tag."><i class="fa fa-trash fa-lg"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pull-right">                    
+                    <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
+                    <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px" ng-change="setPageLimit()" ng-model="numPerPage" ng-options="k as v for (k,v) in page_dropdown">
+                    </select>
+                </div>
+            </div>          
+        </div><!--/row-->
+    </div>
+</div><!--/tab-content-->

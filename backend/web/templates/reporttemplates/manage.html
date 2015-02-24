@@ -76,7 +76,51 @@
                         </div>
                     </div><!--/.col-md-->
                 </div><!--/row-->
-                <div class="col-xs-12 search-box mb-20">
+                
+                <h2 class="col-xs-12 search-title mb-20">Other Settings</h2>
+                <div class="row mt-20">
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">QR Code width (px) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" ng-model="report_template.qr_code_width" numbers-only placeholder="QR Code Width" ng-required="true" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Bar Code width (px) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" ng-model="report_template.bar_code_width" numbers-only  placeholder="Bar code width" ng-required="true" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Page Number Prefix :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" ng-model='report_template.page_number_prefix' placeholder="Page Number Prefix" maxlength="16" ng-required="true" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Project Logo width (px) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" ng-model='report_template.project_logo_width' numbers-only placeholder="Project logo width" ng-required="true">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Project image width (px) :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" ng-model='report_template.project_image_width' numbers-only placeholder="Project image width" ng-required="true" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Page Number Suffix :</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" ng-model='report_template.page_number_suffix' placeholder="Page Number Suffix" maxlength="16" />
+                            </div>
+                        </div>
+                    </div><!--/.col-md-->
+                </div><!--/row-->
+                <div class="mb-20 mt-10">
                     <div class="row">
                         <h2 class="col-xs-12 search-title clickable" ng-click="variableBox=!variableBox;">
                             Placeholder Variables:
@@ -86,20 +130,29 @@
                         </h2>
                     </div><!--/row-->
                     <div class="row pb-20 mt-10 slide" ng-hide="variableBox">
+                        <div class="pull-left mr-10 pl-20"><strong>Page Number:</strong> [[page_number]],</div>
                         <div class="pull-left mr-10 pl-20"><strong>Tag Name:</strong> [[tag_name]],</div>
                         <div class="pull-left mr-10 pl-20"><strong>QR Code Image:</strong> [[image_qr_code]],</div>
                         <div class="pull-left mr-10 pl-20"><strong>Bar Code Image:</strong> [[image_bar_code]],</div>
-                        <div class="pull-left mr-10 pl-20"><strong>Company Name:</strong> [[company_name]],</div>
-                        <div class="pull-left mr-10 pl-20"><strong>Client Location:</strong> [[client_location]],</div>
-                        <div class="pull-left mr-10 pl-20"><strong>Main Contractor:</strong> [[main_contractor]],</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Unique Code:</strong> [[unique_ode]],</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Tag Description:</strong> [[tag_description]]</div>
                         <div class="pull-left mr-10 pl-20"><strong>Project Name:</strong> [[project_name]],</div>
                         <div class="pull-left mr-10 pl-20"><strong>Project Address:</strong> [[project_address]],</div>
                         <div class="pull-left mr-10 pl-20"><strong>Project Area:</strong> [[area]],</div>
+                        <div class="pull-left mr-10 pl-20"><strong>client - project manager:</strong> [[client_project_manager]]</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Project management - Project Manager:</strong> [[project_manager]]</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Consultant:</strong> [[consultant]]</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Project Director:</strong> [[project_director]]</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Consultant Project Manager:</strong> [[consultant_project_manager]]</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Contractor-Project Manager:</strong> [[contractor_project_manager]]</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Project Logo:</strong> [[project_logo]]</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Project Image:</strong> [[project_image]]</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Company Name:</strong> [[company_name]],</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Client Location:</strong> [[client_location]],</div>
+                        <div class="pull-left mr-10 pl-20"><strong>Main Contractor:</strong> [[main_contractor]],</div>
                         <div class="pull-left mr-10 pl-20"><strong>Project Level:</strong> [[project_level]],</div>
                         <div class="pull-left mr-10 pl-20"><strong>Items:</strong> [[items]],</div>
                         <div class="pull-left mr-10 pl-20"><strong>Process:</strong> [[process]],</div>
-                        <div class="pull-left mr-10 pl-20"><strong>Unique Code:</strong> [[unique Code]],</div>
-                        <div class="pull-left mr-10 pl-20"><strong>Tag Description:</strong> [[tag_description]]</div>
                     </div><!--/row-->
                 </div>
                 <div class="row">

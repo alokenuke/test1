@@ -660,6 +660,7 @@ table .form-control {
     padding-right: 15px;
     background-position: right
 }
+.multi-level > .level-item:first-child {padding-left: 0;}
 .multi-level > .level-item.last-child {
     background: none
 }
@@ -772,11 +773,8 @@ margin-top: -5px
     position: relative;
     top: 3px
 }
-
-.ui-select-bootstrap, .multi-level{
-    margin-top: 7px;
-    min-height: 30px;
-}
+.multi-level {min-height: 30px;}
+form .multi-level{margin-top: 7px;padding-bottom: 7px;}
 .table th a {
     text-decoration: none;
     color: #fff
@@ -958,6 +956,13 @@ margin-top: -5px
 
 .clickable {
     cursor: pointer;
+}
+
+.angular-ui-tree-node.has-error, .angular-ui-tree-node.has-error .angular-ui-tree-handle{
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    color: #a94442;
+    margin-top: 5px;
 }
 
 /*------------/footer----------*/

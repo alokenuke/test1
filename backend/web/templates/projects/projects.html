@@ -1,55 +1,51 @@
-<div role="tabpanel">
-    <!-- Nav tabs -->
-    
-    <!-- Tab panes -->
-    <div class="tab-content col-xs-12 pl-lg-25 pr-lg-25">
-        <div role="tabpanel" class="tab-pane col-xs-12 active" id="List_Tags">
-            <div class="row">
-                <div ng-include="'templates/project/search.html'"></div>
-            </div><!--/row-->
-            <div class="row mt-20">
-                <button class="btn btn-default add-new-btn"><i class="fa fa-plus-circle fa-1x"></i>Add New Project</button>
-            </div><!--/row-->
-            <div class="row mt-15">
-                <div class="">
-                    <div class="table-responsive table-responsive-cust">
-                   
-                        
-                        <table class="table table-striped table-bordered">
-		<thead>
-		<tr>
-                        <th ng-repeat="field in fields">
-                            <a href="" ng-click="predicate = field.key;reverse=!reverse;order(field.key, reverse)">{{field.label}}
-                                <i ng-class="{'pull-right glyphicon glyphicon-chevron-down': predicate=='-'+field.key,'pull-right glyphicon glyphicon-chevron-up': !reverse && predicate==field.key}"></i>
-                            </a>
-                        </th>
-			<th>&nbsp;</th>
-		</tr>
-		</thead>
-		<tbody>
-		<tr ng-repeat="dat in data">
-                        <td ng-repeat="field in fields">
-                            <p ng-bind-html="(field.key=='project_status'?(dat[field.key]?'<span class=\'btn btn-success\'>Active</span>':'<span class=\'btn btn-danger\'>Not Active</span>'):dat[field.key])"></p>
-                            
-                        </td>
-			<td>
-				<a href="#/projects/{{dat[fields[0].key]}}" title="View">
-					<span class="glyphicon glyphicon-eye-open"></span>
-				</a>
-				<a href="#/projects/update/{{dat[fields[0].key]}}" title="Update">
-					<span class="glyphicon glyphicon-pencil"></span>
-				</a>
-				<a ng-href="#/projects" title="Delete" ng-click="delete({{dat[fields[0].key]}})" ng-confirm-click="Are you sure to delete?">
-					<span class="glyphicon glyphicon-trash"></span>
-				</a>
-			</td>
-		</tr>
-		</tbody>
-	</table>
-                        <div class="pull-right">                    
-                    <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
-                    <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 7px"><option>20</option></select>
-                </div>
+<div class="tab-content col-xs-12 pl-lg-25 pr-lg-25">
+    <div role="tabpanel" class="tab-pane col-xs-12 active" id="List_Tags">
+        <div class="row">
+            <div ng-include="'templates/project/search.html'"></div>
+        </div><!--/row-->
+        <div class="row mt-20">
+            <button class="btn btn-default add-new-btn"><i class="fa fa-plus-circle fa-1x"></i>Add New Project</button>
+        </div><!--/row-->
+        <div class="row mt-15">
+            <div class="">
+                <div class="table-responsive table-responsive-cust">
+
+
+                    <table class="table table-striped table-bordered" id="rt1">
+                        <thead>
+                            <tr>
+                                <th ng-repeat="field in fields">
+                                    <a href="" ng-click="predicate = field.key; reverse = !reverse; order(field.key, reverse)">{{field.label}}
+                                        <i ng-class="{'pull-right glyphicon glyphicon-chevron-down': predicate == '-' + field.key,'pull-right glyphicon glyphicon-chevron-up': !reverse && predicate == field.key}"></i>
+                                    </a>
+                                </th>
+                                <th>&nbsp;</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="dat in data">
+                                <td ng-repeat="field in fields">
+                                    <p ng-bind-html="(field.key=='project_status'?(dat[field.key]?'<span class=\'btn btn-success\'>Active</span>':'< span class = \'btn btn-danger\'>Not Active</span>'):dat[field.key])"></p>
+
+                                </td>
+                                <td>
+                                    <a href="#/projects/{{dat[fields[0].key]}}" title="View">
+                                        <span class="glyphicon glyphicon-eye-open"></span>
+                                    </a>
+                                    <a href="#/projects/update/{{dat[fields[0].key]}}" title="Update">
+                                        <span class="glyphicon glyphicon-pencil"></span>
+                                    </a>
+                                    <a ng-href="#/projects" title="Delete" ng-click="delete({{dat[fields[0].key]}})" ng-confirm-click="Are you sure to delete?">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pull-right">                    
+                        <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
+                        <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 7px"><option>20</option></select>
+                    </div>
                 </div>          
             </div><!--/row-->
         </div>

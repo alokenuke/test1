@@ -269,6 +269,9 @@ appServices.directive('ckEditor', function() {
         ck.on('change', updateModel);
         ck.on('key', updateModel);
         ck.on('dataReady', updateModel);
+        ck.on('pasteState', updateModel);
+        ck.on('paste', updateModel);
+        ck.on('selectionChange', updateModel);
 
         ngModel.$render = function(value) {
           ck.setData(ngModel.$viewValue);
