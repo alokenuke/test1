@@ -662,13 +662,12 @@ class ReportsdownloadController extends Controller
         $data['pageWidth'] = isset($template_param['page_width']) ? (int) $template_param['page_width'] : 216;
         $data['pageHeight'] = isset($template_param['page_height']) ? (int) $template_param['page_height'] : 279;
         
-        $fileManager = new \backend\models\FileManager();
+        $data['qrCodeWidth'] = isset($template_param['qr_code_width']) ? (int) $template_param['qr_code_width'] : 100;
+        $data['barCodeWidth'] = isset($template_param['bar_code_width']) ? (int) $template_param['bar_code_width'] : 150;
+        $data['projectlogoWidth'] = isset($template_param['project_logo_width']) ? (int) $template_param['project_logo_width'] : 100;
+        $data['projectImageWidth'] = isset($template_param['project_image_width']) ? (int) $template_param['project_image_width'] : 100;
         
-        if(isset($data['logo'])) {
-            $logoFilename = array_pop(preg_split("/((=)|(\/))/", $data['logo']));
-            
-            $nfcLogo = $fileManager->getPath("")."/".$logoFilename;
-        }
+        $fileManager = new \backend\models\FileManager();
         
         $projectLevel = "";
         foreach($tagArray['project_level'] as $key => $val) {
@@ -691,10 +690,25 @@ class ReportsdownloadController extends Controller
             $process .= $val['process_name'];
         }
         
+        $noImageUrl = "images/noimage.png";
+        
+        $projectLogoUrl = $fileManager->getPath("project_image")."/".$tagArray['project']['project_logo'];
+        if(file_exists($projectLogoUrl))
+            $projectLogoUrl = $noImageUrl;
+        
+        $projectImageUrl = $fileManager->getPath("project_image")."/".$tagArray['project']['project_image'];
+        if(file_exists($projectImageUrl))
+            $projectImageUrl = $noImageUrl;
+        
         $sampleLabels = [
             '[[tag_name]]' => $tagArray['tag_name'],
-            '[[image_qr_code]]' => "<img src='".$fileManager->getPath("qrcode")."/".$tagArray['uid'].".png' alt='QR Code' alt='QR Code' border='1' width='100' height='100' />",
-            '[[image_bar_code]]' => "<img src='".$fileManager->getPath("qrcode")."/".$tagArray['uid'].".png' alt='Bar Code' alt='QR Code' border='1' width='100' height='100' />",
+            
+            '[[project_logo]]' => "<img src='".$projectLogoUrl."' width='".$template_param['project_logo_width']."' />",
+            '[[project_image]]' => "<img src='".$projectImageUrl."' width='".$template_param['project_image_width']."' />",
+            
+            '[[image_qr_code]]' => "<img src='".$fileManager->getPath("qrcode")."/".$tagArray['uid'].".png' alt='QR Code' border='1' width='".$template_param['qr_code_width']."' />",
+            '[[image_bar_code]]' => "<img src='".$fileManager->getPath("barcode")."/".$tagArray['uid'].".png' alt='QR Code' border='1' width='".$template_param['bar_code_width']."' />",
+            
             '[[company_name]]' => $tagArray['company']['company_name'],
             '[[client_name]]' => $tagArray['project']['client_name'],
             '[[client_location]]' => $tagArray['project']['client_address'].", ".$tagArray['project']['client_city'],
@@ -702,6 +716,16 @@ class ReportsdownloadController extends Controller
             '[[project_name]]' => $tagArray['project']['project_name'],
             '[[project_address]]' => $tagArray['project']['project_address'].", ".$tagArray['project']['project_city'],
             '[[area]]' => $tagArray['project']['project_location'],
+            
+            '[[client_project_manager]]' => $tagArray['project']['client_project_manager'],
+            '[[project_manager]]' => $tagArray['project']['project_manager'],
+            '[[consultant]]' => $tagArray['project']['consultant'],
+            '[[project_director]]' => $tagArray['project']['project_director'],
+            '[[consultant_project_manager]]' => $tagArray['project']['consultant_project_manager'],
+            '[[contractor_project_manager]]' => $tagArray['project']['contractor_project_manager'],
+            
+            '[[page_number]]' => $tagArray['project']['page_number_prefix']."1".$tagArray['project']['page_number_suffix'],
+            
             '[[project_level]]' => $projectLevel,
             '[[items]]' => $items,
             '[[process]]' => $process,
@@ -714,12 +738,9 @@ class ReportsdownloadController extends Controller
         $content = $template_param['content'];
         
         $content = str_replace(array_keys($sampleLabels), $sampleLabels, $content);
+                
+        $pdf = new \mPDF('', array($data['pageWidth'], $data['pageHeight']));
         
-        if ($data['pageWidth'] <= $data['pageHeight'])
-            $pdf = new \backend\models\customPDF\FPDF('p', 'mm', array($data['pageWidth'], $data['pageHeight']));
-        else
-            $pdf = new \backend\models\customPDF\FPDF('l', 'mm', array($data['pageWidth'], $data['pageHeight']));
-
         $pdf->AddPage();
         $pdf->SetAutoPageBreak(false);
         $pdf->HREF = '';
@@ -731,6 +752,7 @@ class ReportsdownloadController extends Controller
         $pdf->WriteHTML($content);
         
         $pdf->Output();
+        exit;
     }
     
     public function actionPrintTagReports()
@@ -760,10 +782,12 @@ class ReportsdownloadController extends Controller
         $data['pageWidth'] = isset($template_param['page_width']) ? (int) $template_param['page_width'] : 216;
         $data['pageHeight'] = isset($template_param['page_height']) ? (int) $template_param['page_height'] : 279;
         
-        if ($data['pageWidth'] <= $data['pageHeight'])
-            $pdf = new \backend\models\customPDF\FPDF('p', 'mm', array($data['pageWidth'], $data['pageHeight']));
-        else
-            $pdf = new \backend\models\customPDF\FPDF('l', 'mm', array($data['pageWidth'], $data['pageHeight']));
+        $data['qrCodeWidth'] = isset($template_param['qr_code_width']) ? (int) $template_param['qr_code_width'] : 100;
+        $data['barCodeWidth'] = isset($template_param['bar_code_width']) ? (int) $template_param['bar_code_width'] : 150;
+        $data['projectlogoWidth'] = isset($template_param['project_logo_width']) ? (int) $template_param['project_logo_width'] : 100;
+        $data['projectImageWidth'] = isset($template_param['project_image_width']) ? (int) $template_param['project_image_width'] : 100;
+        
+        $pdf = new \mPDF('', array($data['pageWidth'], $data['pageHeight']));
         
         $pdf->SetAutoPageBreak(false);
         $pdf->HREF = '';
@@ -774,7 +798,7 @@ class ReportsdownloadController extends Controller
         
         $fileManager = new \backend\models\FileManager();
         
-        foreach($tagsObj as $tagArray) {
+        foreach($tagsObj as $tagKey => $tagArray) {
             
             $pdf->AddPage();
             
@@ -799,10 +823,25 @@ class ReportsdownloadController extends Controller
                 $process .= $val['process_name'];
             }
 
+            $noImageUrl = "images/noimage.png";
+
+            $projectLogoUrl = $fileManager->getPath("project_image")."/".$tagArray['project']['project_logo'];
+            if(file_exists($projectLogoUrl))
+                $projectLogoUrl = $noImageUrl;
+
+            $projectImageUrl = $fileManager->getPath("project_image")."/".$tagArray['project']['project_image'];
+            if(file_exists($projectImageUrl))
+                $projectImageUrl = $noImageUrl;
+
             $sampleLabels = [
                 '[[tag_name]]' => $tagArray['tag_name'],
-                '[[image_qr_code]]' => "<img src='".$fileManager->getPath("qrcode")."/".$tagArray['uid'].".png' alt='QR Code' alt='QR Code' border='1' width='100' height='100' />",
-                '[[image_bar_code]]' => "<img src='".$fileManager->getPath("qrcode")."/".$tagArray['uid'].".png' alt='Bar Code' alt='QR Code' border='1' width='100' height='100' />",
+
+                '[[project_logo]]' => "<img src='".$projectLogoUrl."' width='".$template_param['project_logo_width']."' />",
+                '[[project_image]]' => "<img src='".$projectImageUrl."' width='".$template_param['project_image_width']."' />",
+
+                '[[image_qr_code]]' => "<img src='".$fileManager->getPath("qrcode")."/".$tagArray['uid'].".png' alt='QR Code' border='1' width='".$template_param['qr_code_width']."' />",
+                '[[image_bar_code]]' => "<img src='".$fileManager->getPath("barcode")."/".$tagArray['uid'].".png' alt='QR Code' border='1' width='".$template_param['bar_code_width']."' />",
+
                 '[[company_name]]' => $tagArray['company']['company_name'],
                 '[[client_name]]' => $tagArray['project']['client_name'],
                 '[[client_location]]' => $tagArray['project']['client_address'].", ".$tagArray['project']['client_city'],
@@ -810,6 +849,16 @@ class ReportsdownloadController extends Controller
                 '[[project_name]]' => $tagArray['project']['project_name'],
                 '[[project_address]]' => $tagArray['project']['project_address'].", ".$tagArray['project']['project_city'],
                 '[[area]]' => $tagArray['project']['project_location'],
+
+                '[[client_project_manager]]' => $tagArray['project']['client_project_manager'],
+                '[[project_manager]]' => $tagArray['project']['project_manager'],
+                '[[consultant]]' => $tagArray['project']['consultant'],
+                '[[project_director]]' => $tagArray['project']['project_director'],
+                '[[consultant_project_manager]]' => $tagArray['project']['consultant_project_manager'],
+                '[[contractor_project_manager]]' => $tagArray['project']['contractor_project_manager'],
+
+                '[[page_number]]' => $template_param['page_number_prefix'].($tagKey+1).$template_param['page_number_suffix'],
+
                 '[[project_level]]' => $projectLevel,
                 '[[items]]' => $items,
                 '[[process]]' => $process,
@@ -822,9 +871,8 @@ class ReportsdownloadController extends Controller
             $content = $template_param['content'];
 
             $content = str_replace(array_keys($sampleLabels), $sampleLabels, $content);
-            
-            $pdf->WriteHTML($content);
 
+            $pdf->WriteHTML($content);
         }
         
         $file_download = "temp/report_tags_". date("d-M-Y-H-i-s"). uniqid().".pdf";

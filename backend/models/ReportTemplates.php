@@ -48,11 +48,12 @@ class ReportTemplates extends \yii\db\ActiveRecord
     {
         return [
             [['template_name', 'content'], 'required'],
-            [['company_id', 'page_width', 'page_height', 'top_margin', 'bottom_margin', 'right_margin', 'left_margin'], 'integer'],
+            [['company_id', 'page_width', 'page_height', 'top_margin', 'bottom_margin', 'right_margin', 'left_margin', 'qr_code_width', 'bar_code_width', 'project_logo_width', 'project_image_width'], 'integer'],
             [['template_name'], 'string', 'max' => 50],
             ['company_id', 'default', 'value' => \yii::$app->user->identity->company_id],
             ['created_by', 'default', 'value' => \yii::$app->user->identity->id],
             ['created_date', 'default', 'value' => date("Y-m-d")],
+            [['page_number_prefix', 'page_number_suffix'], 'safe']
         ];
     }
     
@@ -81,6 +82,12 @@ class ReportTemplates extends \yii\db\ActiveRecord
             'bottom_margin',
             'right_margin',
             'left_margin',
+            'qr_code_width',
+            'bar_code_width',
+            'project_logo_width',
+            'project_image_width',
+            'page_number_prefix',
+            'page_number_suffix'
         ];
     }
         

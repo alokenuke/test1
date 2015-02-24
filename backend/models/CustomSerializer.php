@@ -4,33 +4,89 @@ namespace backend\models;
 
 use yii\rest\Serializer;
 
+use yii\base\Component;
+use yii\base\Model;
+use yii\data\DataProviderInterface;
+use yii\data\Pagination;
+use yii\helpers\ArrayHelper;
+use yii\web\Link;
+use yii\web\Request;
+use yii\web\Response;
+
 class CustomSerializer extends Serializer {
     
     public $modelClass;
-    
+    public $msg='';
+    public $status='SUCCESS';
+    public $tokenDetails;
     /**
      * Serializes a model object.
-     * @param Arrayable $model
+     * @param Arrayab'le $model
      * @return array the array representation of the model
      */
     
+    public function serialize($data)
+    {
+        $token = $_GET['access-token'];
+        
+        $this->tokenDetails = UserTokens::findOne(['token' => $_GET['access-token']]);
+        
+        if($this->tokenDetails->request_from == 'webapp')
+            return parent::serialize ($data);
+        
+        if ($data instanceof Model && $data->hasErrors()) {
+            return $this->serializeModelErrors($data);
+        } elseif ($data instanceof Arrayable) {
+            return $this->serializeModel($data);
+        } elseif ($data instanceof DataProviderInterface) {
+            return $this->serializeDataProvider($data);
+        } else {
+            return array('status'=>$this->status,"items"=>$data,'msg'=>$this->msg );
+        }
+    }
+    
     protected function serializeModel($model)
     {
+        if($this->tokenDetails->request_from == 'webapp')
+            return parent::serializeModel($model);
+        
         if ($this->request->getIsHead()) {
             return null;
         } else {
             list ($fields, $expand) = $this->getRequestedFields();
             $result = $model->toArray($fields, $expand);
-            
-            //$result = array_merge($result, $this->serializeFields($this->getFields()));
-            
-            return $result;
+            return array('status'=>$this->status,"items"=>$result,'msg'=>$this->msg );
             
         }
     }
     
+    /**
+     * Serializes the validation errors in a model.
+     * @param Model $model
+     * @return array the array representation of the errors
+     */
+    protected function serializeModelErrors($model)
+    {
+        if($this->tokenDetails->request_from == 'webapp')
+            return parent::serializeModelErrors($model);
+        
+        $this->response->setStatusCode(422, 'Data Validation Failed.');
+        $result = [];
+        foreach ($model->getFirstErrors() as $name => $message) {
+            $result[] = [
+                'field' => $name,
+                'message' => $message,
+            ];
+        }
+
+        return array('status'=>"ERROR","items"=>$result,'msg'=>"" );
+    }
+    
     protected function serializeDataProvider($dataProvider)
     {
+        if($this->tokenDetails->request_from == 'webapp')
+            return parent::serializeDataProvider($dataProvider);
+        
         $models = $this->serializeModels($dataProvider->getModels());
 
         if (($pagination = $dataProvider->getPagination()) !== false) {
@@ -42,58 +98,25 @@ class CustomSerializer extends Serializer {
         } elseif ($this->collectionEnvelope === null) {
             return $models;
         } else {
-            $result = [
-                $this->collectionEnvelope => $models,
-            ];
             if ($pagination !== false) {
-                $result = array_merge($result, $this->serializePagination($pagination));
+                $result = [
+                    $this->collectionEnvelope => array_merge($models, $this->serializePagination($pagination)),
+                ];
             } 
+            else
+            {
+                $result = [
+                    $this->collectionEnvelope => $models,
+                ];
+            }
+            
             
             unset($result['_links']);
-            
-            //$result = array_merge($result, $this->serializeFields($this->getFields()));
-            
+            $result = array_merge($result, array('status'=>$this->status,'msg'=>$this->msg ));
             return $result;
         }
     }
-    
-    public function getFields() {
-                
-        $model = \Yii::createObject($this->modelClass);
         
-        if($model) {
-            
-            if($model->fields()) {
-                $fields = $model->fields();
-                $labels = $model->attributeLabels();
-                
-                $temp = array();
-                                                
-                foreach($fields as $key) {
-                    if(!isset($labels[$key]))
-                        $labels[$key] = $key;
-                    $temp[] = array('key' => $key, 'label' => $labels[$key]);
-                }
-                
-                return $temp;                
-                
-            }
-            else {
-                $fields = $model->getAttributes();
-                $labels = $model->attributeLabels();
-                
-                $temp = array();
-                
-                foreach($fields as $key => $field) {
-                    $temp[] = array('key' => $key, 'label' => $labels[$key]);
-                }
-                
-                return $temp;
-                
-            }
-        }
-    }
-    
     /**
      * Serializes fields into an array.
      * @param Fields $fields
