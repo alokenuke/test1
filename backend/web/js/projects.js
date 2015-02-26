@@ -411,6 +411,7 @@ app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route', '$routeP
                 id: null,
                 process_name: nodeData.process_name + '.' + (nodeData.tree.length + 1),
                 tree: [],
+                type: (nodeData.type+1),
                 parent_id: nodeData.id,
                 editing: true,
             });
@@ -423,11 +424,11 @@ app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route', '$routeP
         if (scope) {
             scope.process_name = title;
             if (scope.id)
-                $http.put("/tagprocess/" + scope.id, {'process_name': scope.process_name, 'type': scope.type}).success(function (data) {
+                $http.put("/tagprocess/" + scope.id, {'process_name': scope.process_name, 'type': scope.type, 'option_type': scope.option_type}).success(function (data) {
                     console.log("Process updated-" + data.id);
                 });
             else
-                $http.post("/tagprocess", {'process_name': scope.process_name, 'parent_id': scope.parent_id, 'type': scope.type})
+                $http.post("/tagprocess", {'process_name': scope.process_name, 'parent_id': scope.parent_id, 'type': scope.type, 'option_type': scope.option_type})
                   .success(function (data) {
                     scope.id = data.id;
                     console.log("Process created - " + data.id);

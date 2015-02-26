@@ -4,7 +4,7 @@
     <span ng-show="tagLoading" class="alert alert-warning"><i class="fa fa-refresh"></i> Tag Loading...</span>
 </div>
 <div class="col-xs-12 secondary-bg mt-20">
-    <form id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form"  ng-submit="saveTagDetails()">
+    <form name="frmCreateTag" id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form"  ng-submit="saveTagDetails()">
         <div class="col-xs-12 shadow-box">        
             <div class="row">
                 <div class="col-md-6 col-lg-5">
@@ -69,7 +69,7 @@
                 <div class="col-md-6 col-lg-7">
                     <div class="form-group">
                         <label class="col-sm-4 col-lg-3 control-label text-right">Process Flow:</label>
-                        <div class="col-sm-8 col-lg-9 multi-level">
+                        <div class="col-sm-8 col-lg-9 multi-level" ng-class="{'has-error': search.process[1].checkProcessError}">
                             <ui-select ng-repeat="process in processes"  ng-model="search.process[$index]"
                                        theme="bootstrap" ng-disabled="disabled" class="{{((processes.length-1)===$index?'last-child ':'')}}" ng-if="(processes.length && tagDetails.project_id)">
                               <ui-select-match placeholder="Select process {{$index==0?'Type':'Flow'}}">{{$select.selected.process_name}}</ui-select-match>
@@ -85,6 +85,9 @@
                             </span>
                             <span ng-if="(processes.length && tagDetails.project_id && search.process[0] && !search.item[1])">Select an item type first</span>
                             <input ng-model="tagDetails.tag_process_flow_id" type="hidden" ng-required="true" />
+                            
+                            <div class="help-block help-block-error" ng-show="search.process[1].checkProcessError">We have noted some errors on this process. Please visit Manage > Tag Process Flow for further information on the issue.</div>
+                            
                         </div>
                     </div>
                 </div>
@@ -157,7 +160,7 @@
                                          </div>
                                      </td>
                                      <td class="text-center">
-                                        <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.stage_from[relateUser.users.id]" ng-init="search.stage_from[relateUser.users.id]=tagAssignment.process_stage_from">
+                                        <ui-select theme="bootstrap" ng-model="search.stage_from[relateUser.users.id]" ng-init="search.stage_from[relateUser.users.id]=tagAssignment.process_stage_from" ng-disabled="!relateUser.isSelected">
                                              <ui-select-match placeholder="No task selected">{{$select.selected.process_name}}</ui-select-match>
                                              <ui-select-choices repeat="stage in process_stages | filter: $select.search"
                                                       refresh-delay="0">
@@ -165,14 +168,14 @@
                                              </ui-select-choices>
                                         </ui-select>
                                      </td>
-                                     <td class="text-center">
-                                         <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.stage_to[relateUser.users.id]" ng-init="search.stage_to[relateUser.users.id]=tagAssignment.process_stage_to">
-                                             <ui-select-match placeholder="No task selected">{{$select.selected.process_name}}</ui-select-match>
-                                             <ui-select-choices repeat="stage in process_stages | filter: $select.search"
-                                                      refresh-delay="0">
-                                                 <div ng-bind-html="stage.process_name"></div>
-                                             </ui-select-choices>
-                                           </ui-select>
+                                     <td class="text-center" ng-class="{'has-error': frmCreateTag['stage_to_'+$index].$invalid}">
+                                        <ui-select name="stage_to_{{$index}}" theme="bootstrap" ng-model="search.stage_to[relateUser.users.id]" ng-init="search.stage_to[relateUser.users.id]=tagAssignment.process_stage_to" ng-required="search.stage_from[relateUser.users.id] != null" ng-disabled="!relateUser.isSelected">
+                                            <ui-select-match placeholder="No task selected">{{$select.selected.process_name}}</ui-select-match>
+                                            <ui-select-choices repeat="stage in process_stages | filter: $select.search"
+                                                     refresh-delay="0">
+                                                <div ng-bind-html="stage.process_name" ng-hide="stage.position < search.stage_from[relateUser.users.id].position"></div>
+                                            </ui-select-choices>
+                                        </ui-select>
                                      </td>
                                      <td class="text-center">
                                          <div class="checkbox">
@@ -277,5 +280,8 @@
 }
 .ui-select-multiple.ui-select-bootstrap input.ui-select-search {
     width: 100% !important;
+}
+td.has-error div.ui-select-bootstrap{
+    border: 1px solid #a94442;
 }
 </style>

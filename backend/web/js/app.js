@@ -246,6 +246,60 @@ app.controller('SiteIndex', ['$scope', 'rest', 'breadcrumbsService', '$http', "$
             $http.post("usergroups/getall?expand=stats").success(function (data) {
                 $scope.usergroups = data.items;
             })
+            
+            $.getScript('/js/Chart.min.js', function()
+            {
+                $http.post("projects/getchartstats", {}).success(function (data) {
+                    var $completedTags = [];
+                    var $totalTags = [];
+                    var $labels = [];
+                    var $i=0
+                    angular.forEach(data.items, function(val) {
+                        if(val['totalTags']>0) {
+                            $labels[$i] = val['project_name'];
+                            $completedTags[$i] = val['completedTags'];
+                            $totalTags[$i++] = val['totalTags'];
+                        }
+                    });
+                    
+                    if($labels.length>0) {
+                        var barChartData = {
+                            labels : $labels,
+                            datasets : [
+                                {
+                                    label: "Completed Tags",
+                                    fillColor : "rgba(220,220,220,0.5)",
+                                    strokeColor : "rgba(220,220,220,0.8)",
+                                    highlightFill: "rgba(220,220,220,0.75)",
+                                    highlightStroke: "rgba(220,220,220,1)",
+                                    data : $completedTags
+                                },
+                                {
+                                    label: "Total Tags",
+                                    fillColor : "rgba(151,187,205,0.5)",
+                                    strokeColor : "rgba(151,187,205,0.8)",
+                                    highlightFill : "rgba(151,187,205,0.75)",
+                                    highlightStroke : "rgba(151,187,205,1)",
+                                    data : $totalTags
+                                }
+                            ]
+                        }
+                        var ctx = document.getElementById("canvas").getContext("2d");
+                        window.myBar = new Chart(ctx).Bar(barChartData, {
+                                responsive : true,
+                                //String - A legend template
+                                legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].fillColor%>;display: inline-block; width: 20px;\">&nbsp;</span> <%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
+                        });
+
+                        var legend = window.myBar.generateLegend();
+                        $('#canvas').before(legend);
+                    } else {
+                        $('#canvas').attr("height", "0");
+                        $('#canvas').before("<h4>There is nothing to show.</h4>");
+                    }
+                });
+            });
+            
         }
     }
 }]);

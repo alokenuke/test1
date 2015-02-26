@@ -35,7 +35,7 @@
                                                     <div click-to-edit="item" template-url="editFlow.html" editable-field="item.process_name"></div>
                                                 </div>
                                                 <ol ui-tree-nodes="options" ng-model="item.tree" ng-hide="collapsed" class="slide">
-                                                    <li ng-repeat="item in item.tree" ui-tree-node ng-class="{'has-error': (item.type!='3' && item.type!='5'?(item.tree.length<2 || (!item.flagDefault || !item.flagCompletion)):false)}">
+                                                    <li ng-repeat="item in item.tree" ui-tree-node ng-class="{'has-error': (item.option_type!='3' && item.option_type!='5'?(item.tree.length<2 || (!item.flagDefault || !item.flagCompletion)):false)}">
                                                         <div ui-tree-handle ng-class="'level-'+(this.depth()-1)">
                                                             <div click-to-edit="item" template-url="editStage.html" editable-field="item.process_name">
                                                             </div>
@@ -48,7 +48,7 @@
                                                                 <ol ui-tree-nodes ng-model="item.tree"></ol>
                                                             </li>
                                                         </ol>
-                                                        <div class="pl-10" ng-if="item.type!='3' && item.type!='5'">
+                                                        <div class="pl-10" ng-if="item.option_type!='3' && item.option_type!='5'">
                                                             <div ng-show="item.tree.length<2">
                                                                 <strong>Error: </strong>
                                                                 This process should have at least 2 options (1 for default and 1 for completion flag.
@@ -140,10 +140,10 @@
                 <span class="fa" ng-class="{'fa-chevron-right': $parent.collapsed, 'fa-chevron-down': !$parent.collapsed}"></span>
             </a>
             {{$parent.$index+1}}. &nbsp; &nbsp;{{view.editableValue}}
-            (<u>{{process_stage_type[view.type]}}</u>)
+            (<u>{{process_stage_type[view.option_type]}}</u>)
             <a class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this status? This action cannot be undone."><span class="fa fa-trash"></span></a>
             <span ng-click="$parent.newSubItem($parent, '')">
-                <a class="pull-right btn btn-primary btn-xs" ng-if="view.type!='3' && view.type!='5'" nodrag  style="margin-right: 8px;">
+                <a class="pull-right btn btn-primary btn-xs" ng-if="view.option_type!='3' && view.option_type!='5'" nodrag  style="margin-right: 8px;">
                     <span class="fa fa-plus"></span>
                 </a>
             </span>
@@ -160,7 +160,7 @@
                 <div class="form-group">
                     {{$parent.$index+1}}. &nbsp; &nbsp;
                     <input type="text" class="form-control" placeholder="Level Name" ng-required="true" ng-model="view.editableValue"/>
-                    <select class="form-control form-control-small" ng-model="view.type" ng-options="k as v for (k,v) in process_stage_type" ng-required="true" ng-disabled="view.id!=null">
+                    <select class="form-control form-control-small" ng-model="view.option_type" ng-options="k as v for (k,v) in process_stage_type" ng-required="true" ng-disabled="view.id!=null">
                         <option value=''>--Select option type--</option>
                     </select>
                 </div>

@@ -52,45 +52,19 @@
                         </button>
                     </h2>
                     <div class="wrapper slide" ng-hide="hideChart">
-                        <script type="text/javascript" src="/js/Chart.min.js"></script>
                         <div class="col-xs-12 col-sm-12" style="background-color: #fff;">
+                            <select class="form-control form-control-small pull-right mt-10" ng-model="chart.project" ng-options="p.id as p.project_name for p in projects">
+                                <option value="">-- All Projects --</option>
+                            </select>
                             <select class="form-control form-control-small pull-right mt-10">
-                                <option value="weekly">This Week</option>
-                                <option value="weekly">This month</option>
-                                <option value="weekly">This Quarter</option>
-                                <option value="weekly">This Yearly</option>
+                                <option value="">-- Lifetime --</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This month</option>
+                                <option value="quarter">This Quarter</option>
+                                <option value="year">This Yearly</option>
                             </select>
                             <canvas id="canvas" height="200" width="600"></canvas>
                         </div>
-                        <script>
-                            var randomScalingFactor = function(){ return Math.round(Math.random()*100)};
-
-                            var barChartData = {
-                                    labels : ["Mirbat Resorts","City Center","Sky Tower","Star Trek","Site Construction","Sidhpur Villa","Resort"],
-                                    datasets : [
-                                            {
-                                                    fillColor : "rgba(220,220,220,0.5)",
-                                                    strokeColor : "rgba(220,220,220,0.8)",
-                                                    highlightFill: "rgba(220,220,220,0.75)",
-                                                    highlightStroke: "rgba(220,220,220,1)",
-                                                    data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
-                                            },
-                                            {
-                                                    fillColor : "rgba(151,187,205,0.5)",
-                                                    strokeColor : "rgba(151,187,205,0.8)",
-                                                    highlightFill : "rgba(151,187,205,0.75)",
-                                                    highlightStroke : "rgba(151,187,205,1)",
-                                                    data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
-                                            }
-                                    ]
-
-                            }
-                            var ctx = document.getElementById("canvas").getContext("2d");
-                            window.myBar = new Chart(ctx).Bar(barChartData, {
-                                    responsive : true
-                            });
-
-                        </script>
                     </div>
                 </div>
                 <div class="wrapper mt-20">

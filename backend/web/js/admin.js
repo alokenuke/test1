@@ -457,7 +457,7 @@ app.controller('CreateCompany', ['$scope', 'rest', '$location', '$route','$route
             $scope.datepickers[which]= true;
         };
         $scope.dateOptions = {formatYear: 'yy',startingDay: 1};
-        $scope.formats = ['dd MMM, yyyy', 'dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'yyyy-MM-dd','shortDate'];
+        $scope.formats = ['dd MMM yyyy'];
         $scope.format = $scope.formats[0];
         
 
@@ -489,10 +489,10 @@ app.controller('CreateCompany', ['$scope', 'rest', '$location', '$route','$route
             if(typeof $scope.company.expiry_date !== 'undefined') {
                 $monthArr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                 $expiryDate = $scope.company.expiry_date;
-                if($expiryDate !=null && typeof $expiryDate === 'object')
-                    $scope.company.expiry_date = $expiryDate.getDate()+" "+$monthArr[$expiryDate.getMonth()]+", "+$expiryDate.getFullYear();
+                if($expiryDate !=null && typeof $expiryDate === 'object') 
+                    $scope.company.expiry_date = $expiryDate.getDate()+" "+$monthArr[$expiryDate.getMonth()]+" "+$expiryDate.getFullYear();
             }
-            
+
             if ($scope.company.id)
             {
                 $http.post('company/savecompany',{'company':$scope.company,'user':$scope.user}).success(function (data) {

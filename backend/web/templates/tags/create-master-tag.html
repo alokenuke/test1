@@ -67,7 +67,7 @@
                 <div class="col-md-6 col-lg-7">
                     <div class="form-group">
                         <label class="col-sm-4 col-lg-3 control-label text-right">Process Flow:</label>
-                        <div class="col-sm-8 multi-level">
+                        <div class="col-sm-8 col-lg-9 multi-level" ng-class="{'has-error': search.process[1].checkProcessError}">
                             <ui-select ng-repeat="process in processes"  ng-model="search.process[$index]"
                                        theme="bootstrap" ng-disabled="disabled" class="{{((processes.length-1)===$index?'last-child ':'')}}" ng-if="(processes.length && tagDetails.project_id)">
                               <ui-select-match placeholder="Select process {{$index==0?'Type':'Flow'}}">{{$select.selected.process_name}}</ui-select-match>
@@ -83,6 +83,9 @@
                             </span>
                             <span ng-if="(processes.length && tagDetails.project_id && search.process[0] && !search.item[1])">Select an item type first</span>
                             <input ng-model="tagDetails.tag_process_flow_id" type="hidden" ng-required="true" />
+                            
+                            <div class="help-block help-block-error" ng-show="search.process[1].checkProcessError">We have noted some errors on this process. Please visit Manage > Tag Process Flow for further information on the issue.</div>
+                            
                         </div>
                     </div>
                 </div>
@@ -295,5 +298,8 @@
 }
 .ui-select-multiple.ui-select-bootstrap input.ui-select-search {
     width: 100% !important;
+}
+td.has-error div.ui-select-bootstrap{
+    border: 1px solid #a94442;
 }
 </style>
