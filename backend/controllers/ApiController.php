@@ -61,7 +61,7 @@ class ApiController extends ActiveController
         
         if(!isset($_GET['access-token']) && isset($this->identity[1]))
             $_GET['access-token'] = $this->identity[1];
-        
+                
         $this->serializer = [
             'class' => 'backend\models\CustomSerializer',
             'collectionEnvelope' => 'items',
@@ -85,6 +85,7 @@ class ApiController extends ActiveController
         $model = new \backend\models\LoginForm();
         
         if ($model->load(\yii::$app->request->post()) && $model->login()) {
+            $_GET['access-token'] = \yii::$app->user->identity->auth_key;
             return [
                 'token' => \yii::$app->user->identity->auth_key,
             ];

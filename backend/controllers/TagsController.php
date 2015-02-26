@@ -60,6 +60,24 @@ class TagsController extends ApiController
                         if(isset($val['project']))
                             $query->andWhere(['project_id' => $val['project']['id']]);
                     }
+                    else if($key == 'tag_process_flow_id') {
+                        $processDetails = \backend\models\TagProcess::findOne(['id' => $val]);
+                        
+                        if($processDetails->type==1) {
+                            $query->andWhere([$key => $val]);
+                        }
+                        else if($processDetails->type==2) {
+                            $query->andWhere([$key => $processDetails->parent_id]);
+                            
+                            
+                            
+                        }
+                        else if($processDetails->type==3) {
+                            $processType = $processDetails->getParentProcess()->one()->parent_id;
+                            $query->andWhere([$key => $processType]);
+                            
+                        }
+                    }
                     else if(isset($val)) {
                         if(in_array($key, $this->partialMatchFields))
                             $query->andWhere(['like', $key, $val]);
@@ -94,6 +112,32 @@ class TagsController extends ApiController
                 throw new \yii\web\HttpException(500, 'Internal server error');
             }
             return $provider;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
+    public function actionGetTag() {
+        if (!$_POST) {
+            
+            if(!isset($_GET['expand']))
+                $_GET['expand'] = "project_level, itemDetails, userGroup";
+            else
+                $_GET['expand'] = "project_level, itemDetails, userGroup,".$_GET['expand'];
+            
+            $uid = \Yii::$app->request->post("uid");
+            
+            $model = new $this->modelClass;
+            
+            $query = $model->find()->andWhere(['uid' => $uid])->one();
+            
+            if($query && $query->uid == $uid)
+                return $query;
+            else
+            {
+                $model->addError("uid", "Invalid UID.");
+                return $model;
+            }
         } else {
             throw new \yii\web\HttpException(404, 'Invalid Request');
         }

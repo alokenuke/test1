@@ -169,7 +169,13 @@ class Projects extends \yii\db\ActiveRecord
                 $return['users']['count'] = RelUserLevelsUsers::find()->andWhere(['user_group_id' => UserGroups::find()->select("user_groups.id")->andWhere(['project_id' => $this->id])])->count();
                 
                 return $return;
-            }
+            },
+            'completedTags' => function() {
+                return Tags::find()->andWhere(['completed' => '1', 'project_id' => $this->id])->count();
+            },
+            'totalTags' => function() {
+                return Tags::find()->andWhere(['project_id' => $this->id])->count();
+            },
         ];
     }
     

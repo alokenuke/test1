@@ -212,6 +212,42 @@ class ProjectsController extends ApiController
         }
     }
     
+    public function actionGetchartstats() {
+        if (!$_POST) {
+            
+            $post = \Yii::$app->request->post();
+            
+            $_GET['expand'] = "completedTags, totalTags";
+            
+            $model = new $this->modelClass;
+            
+            $query = $model->find();
+            
+            if(isset($post['search'])) {
+                foreach($post['search'] as $key => $val)
+                    if(isset($val)) {
+                        if(in_array($key, $this->partialMatchFields))
+                            $query->andWhere(['like', $key, $val]);
+                        else
+                            $query->where([$key => $val]);
+                    }
+            }
+            
+            try {
+                $provider = new ActiveDataProvider ([
+                    'query' => $query,
+                    'pagination'=> FALSE,
+                ]);
+                
+            } catch (Exception $ex) {
+                throw new \yii\web\HttpException(500, 'Internal server error');
+            }
+            return $provider;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
     public function actionTagitems($id) {
         if (!$_POST) {
             

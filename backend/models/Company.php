@@ -82,7 +82,7 @@ class Company extends \yii\db\ActiveRecord
             'company_status',
             'expiry_date' => function() {
                 if(strtotime($this->expiry_date))
-                    return date("d M, Y", strtotime($this->expiry_date));
+                    return date("d M Y", strtotime($this->expiry_date));
             }
         ];
     }

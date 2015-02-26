@@ -27,9 +27,15 @@ class CustomSerializer extends Serializer {
     
     public function serialize($data)
     {
-        $token = $_GET['access-token'];
+        $identity = json_decode(\Yii::$app->getRequest()->getCookies()->getValue('_identity'));
         
-        $this->tokenDetails = UserTokens::findOne(['token' => $_GET['access-token']]);
+        $token = "";
+        if(!isset($_GET['access-token']) && isset($identity[1]))
+            $token = $identity[1];
+        else
+            $token = $_GET['access-token'];
+        
+        $this->tokenDetails = UserTokens::findOne(['token' => $token]);
         
         if($this->tokenDetails->request_from == 'webapp')
             return parent::serialize ($data);

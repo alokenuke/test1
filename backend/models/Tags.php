@@ -329,5 +329,7 @@ class Tags extends \yii\db\ActiveRecord
         return $this->hasOne(TagActivityLog::className(), ['tag_id'=>'id'])->orderBy("logged_date");
     }
     
-
+    public function getNextActivity() {
+        
+    }
 }

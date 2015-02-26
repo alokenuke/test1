@@ -20,6 +20,7 @@ class TagProcess extends \yii\db\ActiveRecord
 {
     const STATUS_NOTACTIVE = 0;
     const STATUS_ACTIVE = 1;
+    
     /**
      * @inheritdoc
      */
@@ -35,7 +36,7 @@ class TagProcess extends \yii\db\ActiveRecord
     {
         return [
             [['process_name', 'parent_id'], 'required'],
-            [['type', 'parent_id'], 'integer'],
+            [['type', 'parent_id', 'option_type'], 'integer'],
             [['created_date'], 'safe'],
             ['params', 'string'],
             [['process_name'], 'string', 'max' => 128],
@@ -50,7 +51,7 @@ class TagProcess extends \yii\db\ActiveRecord
     {
         $post = \Yii::$app->request->post();
         
-        $select = ['tag_process.id', 'tag_process.process_name', 'tag_process.parent_id', 'tag_process.type', 'tag_process.params'];
+        $select = ['tag_process.id', 'tag_process.process_name', 'tag_process.parent_id', 'tag_process.type', 'tag_process.params', 'tag_process.option_type', 'tag_process.position'];
 
         if(isset($post['select']['Process']))
            $select = $post['select']['Process'];
@@ -59,26 +60,28 @@ class TagProcess extends \yii\db\ActiveRecord
         
         return $query;
     }
-
+    
     public function fields() {
-        $params = (array) json_decode($this->params);
+        $this->params = (array) json_decode($this->params);
         return [
             'id',
             'process_name',
             'flagDefault' => function() {
-                if(isset($params['flagDefault']))
-                    return $params['flagDefault'];
+                if(isset($this->params['flagDefault']))
+                    return $this->params['flagDefault'];
             },
             'flagCompletion' => function() {
-                if(isset($params['flagCompletion']))
-                    return $params['flagCompletion'];
+                if(isset($this->params['flagCompletion']))
+                    return $this->params['flagCompletion'];
             },
             'flagHierarchy' => function() {
-                if(isset($params['flagHierarchy']))
-                    return $params['flagHierarchy'];
+                if(isset($this->params['flagHierarchy']))
+                    return $this->params['flagHierarchy'];
             },
             'type',
+            'option_type',
             'parent_id',
+            'position',
             'status'
         ];
     }
@@ -88,6 +91,38 @@ class TagProcess extends \yii\db\ActiveRecord
             'parentProcess',
             'tree' => function() {
                 return static::getTreeRecrusive($this->id);
+            },
+            'checkProcessError' => function() {
+                $return = false;
+                if($this->type==1) {
+                    // Select all process stages and check related options
+                    $processStages = static::find()->andWhere(['parent_id' => $this->id])->all();
+                    
+                    foreach ($processStages as $process)
+                    {
+                        // If stage is of status % or textbox do not check child options
+                        if($process->option_type==3 || $process->option_type==5)
+                            continue;
+                        
+                        // else check the params for default and completion flags.
+                        $params = (array) json_decode($process->params);
+                        
+                        // check if default and completion both flags are available.
+                        if(!(isset($params['flagDefault']) && $params['flagDefault'] >0) || !(isset($params['flagCompletion']) && $params['flagCompletion'] >0)) {
+                            $return = true;
+                            break;
+                        }
+                        else {
+                            // check if system has more than 1 options available
+                            $optionsCount = static::find()->andWhere(['parent_id' => $process->id])->count();
+                            if($optionsCount < 2) {
+                                $return = true;
+                                return;
+                            }
+                        }
+                    }
+                }
+                return $return;
             }
         ];
     }
@@ -116,6 +151,7 @@ class TagProcess extends \yii\db\ActiveRecord
                 'flagCompletion' => (isset($params['flagCompletion'])?$params['flagCompletion']:null),
                 'flagHierarchy' => (isset($params['flagHierarchy'])?$params['flagHierarchy']:null),
                 'type' => $item->type,
+                'option_type' => $item->option_type,
                 'tree' => ($child?$child:[]),
                 'parent_id' => $item->parent_id
             ];
