@@ -7,7 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'mPDF' => array($vendorDir . '/MPDF60'),
-    'PHPExcel' => array($vendorDir . '/phpoffice/phpexcel/Classes'),
+    'PHPExcel' => array($vendorDir . '/PHPExcel/Classes'),
     'HTMLPurifier' => array($vendorDir . '/ezyang/htmlpurifier/library'),
     'Faker\\PHPUnit' => array($vendorDir . '/fzaninotto/faker/test'),
     'Faker' => array($vendorDir . '/fzaninotto/faker/src'),
