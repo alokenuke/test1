@@ -47,12 +47,12 @@ app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParam
         $scope.clearSearch = function() {
             $scope.search = $scope.project = $scope.tag_process = $scope.tag_item = {};
             $scope.projectlevels = [];
-            $scope.projects = [];
+            //$scope.projects = [];
             $scope.usergroups = [];
             $scope.items = [];
             $scope.processes = [];
             
-            rest.setData("projects/getall", ['id', 'project_name'], {'project_status': null}).success(function(data) {$scope.projects = data.items;});
+            //rest.setData("projects/getall", ['id', 'project_name'], {'project_status': null}).success(function(data) {$scope.projects = data.items;});
             rest.setData("items/getall", ['id', 'item_name'], {'parent_id': 0}).success(function(data) {$scope.items.push(data.items);});
             rest.setData("tagprocess/getall", ['id', 'process_name'], {'parent_id': 0}).success(function(data) {$scope.processes.push(data.items);});
             
@@ -1585,8 +1585,8 @@ app.controller('TagsUpdateMaster', ['$scope', 'rest', '$location', '$route','$ro
         
     }])
 
-app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 
-                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService) {
+app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', '$modal', '$log',
+                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, $modal, $log) {
         
         rest.path = "tag-activity-log";
         
@@ -1646,10 +1646,9 @@ app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParam
             }).error(errorCallback);
         }
                 
-        $scope.delete = function (id) {
-            rest.deleteById({id: id}).success(function () {
-                $location.path('/post');
-                $route.reload();
+        $scope.deleteActivityLog = function (model, index) {
+            rest.deleteById(model).success(function () {
+                $scope.activity.splice(index, 1);
             }).error(errorCallback);
         }
         
@@ -1664,10 +1663,10 @@ app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParam
         $scope.logActivity = function () {
             var modalInstance = $modal.open({
               templateUrl: '/templates/tags/logActivity.html',
-              controller: 'TagLogActivity',
-              size: '',
+              controller: 'TagLogActivityPopup',
+              size: 'lg',
                resolve: {
-                    tagId: function () {
+                    itemScope: function () {
                         return $routeParams.id;
                     }
                }
@@ -2123,4 +2122,84 @@ app.controller('SelectTagsPopup', function ($scope, $modalInstance, $http, items
     getRelatedProcess();
     
     
+})
+
+.controller('TagLogActivityPopup', function ($scope, $modalInstance, $http, itemScope, process_stage_type, $upload) {
+    
+    $scope.process_stage_type = process_stage_type;
+    
+    $scope.rate = 0;
+    $scope.max = 10;
+    $scope.isReadonly = false;
+    $scope.select = {};
+    $scope.select.tag_id = itemScope;
+    $scope.select.process_stage_answer = 0;
+    $scope.serverError = {};
+    
+    $scope.close = function () {
+        $modalInstance.dismiss('cancel');
+    };
+    
+    $scope.logActivity = function() {
+        $scope.select.process_stage_id = $scope.process_stage.id;
+        $http.post("tag-activity-log/logactivity", {'LogActivity': $scope.select}).success(function(data) {
+            $modalInstance.close();
+        }).error(function(data) {
+            angular.forEach(data, function(val) {
+                $scope.serverError[field] = message;
+            });
+        });
+    }
+    
+    $http.get("tags/"+itemScope+"?expand=tagActivityLog").success(function(data) {
+        $scope.tagDetails = data;
+        
+        $http.post("tags/getstages/"+itemScope).success(function(data) {
+            
+            if(typeof data.items == 'undefined') {
+                $scope.process = [];
+                $scope.process.push(data);
+                $scope.process_stage = $scope.process[0];
+            }
+            else
+                $scope.process = data.items;
+        }).error(function() {
+            alert("Error in loading stages of this tag. Please try again.");
+            $scope.close();
+        });
+        
+    });
+    
+    $scope.onFileSelect = function ($files) {
+        $scope.select.files = [];
+        
+        var hasError = false;
+        
+        for (var i = 0; i < $files.length; i++) {
+            var file = $files[i];
+            if(file.size > 1024*1024) {
+                hasError = true;
+            }
+        }
+        if(hasError) {
+            $scope.serverError['files'] = "You have uploaded a file with more than 1 MB of size.";
+            return;
+        }
+        //$files: an array of files selected, each file has name, size, and type.
+        for (var i = 0; i < $files.length; i++) {
+            var file = $files[i];
+            $scope.upload = $upload.upload({
+                url: 'filemanager/upload', //upload.php script, node.js route, or servlet url
+                data: {myObj: $scope.myModelObj},
+                file: file,
+            }).progress(function (evt) {
+                console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
+            }).success(function (data, status, headers, config) {
+                // file is uploaded successfully
+                $scope.select.files.push(data);
+            }).error(function(data) {
+                $scope.serverError['files'] = data;
+            });
+        }
+    };
 })

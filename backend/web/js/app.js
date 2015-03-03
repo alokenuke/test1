@@ -1,4 +1,4 @@
-var app = angular.module('siteTrackApp', ['ngRoute', 'ngAnimate', 'ui.bootstrap', 'ngResource', 'appApp.services', 'ui.select', 'ngSanitize', 'ui.tree', 'angularFileUpload', 'angular-loading-bar']);
+var app = angular.module('siteTrackApp', ['ngRoute','ui.bootstrap', 'ngResource', 'appApp.services', 'ui.select', 'ngSanitize', 'ui.tree', 'angularFileUpload', 'angular-loading-bar']);
 
 app.run(function($http, $window, $rootScope, $location, $route) {
     delete $window.sessionStorage.token;
@@ -249,17 +249,21 @@ app.controller('SiteIndex', ['$scope', 'rest', 'breadcrumbsService', '$http', "$
             
             $.getScript('/js/Chart.min.js', function()
             {
-                $http.post("projects/getchartstats", {}).success(function (data) {
+                $scope.loadChart({});
+            });
+            
+            $scope.loadChart = function(params) {
+                $http.post("projects/getchartstats", params).success(function (data) {
                     var $completedTags = [];
                     var $totalTags = [];
                     var $labels = [];
                     var $i=0
                     angular.forEach(data.items, function(val) {
-                        if(val['totalTags']>0) {
+                        //if(val['totalTags']>0) {
                             $labels[$i] = val['project_name'];
                             $completedTags[$i] = val['completedTags'];
                             $totalTags[$i++] = val['totalTags'];
-                        }
+                        //}
                     });
                     
                     if($labels.length>0) {
@@ -287,10 +291,12 @@ app.controller('SiteIndex', ['$scope', 'rest', 'breadcrumbsService', '$http', "$
                         var ctx = document.getElementById("canvas").getContext("2d");
                         window.myBar = new Chart(ctx).Bar(barChartData, {
                                 responsive : true,
+                                multiTooltipTemplate: "<%if (datasetLabel ){%><%=datasetLabel %>: <%}%><%= value %>",
                                 //String - A legend template
-                                legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].fillColor%>;display: inline-block; width: 20px;\">&nbsp;</span> <%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
+                                legendTemplate : "<ul id=\"chart_legend\" class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].fillColor%>;display: inline-block; width: 20px;\">&nbsp;</span> <%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
                         });
-
+                        
+                        $("#chart_legend").remove();
                         var legend = window.myBar.generateLegend();
                         $('#canvas').before(legend);
                     } else {
@@ -298,8 +304,8 @@ app.controller('SiteIndex', ['$scope', 'rest', 'breadcrumbsService', '$http', "$
                         $('#canvas').before("<h4>There is nothing to show.</h4>");
                     }
                 });
-            });
-            
+            }
+                     
         }
     }
 }]);

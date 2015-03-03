@@ -1,25 +1,107 @@
-<div class=" modal-lg col-xs-12 secondary-bg mt-20">
+<div class="col-xs-12 secondary-bg mt-20">
     <!--/shadow-box-->
-    <div class="table-responsive table-responsive-cust">
-        <div class="col-xs-12 search-box mb-sm-large">
+    <div class="col-xs-12 search-box mb-sm-large">
+        <div class="row">
+            <h2 class="col-xs-12 search-title">
+                Log Activity
+            </h2>
+        </div><!--/row-->
+        <div class="row">
+            <div class="form-group">
+                <div class="col-sm-2"></div>
+                <div class="col-xs-8 mt-10" style="font-size: 1.1em">
+                    <strong>Last Activity on Tag: {{tagDetails.tag_name}} - {{tagDetails.type}}</strong><br />
+                    <strong>Status:</strong> {{tagDetails.tagActivityLog.stageInfo.process_name}} - {{tagDetails.tagActivityLog.answer.process_name}} <br/>
+                    <strong>Comment:</strong> {{tagDetails.tagActivityLog.comment}} (from {{tagDetails.tagActivityLog.device}}) <br/>
+                    <strong>By:</strong> {{tagDetails.tagActivityLog.loggedBy.first_name}} {{tagDetails.tagActivityLog.loggedBy.last_name}} at <small>{{tagDetails.tagActivityLog.logged_date}}</small>
+                </div>
+            </div>
+        </div><!--/row-->
+        <form ng-submit="logActivity()" role="form" class="form-horizontal form-horizontal-typ1 form-wrapper" id="form">
             <div class="row">
-                <h2 class="col-xs-12 search-title">
-                    Log Activity
-                </h2>
+                <div class="form-group">
+                    <label class="col-sm-4 control-label text-right">Process Stages :</label>
+                    <div class="col-sm-6">
+                        <select class="form-control form-control-medium" ng-model="process_stage" ng-options="stage.process_name for stage in process" ng-disabled="process.length<=1" ng-required="true">
+                            <option value="">-- Select Process Stage --</option>
+                        </select>
+                    </div>
+                </div>
             </div><!--/row-->
-            <form ng-submit="logActivity()" role="form" class="form-horizontal form-horizontal-typ1 form-wrapper" id="form">
-                <div class="row">
-                    <div class="col-md-6 col-lg-5">
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">Tag Name :</label>
-                            <div class="col-sm-6">
-                                <input type="text" class="form-control" ng-model="search.tag_name">
+            <div class="row">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label text-right">Status :</label>
+                    <div class="col-sm-6">
+                        <div ng-if="!process_stage">Please select a process to show related options.</div>
+                        <div ng-if="process_stage">
+                            <div ng-if="process_stage.option_type==1">
+                                <div class="col-sm-12 " ng-repeat="option in process_stage.childOptions">
+                                    <input type="checkbox" ng-model="select.process_stage_answer" ng-value="{{option.id}}" name="stage_answer" ng-required="true" /> {{option.process_name}}
+                                </div>
+                            </div>
+                            <div ng-if="process_stage.option_type==2">
+                                <div class="col-sm-12 " ng-repeat="option in process_stage.childOptions">
+                                    <input type="radio" ng-model="select.process_stage_answer" ng-value="{{option.id}}" name="stage_answer" ng-required="true" /> {{option.process_name}}
+                                </div>
+                            </div>
+                            <div ng-if="process_stage.option_type==3">
+                                
+                                <rating state-on="'fa fa-circle fa-2x clickable'" state-off="'fa fa-circle-o fa-2x clickable'" ng-model="select.process_stage_answer" max="max" readonly="isReadonly" ng-init='percent = 100 * (select.process_stage_answer/ max);' on-hover="overStar = value;percent = 100 * (value / max)" on-leave="overStar = null"></rating>
+                                
+                                <span class="label" 
+                                      ng-class="{'label-warning': percent<30, 'label-info': percent>=30 && percent<70, 'label-success': percent>=70}" ng-hide="!overStar"
+                                      >
+                                    
+                                    Status: {{percent}}%
+                                </span>
+                                <div>
+                                    <strong>Status: {{100* (select.process_stage_answer /max)}}%</strong>
+                                </div>
+                            </div>
+                            <div ng-if="process_stage.option_type==4">
+                                <select class="form-control form-control-medium" ng-model="select.process_stage_answer" ng-options="stage.id as stage.process_name for stage in process_stage.childOptions" ng-required="true">
+                                    <option value="">-- Select option --</option>
+                                </select>
+                            </div>
+                            <div ng-if="process_stage.option_type==5">
+                                <input type="text" ng-model="select.process_stage_answer" max="100" ng-required="true" />
                             </div>
                         </div>
                     </div>
-                </div><!--/row-->
-            </form>
-        </div><!--/search-tag-box-->
-    </div>
-
+                </div>
+            </div><!--/row-->
+            <div class="row">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label text-right">Comment :</label>
+                    <div class="col-sm-6" ng-class="{'has-error': serverError.comment}">
+                        <textarea class="form-control form-control-medium" maxlength="128" ng-model="select.comment" ng-required="true"></textarea>
+                        <div class="help-block">{{serverError.comment}}</div>
+                    </div>
+                </div>
+            </div><!--/row-->
+            <div class="row">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label text-right">Upload (image or documents :</label>
+                    <div class="col-sm-6" ng-class="{'has-error': serverError.files}">
+                        <input type="file" class="upload" onchange="angular.element(this).scope().onFileSelect(this.files)" multiple>
+                        <small>Max 1 MB</small>
+                        <div class="help-block">{{serverError.files}}</div>
+                    </div>
+                </div>
+            </div><!--/row-->
+            <div class="row">
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-primary" ng-click="close()">Cancel & Close</button>
+                </div>
+            </div><!--/row-->
+        </form>
+    </div><!--/search-tag-box-->
 </div><!--/secondary-bg-->
+<style>
+    .grey {
+        color: #ccc;
+    }
+    .glyphicon-th-large {font-size: 48px;cursor: pointer;}
+    
+</style>

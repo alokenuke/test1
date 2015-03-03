@@ -71,6 +71,7 @@ appServices.directive('numbersOnly', function(){
            // In such cases, when a letter is typed first, this parser will be called
            // again, and the 2nd time, the value will be undefined
            if (inputValue == undefined || inputValue == null) return '' 
+           
            if(max) {
                var transformedInput = inputValue.replace(/[^0-9+.]/g, ''); 
                if(transformedInput.length>max)

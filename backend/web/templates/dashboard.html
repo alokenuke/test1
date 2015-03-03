@@ -53,15 +53,12 @@
                     </h2>
                     <div class="wrapper slide" ng-hide="hideChart">
                         <div class="col-xs-12 col-sm-12" style="background-color: #fff;">
-                            <select class="form-control form-control-small pull-right mt-10" ng-model="chart.project" ng-options="p.id as p.project_name for p in projects">
-                                <option value="">-- All Projects --</option>
-                            </select>
-                            <select class="form-control form-control-small pull-right mt-10">
+                            <select ng-if="!chart.projects" class="form-control form-control-small pull-right mt-10" ng-model="chartstats_duration" ng-change="loadChart({'duration': chartstats_duration});">
                                 <option value="">-- Lifetime --</option>
-                                <option value="week">This Week</option>
-                                <option value="month">This month</option>
-                                <option value="quarter">This Quarter</option>
-                                <option value="year">This Yearly</option>
+                                <option value="7days">In 7 days</option>
+                                <option value="1month">In 1 month</option>
+                                <option value="3months">In 3 months</option>
+                                <option value="1year">In 1 year</option>
                             </select>
                             <canvas id="canvas" height="200" width="600"></canvas>
                         </div>
