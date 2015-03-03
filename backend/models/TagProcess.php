@@ -20,6 +20,7 @@ class TagProcess extends \yii\db\ActiveRecord
 {
     const STATUS_NOTACTIVE = 0;
     const STATUS_ACTIVE = 1;
+    public $flagHierarchy, $flagDefault, $flagCompletion;
     
     /**
      * @inheritdoc
@@ -92,6 +93,10 @@ class TagProcess extends \yii\db\ActiveRecord
             'tree' => function() {
                 return static::getTreeRecrusive($this->id);
             },
+            'childOptions' => function() {
+                if($this->type==2)
+                    return static::getStageOptions($this->id);
+            },
             'checkProcessError' => function() {
                 $return = false;
                 if($this->type==1) {
@@ -154,6 +159,29 @@ class TagProcess extends \yii\db\ActiveRecord
                 'option_type' => $item->option_type,
                 'tree' => ($child?$child:[]),
                 'parent_id' => $item->parent_id
+            ];
+        }
+        return $result;
+    }
+    
+    
+    private static function getStageOptions($parent)
+    {
+        $items = static::find()
+            ->andWhere(['parent_id' => $parent])
+            ->andWhere(['type' => 3])
+            ->orderBy("position")
+            ->all();
+        
+        $result = []; 
+
+        foreach ($items as $item) {
+            
+            $params = (array) json_decode($item->params);
+            
+            $result[] = [
+                'id' => $item->id,
+                'process_name' => $item->process_name,
             ];
         }
         return $result;

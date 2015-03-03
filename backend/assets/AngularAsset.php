@@ -26,7 +26,7 @@ class AngularAsset extends AssetBundle
                 $this->js[] = 'fileUpload/angular-file-upload' . $prefix . 'js';
 		$this->js[] = 'angular-route' . $prefix . 'js';
 		$this->js[] = 'angular-touch' . $prefix . 'js';
-		$this->js[] = 'angular-animate' . $prefix . 'js';
+		//$this->js[] = 'angular-animate' . $prefix . 'js';
                 $this->js[] = 'angular-resource' . $prefix . 'js';
                 $this->js[] = 'angular-sanitize' . $prefix . 'js';
                 $this->js[] = 'angular-ui-tree' . $prefix . 'js';

@@ -29,7 +29,15 @@ class FilemanagerController extends Controller
     public function actionUpload() {
         $fileManager = new \backend\models\FileManager();
         
+        $mimeType = $_FILES['file']['type'];
+        
+        if(!in_array($mimeType, $fileManager->getAllowedTypes())) {
+            Yii::$app->getResponse()->setStatusCode(422, 'Data Validation Failed.');
+            return "You have uploaded a unsupported file of type ".$mimeType.". Please try again.";
+        }
+        
         $postdata = fopen( $_FILES[ 'file' ][ 'tmp_name' ], "r" );
+        
         /* Get file extension */
         $extension = substr( $_FILES[ 'file' ][ 'name' ], strrpos( $_FILES[ 'file' ][ 'name' ], '.' ) );
 
@@ -48,9 +56,10 @@ class FilemanagerController extends Controller
         fclose( $fp );
         fclose( $postdata );
         
-        
-	/* the result object that is sent to client*/
-        $fileManager->imageResize($filename, 100, 100, $filename);
+        if(in_array($mimeType, ['image/jpeg', 'image/pjpeg', 'image/gif', 'image/png', 'image/x-png'])) {
+            /* the result object that is sent to client*/
+            $fileManager->imageResize($filename, 100, 100, $filename);
+        }
         return $filename;
     }
     

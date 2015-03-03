@@ -35,7 +35,7 @@ class AppAsset extends AssetBundle
         'js/projects.js',
         'js/reports.js',
         'js/settings.js',
-        'js/bootstrap-submenu.js',
+        //'js/bootstrap-submenu.js',
         'js/html5shiv.js',
         'js/respond.js',
         'js/site.js',

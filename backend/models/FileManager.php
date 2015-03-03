@@ -69,6 +69,36 @@ class FileManager extends Model
         return $extension;
     }
     
+    public function getFileTypeCode($path="", $filename, $type) {
+        if(!$path)
+            $path = $this->getPath($type);
+        
+        $file = $path."/".$filename;
+        
+        $fileinfo = new \SplFileInfo($file);
+        
+        $extension = $fileinfo->getExtension();
+        
+        $type = "";
+        
+        if(in_array($extension, ['jpg', 'jpeg', 'png', 'gif']))
+            $type = 'image';
+        else if(in_array($extension, ['pdf']))
+            $type = 'pdf';
+        else if(in_array($extension, ['docx', 'doc', 'odt']))
+            $type = 'word';
+        else if(in_array($extension, ['dwf']))
+            $type = 'drawing';
+        else if(in_array($extension, ['xls', 'xlsx', 'csv', 'ods']))
+            $type = 'excel';
+        else if(in_array($extension, ['ppt', 'pptx']))
+            $type = 'powerpoint';
+        else if(in_array($extension, ['txt', 'rtf']))
+            $type = 'text';
+        
+        return $type;
+    }
+    
     public function imageResize($imagePath, $destinationWidth, $destinationHeight, $destinationPath) {
         if (file_exists($imagePath)) {
             $imageInfo = getimagesize($imagePath);
@@ -120,9 +150,44 @@ class FileManager extends Model
     public function replaceFile($oldfile, $newfile, $existingPath, $type) {
         $path = $this->getPath($type);
         
-        if(file_exists($path."/".$oldfile))
+        if($oldfile && file_exists($path."/".$oldfile))
             unlink($path."/".$oldfile);
         
         rename($existingPath."/".$newfile, $path."/".$newfile);        
     }
+    
+    public function getAllowedTypes() {
+        return [
+            'application/msword',
+            'application/x-msexcel',
+            'application/x-mspowerpoint',
+            'text/plain',
+            'application/pdf',
+            'image/pjpeg',
+            'image/x-dwg',
+            'video/mpeg',
+            'application/msword',
+            'application/x-msexcel',
+            'application/vnd.ms-powerpoint',
+            'image/pjpeg',
+            'image/x-dwg',
+            'video/mpeg',
+            'application/msword',
+            'application/x-excel',
+            'image/pjpeg',
+            'application/x-mathcad',
+            'video/x-mpeg',
+            'text/xml',
+            'image/x-windows-bmp',
+            'video/quicktime',
+            'x-world/x-3dmf',
+            'image/pjpeg',
+            'image/gif',
+            'video/x-mpeg',
+            'text/css',
+            'image/png',
+            'video/x-msvideo'
+        ];
+    }
+    
 }

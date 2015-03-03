@@ -171,10 +171,50 @@ class Projects extends \yii\db\ActiveRecord
                 return $return;
             },
             'completedTags' => function() {
-                return Tags::find()->andWhere(['completed' => '1', 'project_id' => $this->id])->count();
+                
+                $post = \Yii::$app->request->post();
+                
+                $query = Tags::find()->andWhere(['completed' => '1', 'project_id' => $this->id]);
+                
+                if(isset($post['duration'])) {
+                    if($post['duration']=='7days') {
+                        $query->andWhere(['between', 'completed_date', date("Y-m-d", strtotime("-7 days")), date("Y-m-d H:i:s")]);
+                    }
+                    else if($post['duration']=='1month') {
+                        $query->andWhere(['between', 'completed_date', date("Y-m-d", strtotime("-1 month")), date("Y-m-d H:i:s")]);
+                    }
+                    else if($post['duration']=='3months') {
+                        $query->andWhere(['between', 'completed_date', date("Y-m-d", strtotime("-3 months")), date("Y-m-d H:i:s")]);
+                    }
+                    else if($post['duration']=='1year') {
+                        $query->andWhere(['between', 'completed_date', date("Y-m-d", strtotime("-1 year")), date("Y-m-d H:i:s")]);
+                    }
+                }
+                
+                return $query->count();
             },
             'totalTags' => function() {
-                return Tags::find()->andWhere(['project_id' => $this->id])->count();
+                
+                $post = \Yii::$app->request->post();
+                
+                $query = Tags::find()->andWhere(['project_id' => $this->id]);
+                
+                if(isset($post['duration'])) {
+                    if($post['duration']=='7days') {
+                        $query->andWhere(['between', 'created_date', date("Y-m-d", strtotime("-7 days")), date("Y-m-d H:i:s")]);
+                    }
+                    else if($post['duration']=='1month') {
+                        $query->andWhere(['between', 'created_date', date("Y-m-d", strtotime("-1 month")), date("Y-m-d H:i:s")]);
+                    }
+                    else if($post['duration']=='3months') {
+                        $query->andWhere(['between', 'created_date', date("Y-m-d", strtotime("-3 months")), date("Y-m-d H:i:s")]);
+                    }
+                    else if($post['duration']=='1year') {
+                        $query->andWhere(['between', 'created_date', date("Y-m-d", strtotime("-1 year")), date("Y-m-d H:i:s")]);
+                    }
+                }
+                
+                return $query->count();
             },
         ];
     }

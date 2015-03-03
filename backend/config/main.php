@@ -49,7 +49,7 @@ return [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
-		    ['class' => 'yii\rest\UrlRule', 'controller' => ['api', 'company', 'membership', 'timeattendance', 'users', 'userlevels', 'usergroups', 'roles', 'items', 'tags', 'labeltemplates', 'reporttemplates', 'projects', 'projectlevel', 'tagprocess', 'company'], 'pluralize'=>false, 'extraPatterns' => ['GET search' => 'search']],
+		    ['class' => 'yii\rest\UrlRule', 'controller' => ['api', 'company', 'membership', 'timeattendance', 'users', 'userlevels', 'usergroups', 'roles', 'items', 'tags', 'labeltemplates', 'reporttemplates', 'projects', 'projectlevel', 'tagprocess', 'tag-activity-log'], 'pluralize'=>false, 'extraPatterns' => ['GET search' => 'search']],
 		    'api/fields' => 'api/fields',
                     'reportsdownload/print-tag-report/<tagId:\d+>-<reportTemplate:\d+>' => 'reportsdownload/print-tag-report',
                     'dashboard' => 'site/dashboard',

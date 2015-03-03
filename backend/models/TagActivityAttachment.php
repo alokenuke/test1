@@ -32,11 +32,12 @@ class TagActivityAttachment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['tag_id', 'activity_log_id', 'filename', 'file_type', 'status', 'created_by'], 'required'],
+            [['tag_id', 'activity_log_id', 'filename', 'file_type'], 'required'],
             [['tag_id', 'activity_log_id', 'status', 'created_by'], 'integer'],
             [['created_date'], 'safe'],
             [['filename'], 'string', 'max' => 128],
-            [['file_type'], 'string', 'max' => 32]
+            [['file_type'], 'string', 'max' => 32],
+            ['created_by', 'default', 'value' => \yii::$app->user->id],
         ];
     }
 

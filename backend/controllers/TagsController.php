@@ -20,6 +20,39 @@ class TagsController extends ApiController
         parent::init();
     }
     
+    public function actionGetstages($id) {
+        if (!$_POST) {
+            try {
+                
+                $tagModel = \backend\models\Tags::findOne(['id' => $id]);
+                
+                $tagProcessFlow = \backend\models\TagProcess::findOne(['id' => $tagModel->tag_process_flow_id]);
+                
+                $params = (array) json_decode($tagProcessFlow->params);
+                
+                $_GET['expand'] = "childOptions";
+                
+                if(!$params['flagHierarchy']) {
+                    $query = \backend\models\TagProcess::find()->andWhere(['parent_id' => $tagProcessFlow->id])->orderBy("position");
+                    
+                    $provider = new ActiveDataProvider ([
+                        'query' => $query,
+                        'pagination'=> false,
+                    ]);
+                    return $provider;
+                }
+                else {
+                    return \backend\models\TagProcess::find()->andWhere(['parent_id' => $tagProcessFlow->id])->orderBy("position")->one();
+                }
+
+            } catch(Exception $ex) {
+                throw new \yii\web\HttpException(404, 'Invalid Request');
+            }
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
     public function actionSearch() {
         if (!$_POST) {
             
