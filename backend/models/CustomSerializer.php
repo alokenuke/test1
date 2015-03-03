@@ -47,6 +47,10 @@ class CustomSerializer extends Serializer {
         } elseif ($data instanceof DataProviderInterface) {
             return $this->serializeDataProvider($data);
         } else {
+            if ($data instanceof Model) {
+                $data = $this->serializeModel($data);
+                return array('status'=>$this->status,"items"=>$data,'msg'=>$this->msg );
+            }
             return array('status'=>$this->status,"items"=>$data,'msg'=>$this->msg );
         }
     }
@@ -134,5 +138,4 @@ class CustomSerializer extends Serializer {
             '_fields' => $fields
         ];
     }
-    
 }
