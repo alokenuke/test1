@@ -48,7 +48,10 @@ class CustomSerializer extends Serializer {
             return $this->serializeDataProvider($data);
         } else {
             if ($data instanceof Model) {
-                $data = $this->serializeModel($data);
+                $model=$data;
+                list ($fields, $expand) = $this->getRequestedFields();
+                $result = $model->toArray($fields, $expand);
+                $data = $result;
                 return array('status'=>$this->status,"items"=>$data,'msg'=>$this->msg );
             }
             return array('status'=>$this->status,"items"=>$data,'msg'=>$this->msg );

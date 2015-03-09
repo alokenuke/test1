@@ -4,6 +4,8 @@ namespace backend\controllers;
 use yii\filters\auth\QueryParamAuth;
 use yii\rest\ActiveController;
 use yii\data\ActiveDataProvider;
+use backend\models\Tags;
+
 /**
  * Class TagsController
  * @package rest\versions\v1\controllers
@@ -217,32 +219,64 @@ class ProjectsController extends ApiController
             
             $post = \Yii::$app->request->post();
             
-            $_GET['expand'] = "completedTags, totalTags";
-            
-            $model = new $this->modelClass;
-            
-            $query = $model->find();
-            
-            if(isset($post['search'])) {
-                foreach($post['search'] as $key => $val)
-                    if(isset($val)) {
-                        if(in_array($key, $this->partialMatchFields))
-                            $query->andWhere(['like', $key, $val]);
-                        else
-                            $query->where([$key => $val]);
-                    }
-            }
-            
-            try {
-                $provider = new ActiveDataProvider ([
-                    'query' => $query,
-                    'pagination'=> FALSE,
-                ]);
+            if(isset($post['project']) && $post['project'] > 0) {
+                $duration = "daily";
+                if(isset($post['duration']) && $post['duration'])
+                    $duration = $post['duration'];
                 
-            } catch (Exception $ex) {
-                throw new \yii\web\HttpException(500, 'Internal server error');
+                $result = [];
+                
+                $range = range(5, 0);
+                
+                $result['completedTags'] = [];
+                $result['totalTags'] = [];
+
+                foreach($range as $r) {
+                    
+                    if($duration=='quarterly')
+                    {
+                        $quarterDate = $this->getQuarter(strtotime("-".($r*3)." months"));
+                        $timestamp = strtotime($quarterDate['end']);
+                        $result['labels'][] = $quarterDate['version'];
+                    }
+                    else if($duration=='daily')
+                    {
+                        $timestamp = strtotime("-$r day");
+                        $result['labels'][] = date("D d M, Y", $timestamp);
+                    }
+                    else {
+                        $timestamp = strtotime("-$r ".  str_replace("ly", "", $duration));
+                        
+                        $result['labels'][] = date("D d M, Y", $timestamp);
+                    }
+                    
+                    $date = date("Y-m-d 23:59:59", $timestamp);
+                    
+                    $result['completedTags'][] = Tags::find()->andWhere(['completed' => '1', 'project_id' => $post['project']])->andWhere(['<=', 'completed_date', $date])->count();
+
+                    $result['totalTags'][] = Tags::find()->andWhere(['project_id' => $post['project']])->andWhere(['<=', 'created_date', $date])->count();
+                }
+                
+                return $result;
+                
             }
-            return $provider;
+            else {
+                $_GET['expand'] = "completedTags, totalTags";
+                $model = new $this->modelClass;
+                $query = $model->find();
+                
+                try {
+                    $provider = new ActiveDataProvider ([
+                        'query' => $query,
+                        'pagination'=> FALSE,
+                    ]);
+                
+                } catch (Exception $ex) {
+                    throw new \yii\web\HttpException(500, 'Internal server error');
+                }
+                return $provider;
+                
+            }
         } else {
             throw new \yii\web\HttpException(404, 'Invalid Request');
         }
@@ -295,6 +329,22 @@ class ProjectsController extends ApiController
     
     public function actionGetall() {
         return parent::actionGetall();
+    }
+    
+    function getQuarter( $passedDate = '' ) {
+        if( $passedDate == '' ) {
+            $v = ceil( date( "m" ) / 3 );
+            $y = date( "Y" );
+        } else {
+            $v = ceil( date( "m", $passedDate ) / 3 );
+            $y = date( "Y", $passedDate );
+        }
+        $m = ( $v * 3 ) - 2;
+        $date = $y . '-' . $m . '-' . 01;
+        $return['begin'] = date( "Y-m-d", strtotime(  $date ) );
+        $return['end'] = date( "Y-m-t", strtotime( $return['begin'] . "+ 2 months"  ) );
+        $return['version'] = $y . ' - Q' . $v;
+        return $return;
     }
     
 }

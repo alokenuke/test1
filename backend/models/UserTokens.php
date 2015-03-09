@@ -30,6 +30,7 @@ class UserTokens extends \yii\db\ActiveRecord
         return [
             [['user_id'], 'integer'],
             [['token'], 'string', 'max' => 100],
+            [['login_ip', 'login_location', 'token', 'request_from'], 'safe'],
         ];
     }
 
@@ -52,6 +53,7 @@ class UserTokens extends \yii\db\ActiveRecord
             'token',
             'login_ip',
             'login_location',
+            'login_latlong',
             'created_on',
             'request_from',
             'expire_on',

@@ -20,11 +20,21 @@ class TagsController extends ApiController
         parent::init();
     }
     
-    public function actionGetstages($id) {
+    public function actionGetstages() {
         if (!$_POST) {
             try {
                 
-                $tagModel = \backend\models\Tags::findOne(['id' => $id]);
+                $uid = \Yii::$app->request->post("uid");
+                
+                $tagModel = \backend\models\Tags::findOne(['uid' => $uid]);
+                
+                if(!$tagModel) {
+                    $model = new \backend\models\Tags();
+                    $model->addError("uid", "Invalid UID.");
+                    return $model;
+                }
+                
+                $tagDetails = $tagModel->toArray([], ["tagActivityLog"]);
                 
                 $tagProcessFlow = \backend\models\TagProcess::findOne(['id' => $tagModel->tag_process_flow_id]);
                 
@@ -32,7 +42,9 @@ class TagsController extends ApiController
                 
                 $_GET['expand'] = "childOptions";
                 
-                if(!$params['flagHierarchy']) {
+                $admin = false;
+                
+                if(!$params['flagHierarchy'] || $admin) {
                     $query = \backend\models\TagProcess::find()->andWhere(['parent_id' => $tagProcessFlow->id])->orderBy("position");
                     
                     $provider = new ActiveDataProvider ([
@@ -42,7 +54,44 @@ class TagsController extends ApiController
                     return $provider;
                 }
                 else {
-                    return \backend\models\TagProcess::find()->andWhere(['parent_id' => $tagProcessFlow->id])->orderBy("position")->one();
+                    $tagAssignment = \backend\models\TagAssignment::find()->andWhere(['tag_id' => $tagDetails['id'], 'user_id' => \yii::$app->user->id])->one();
+                    
+                    if($tagAssignment) {
+                        
+                        $lastActivity = $tagDetails['tagActivityLog'];
+                    
+                        $assignedProcessDetails = \backend\models\TagProcess::find()
+                                ->select(['position'])
+                                ->andWhere(["id" => [$tagAssignment->process_stage_from, $tagAssignment->process_stage_to]])
+                                ->orderBy("position")
+                                ->all();
+                        
+                        $processStart = $assignedProcessDetails[0]->position;
+                        $processEnd = $assignedProcessDetails[1]->position;
+                        
+                        if(!isset($lastActivity) || !isset($lastActivity['stageInfo'])) {
+                            return \backend\models\TagProcess::find()->andWhere(['parent_id' => $tagProcessFlow->id])
+                                ->andWhere(['>=', "position", $processStart])
+                                ->andWhere(['<=', "position", $processEnd])
+                                ->orderBy("position")->one();
+                        }
+                        if($lastActivity['stageInfo']['flagCompletion']==$lastActivity['answer']['id']) {
+                            return \backend\models\TagProcess::find()->andWhere(['parent_id' => $tagProcessFlow->id])
+                                ->andWhere(['>=', "position", $processStart])
+                                ->andWhere(['<=', "position", $processEnd])
+                                ->andWhere(["<>", 'id', $lastActivity['stageInfo']['id']])
+                                ->orderBy("position")->one();
+                        }
+                        else {
+                            return \backend\models\TagProcess::find()->andWhere(['parent_id' => $tagProcessFlow->id])
+                                ->andWhere(['>=', "position", $processStart])
+                                ->andWhere(['<=', "position", $processEnd])
+                                ->andWhere(['id' => $lastActivity['stageInfo']['id']])
+                                ->orderBy("position")->one();
+                        }
+                    }
+                    else
+                        return null;
                 }
 
             } catch(Exception $ex) {
@@ -62,7 +111,8 @@ class TagsController extends ApiController
                 $_GET['expand'] = "project_level, itemDetails, userGroup,".$_GET['expand'];
             $post = \Yii::$app->request->post();
             
-            $model = new $this->modelClass;
+//            $model = new $this->modelClass;
+            $model = new \backend\models\Tags();
             
             $query = $model->find();
             
@@ -96,19 +146,85 @@ class TagsController extends ApiController
                     else if($key == 'tag_process_flow_id') {
                         $processDetails = \backend\models\TagProcess::findOne(['id' => $val]);
                         
+                        $processParams = (array) json_decode($processDetails->params);
+                        
                         if($processDetails->type==1) {
                             $query->andWhere([$key => $val]);
                         }
                         else if($processDetails->type==2) {
                             $query->andWhere([$key => $processDetails->parent_id]);
                             
+                            if($processDetails->position==0) {
                             
-                            
+                                if($processDetails->option_type==1)
+                                {
+                                    $query->andWhere("(tag_activity_log.process_stage_id = $processDetails->id and :answer not in (tag_activity_log.process_stage_answer) OR (select count(log.id) from tag_activity_log log where log.tag_id=tags.id) = 0)", [':answer' => $processParams['flagCompletion']]);
+                                }
+                                else if($processDetails->option_type==3)
+                                {
+                                    $query->andWhere("(tag_activity_log.process_stage_id = $processDetails->id and tag_activity_log.process_stage_id = :process_stage) and tag_activity_log.process_stage_answer <> :answer", [':process_stage' => $processDetails->id, ':answer' => "100"]);
+                                }
+                                else if($processDetails->option_type==5)
+                                {
+                                    $query->andWhere("(tag_activity_log.process_stage_id = $processDetails->id and tag_activity_log.process_stage_id = :process_stage) and tag_activity_log.process_stage_answer = :answer", [':process_stage' => $processDetails->id, ':answer' => ""]);
+                                }
+                                else
+                                {
+                                    $query->andWhere("(tag_activity_log.process_stage_id = $processDetails->id and tag_activity_log.process_stage_answer <> :answer OR (select count(log.id) from tag_activity_log log where log.tag_id=tags.id) = 0)", [':answer' => $processParams['flagCompletion']]);
+                                }
+
+                                $query->join("left join", "tag_activity_log", "tags.id = tag_activity_log.tag_id and tag_activity_log.status = 1")->groupBy("tags.id");
+                                
+                                $query->having("count(tag_activity_log.id) = 0 OR (count(tag_activity_log.id) > 0 and max(tag_activity_log.logged_date))");
+                            }
+                            else {
+                                
+                                $lastProcess = \backend\models\TagProcess::find()->andWhere(['parent_id' => $processDetails->parent_id])->andWhere(['<', 'position', $processDetails->position])->one();
+                                $lastProcessParams = (array) json_decode($lastProcess->params);
+                                
+                                $subQryCheckCurrentProcess = "";
+                                $subQryCheckLastProcess = "";
+                                
+                                if($processDetails->option_type == 1) 
+                                    $subQryCheckCurrentProcess = "(tag_activity_log.process_stage_id = $processDetails->id and ($processParams[flagCompletion]) NOT IN (tag_activity_log.process_stage_answer))";
+                                else if($processDetails->option_type==3)
+                                    $subQryCheckCurrentProcess = "(tag_activity_log.process_stage_id = $processDetails->id and tag_activity_log.process_stage_answer <> 100)";
+                                else if($processDetails->option_type==5)
+                                    $subQryCheckCurrentProcess = "(tag_activity_log.process_stage_id = $processDetails->id and tag_activity_log.process_stage_answer = '')";
+                                else
+                                    $subQryCheckCurrentProcess = "(tag_activity_log.process_stage_id = $processDetails->id and tag_activity_log.process_stage_answer <> $processParams[flagCompletion])";
+                                
+                  
+                                if($lastProcess->option_type == 1)
+                                    $subQryCheckLastProcess = "(tag_activity_log.process_stage_id = $lastProcess->id and ($lastProcessParams[flagCompletion]) IN (tag_activity_log.process_stage_answer))";
+                                else if($lastProcess->option_type==3)
+                                    $subQryCheckLastProcess = "(tag_activity_log.process_stage_id = $lastProcess->id and tag_activity_log.process_stage_answer = 100)";
+                                else if($lastProcess->option_type==5)
+                                    $subQryCheckLastProcess = "(tag_activity_log.process_stage_id = $lastProcess->id and tag_activity_log.process_stage_answer <> '')";
+                                else if($lastProcess->option_type != 3 && $lastProcess->option_type != 5) 
+                                    $subQryCheckLastProcess = "(tag_activity_log.process_stage_id= $lastProcess->id and tag_activity_log.process_stage_answer = $lastProcessParams[flagCompletion])";
+                                
+                                $query->andWhere("$subQryCheckCurrentProcess OR $subQryCheckLastProcess");
+
+                                $query->join("left join", "tag_activity_log", "tags.id = tag_activity_log.tag_id and tag_activity_log.status = 1")->groupBy("tags.id");
+                                
+                                $query->having("count(tag_activity_log.id) > 0 and max(tag_activity_log.logged_date)");
+                            }
                         }
                         else if($processDetails->type==3) {
-                            $processType = $processDetails->getParentProcess()->one()->parent_id;
-                            $query->andWhere([$key => $processType]);
+                            $processStage = $processDetails->getParentProcess()->one();
+                            $query->andWhere([$key => $processStage->parent_id]);
                             
+                            if($processDetails->option_type!=3 && $processDetails->option_type!=5)
+                            {
+                                $query->andWhere("(tag_activity_log.process_stage_id = :process_stage) and tag_activity_log.process_stage_answer = :answer", [':process_stage' => $processStage->id, ':answer' => $processDetails->id]);
+                            }
+                            
+                            $query->join("left join", "tag_activity_log", "tags.id = tag_activity_log.tag_id and tag_activity_log.status = 1")->groupBy("tags.id");
+                            
+                            if($processDetails->position==0) {
+                                $query->having("max(tag_activity_log.logged_date)");
+                            }
                         }
                     }
                     else if(isset($val)) {
@@ -127,8 +243,10 @@ class TagsController extends ApiController
                 $query->andWhere(['not in', 'id', $tagIds]);
             }
                         $pageLimit = 20;
-            if(isset($post['sort']))
+            if(isset($post['sort']) && $post['sort'])
                 $_GET['sort'] = $post['sort'];
+            else
+                $_GET['sort'] = "-created_date";
             if(isset($post['page']))
                 $_GET['page'] = $post['page'];
             if(isset($post['limit']))
@@ -154,9 +272,9 @@ class TagsController extends ApiController
         if (!$_POST) {
             
             if(!isset($_GET['expand']))
-                $_GET['expand'] = "project_level, itemDetails, userGroup";
+                $_GET['expand'] = "project_level, processDetails, itemDetails, userGroup";
             else
-                $_GET['expand'] = "project_level, itemDetails, userGroup,".$_GET['expand'];
+                $_GET['expand'] = "project_level, processDetails, itemDetails, userGroup,".$_GET['expand'];
             
             $uid = \Yii::$app->request->post("uid");
             

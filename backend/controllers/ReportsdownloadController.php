@@ -724,7 +724,7 @@ class ReportsdownloadController extends Controller
             '[[consultant_project_manager]]' => $tagArray['project']['consultant_project_manager'],
             '[[contractor_project_manager]]' => $tagArray['project']['contractor_project_manager'],
             
-            '[[page_number]]' => $tagArray['project']['page_number_prefix']."1".$tagArray['project']['page_number_suffix'],
+            '[[page_number]]' => $template_param['page_number_prefix']."1".$template_param['page_number_suffix'],
             
             '[[project_level]]' => $projectLevel,
             '[[items]]' => $items,
@@ -759,6 +759,11 @@ class ReportsdownloadController extends Controller
     {
         
         $tagIds = \Yii::$app->request->post("tags");
+        if(!$tagIds) {
+            \yii::$app->getResponse()->setStatusCode(500);
+            return "Please select a tag to generate report.";
+        }
+            
         $tagQueryObj = \backend\models\Tags::find()->andWhere(['id' => $tagIds]);
         $_GET['expand'] = "project_level,itemObj,processObj,userGroup,company,project";
         $dataProvider = new ActiveDataProvider([

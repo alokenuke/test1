@@ -153,11 +153,14 @@ class FileManager extends Model
         if($oldfile && file_exists($path."/".$oldfile))
             unlink($path."/".$oldfile);
         
-        rename($existingPath."/".$newfile, $path."/".$newfile);        
+        if(file_exists($existingPath."/".$newfile))
+            rename($existingPath."/".$newfile, $path."/".$newfile);        
     }
     
     public function getAllowedTypes() {
         return [
+            'image/jpeg',
+            'image/jpg',
             'application/msword',
             'application/x-msexcel',
             'application/x-mspowerpoint',

@@ -76,7 +76,7 @@ class Timeattendance extends \yii\db\ActiveRecord
             //error_reporting(0);
             $barCode= new BarCodeGenerator\DNS1DBarcode();
             $barCode->save_path= $barCodePath;
-            $barCode->getBarcodePNGPath($this->uid, 'C39', 5, 200);
+            $barCode->getBarcodePNGPath($this->uid, 'C128', 5, 200);
         }
         
         parent::afterSave($insert, $changedAttributes);

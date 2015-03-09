@@ -69,7 +69,9 @@ class TimeattendanceLog extends \yii\db\ActiveRecord
                     return $interval->format('%h.%i hours');
                 }
             },
-            'location',
+            'location' => function() {
+                return (array) json_decode($this->location);
+            },
             'status',
             'logged_by',
             'device',

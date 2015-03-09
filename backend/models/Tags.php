@@ -80,7 +80,7 @@ class Tags extends \yii\db\ActiveRecord
             error_reporting(0);
             $barCode= new BarCodeGenerator\DNS1DBarcode();
             $barCode->save_path= $barCodePath;
-            $barCode->getBarcodePNGPath($this->uid, 'C39', 5, 200);
+            $barCode->getBarcodePNGPath($this->uid, 'C128', 5, 200);
         }
         
         parent::afterSave($insert, $changedAttributes);
@@ -101,7 +101,7 @@ class Tags extends \yii\db\ActiveRecord
     // default scope to check company_id
     public static function find()
     {
-        $query = parent::find()->where(['company_id' => \yii::$app->user->identity->company_id, 'tag_status' => 1]);
+        $query = parent::find()->where(['tags.company_id' => \yii::$app->user->identity->company_id, 'tags.tag_status' => 1]);
         
         return $query;
     }
@@ -244,7 +244,8 @@ class Tags extends \yii\db\ActiveRecord
             'relatedTags',
             'tagActivityLog',
             'company',
-            'project'
+            'project',
+            'processDetails'
         ];
     }
     
@@ -326,10 +327,6 @@ class Tags extends \yii\db\ActiveRecord
     
     public function getTagActivityLog()
     {
-        return $this->hasOne(TagActivityLog::className(), ['tag_id'=>'id'])->orderBy("logged_date");
-    }
-    
-    public function getNextActivity() {
-        
+        return $this->hasOne(TagActivityLog::className(), ['tag_id'=>'id'])->orderBy("logged_date DESC");
     }
 }

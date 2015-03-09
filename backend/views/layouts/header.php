@@ -28,7 +28,11 @@
                 </li>
             </ul>
             <?php if(\yii::$app->user->identity->lastTokens) { ?>
-            <div class="last-login">Last login : <span class="date-time text-muted"><?php echo date("d M Y H:i:s", \yii::$app->user->identity->lastTokens->created_on); ?></span></div>
+            <div class="last-login">Last login : 
+                <span class="date-time text-muted">
+                    {{<?php echo \yii::$app->user->identity->lastTokens->created_on;?>*1000 | date : "dd MMM yyyy h:mm:ss"}}
+                </span>
+            </div>
             <?php } ?>
         </div>
         <div class="navbar-header">

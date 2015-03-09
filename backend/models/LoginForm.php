@@ -73,35 +73,49 @@ class LoginForm extends Model
             
             $authToken->login_ip = Yii::$app->getRequest()->getUserIP();
             
-            if(!$this->location && $authToken->login_ip != "::1") {
+            if($authToken->login_ip != "::1") {
+                
+                $lastLoginQry = UserTokens::find()
+                        ->andWhere("created_on > ".strtotime("-15 days"))
+                        ->andWhere("login_location != 'Not Available'")
+                        ->orderBy("created_on DESC");
+                
+                if($this->location)
+                    $lastLoginQry = $lastLoginQry->andWhere(['login_latlong' => $authToken->login_location['lat'].",".$authToken->login_location['long']]);
+                else
+                    $lastLoginQry = $lastLoginQry->andWhere(['login_ip' => $authToken->login_ip]);
                 
                 // Check if similar ip detected by system in last 6 months
-                $locationDetails = UserTokens::find()
-                        ->andWhere(['login_ip' => $authToken->login_ip])
-                        ->andWhere("created_on > ".strtotime("-6 months"))
-                        ->andWhere("login_location != 'Not Available'")
-                        ->orderBy("created_on DESC")
-                        ->one();
+                $locationDetails = $lastLoginQry->one();
                 
                 if(!$locationDetails) {
-                    $locationDetails = unserialize(file_get_contents('http://www.geoplugin.net/php.gp?ip='.$authToken->login_ip));
-
-                    if(empty($locationDetails['geoplugin_region'])) {
-                        $location = "Not Available";
-                    }
+                    if($this->location)
+                        $locationDetails = unserialize(file_get_contents("http://www.geoplugin.net/extras/location.gp?format=php&lat=$this->location[lat]&long=$this->location[long]"));
                     else
-                        $location = $locationDetails['geoplugin_region']." (".$locationDetails['geoplugin_countryName'].")";
+                        $locationDetails = unserialize(file_get_contents("http://www.geoplugin.net/php.gp?ip=".$authToken->login_ip));
+                    
+                    if(empty($locationDetails['geoplugin_region'])) {
+                        $authToken->login_location = "Not available";
+                        $authToken->login_latlong = "Not available";
+                    }
+                    else {
+                        $authToken->login_location = $locationDetails['geoplugin_region']." (".$locationDetails['geoplugin_countryName'].")";
+                        
+                        if($this->location)
+                            $authToken->login_latlong = $this->location['lat'].",".$this->location['long'];
+                        else
+                            $authToken->login_latlong = $locationDetails['geoplugin_latitude'].",".$locationDetails['geoplugin_longitude'];
+                    }
                 }
                 else {
-                    $location = $locationDetails->login_location;
+                    $authToken->login_location = $locationDetails->login_location;
+                    $authToken->login_latlong = $locationDetails->login_latlong;
                 }
-                
-                $authToken->login_location = $location;
-                
             }
-            else
-                $authToken->login_location = $this->location['lat'].",".$this->location['long'];
-            
+            else {
+                $authToken->login_location = "Not available";
+                $authToken->login_latlong = "Not available";
+            }
             $authToken->request_from = $this->device?$this->device:"webapp";
             $authToken->expire_on = $authToken->created_on+\yii::$app->params['tokenExpiryTime'];
             

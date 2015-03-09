@@ -41,7 +41,7 @@ class TagActivityLog extends \yii\db\ActiveRecord
             [['comment'], 'string', 'max' => 256],
             ['logged_by', 'default', 'value' => \yii::$app->user->id],
             ['status', 'default', 'value' => 1],
-            [['location'], 'string', 'max' => 32],
+            [['location'], 'string', 'max' => 64],
             [['device'], 'string', 'max' => 16]
         ];
     }
@@ -54,7 +54,9 @@ class TagActivityLog extends \yii\db\ActiveRecord
             'answer',
             'loggedBy',
             'comment',
-            'location',
+            'location' => function() {
+                return json_decode($this->location);
+            },
             'logged_by',
             'device',
             'logged_date' => function() {
@@ -65,7 +67,7 @@ class TagActivityLog extends \yii\db\ActiveRecord
     
     public static function find()
     {
-        $query = parent::find()->andWhere(['company_id' => \yii::$app->user->identity->company_id])->joinWith("user")->andWhere(['tag_activity_log.status' => 1])->orderBy("logged_date DESC");
+        $query = parent::find()->joinWith("user")->andWhere(['tag_activity_log.status' => 1])->orderBy("logged_date DESC");
         
         return $query;
     }

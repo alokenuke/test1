@@ -70,11 +70,31 @@ class TagActivityLogController extends ApiController
             
             $fileManager = new \backend\models\FileManager();
             
+            $tagDetails = \backend\models\Tags::findOne(['uid' => $post['uid']]);
+            
+            $location = "";
+            
+            if(!isset($post['location'])) {
+                $currentLoginDetails = \backend\models\UserTokens::findOne(['token' => $_GET['access-token']]);
+                if($currentLoginDetails->login_latlong != "Not available") {
+                    $latlong = explode(",", $currentLoginDetails->login_latlong);
+                    $location['lat'] = (isset($latlong[0])?$latlong[0]:"");
+                    $location['long'] = (isset($latlong[1])?$latlong[1]:"");
+                    $location = json_encode($location);
+                }
+            }
+            else
+                $location = json_encode ($post['location']);
+            
             $model = new $this->modelClass;
+            
             $company_id = \yii::$app->user->identity->company_id;
             
             $model->setAttributes($post);
-
+            
+            $model->setAttribute("tag_id", $tagDetails->id);
+            $model->setAttribute("location", $location);
+            
             try {
                 if ($model->save()) {
                     // do something here after saving
@@ -96,8 +116,8 @@ class TagActivityLogController extends ApiController
                         }
                     }
                     
-                     $transaction->commit();
-                     return "Success";
+                    $transaction->commit();
+                    return "Success";
                 }
                 else {
                     return $model;
@@ -112,5 +132,68 @@ class TagActivityLogController extends ApiController
         } else {
             throw new \yii\web\HttpException(404, 'Invalid Request');
         }
-    }    
+    }
+    
+    public function actionMultipleLogactivity() {
+        if (!$_POST) {
+            
+            $post = \Yii::$app->request->post("LogActivity");
+            
+            $connection = \Yii::$app->db;
+            $transaction = $connection->beginTransaction();
+            
+            $fileManager = new \backend\models\FileManager();
+            
+            $fileAttachments = [];
+            
+            if(isset($post['files']))
+              foreach($post['files'] as $file) {
+                $filename = str_replace("temp/", "",$file );
+                $fileAttachments[] = ['name' => $filename, 'type' => $fileManager->getFileTypeCode("", $filename, "attachments")];
+                
+                $fileManager->replaceFile("", $filename, "temp/", "attachments");
+            }
+            
+            try {
+                $tagIds = $post['tag_id'];
+                                
+                foreach($tagIds as $tagId) {
+                    $model = new $this->modelClass;
+                    $post['tag_id'] = $tagId;
+                    
+                    $model->setAttributes($post);
+                    
+                    if ($model->save()) {
+                        // do something here after saving
+
+                       if(count($fileAttachments))
+                        foreach($fileAttachments as $file) {
+                            $tagAttachmentModel = new \backend\models\TagActivityAttachment();
+                            $tagAttachmentModel->setAttribute("tag_id", $model->tag_id);
+                            $tagAttachmentModel->setAttribute("activity_log_id", $model->id);
+                            $tagAttachmentModel->setAttribute("filename", $file['name']);
+                            $tagAttachmentModel->setAttribute("file_type", $file['type']);
+
+                            if(!$tagAttachmentModel->save()) {
+                                $transaction->rollBack();
+                                return $tagAttachmentModel;
+                            }
+                        }
+                    }
+                    else {
+                        $transaction->rollBack();
+                        return $model;
+                    }
+                }
+                
+                $transaction->commit();
+                return "Success";
+                
+            } catch (Exception $e) {
+                $transaction->rollBack();
+            }
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
 }
