@@ -178,7 +178,7 @@
                                         </ui-select>
                                      </td>
                                      <td class="text-center">
-                                         <div class="checkbox">
+                                         <div class="">
                                              <label>
                                                  <input type="checkbox" ng-model="search.mandatory[relateUser.users.id]" ng-init="search.mandatory[relateUser.users.id] = (tagAssignment.mandatory==1)"> &nbsp;
                                              </label>
@@ -197,8 +197,8 @@
                                      </td>
                                      <td class="text-center" style="width: 200px;">
                                          <div class="dropdown">
-                                            <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.notification_frequency[relateUser.users.id]" style="width: 100%;" ng-init="search.notification_frequency[relateUser.users.id]={'id': (tagAssignment.notification_frequency?tagAssignment.notification_frequency:relateUser.users.rec_notification), 'name': (tagAssignment.notification_frequency?tagAssignment.notification_frequency:relateUser.users.rec_notification)}">
-                                                <ui-select-match placeholder="Select status">{{$select.selected.name | titlecase}}</ui-select-match>
+                                            <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.notification_frequency[relateUser.users.id]" style="width: 100%;" ng-init="search.notification_frequency[relateUser.users.id]={'id': (tagAssignment.notification_frequency?tagAssignment.notification_frequency:relateUser.users.rec_notification), 'name': (tagAssignment.notification_frequency?tagAssignment.notification_frequency:relateUser.users.rec_notification)}" multiple>
+                                                <ui-select-match placeholder="Select status">{{$item.name | titlecase}}</ui-select-match>
                                                 <ui-select-choices repeat="frequency in noti_frequency | filter: $select.search"
                                                          refresh-delay="0">
                                                     <div ng-bind-html="frequency.name"></div>
@@ -215,7 +215,7 @@
            <div class="wrapper mt-20">
                <div class="tag-btn-wrapper row">
                    <div class="col-sm-5 pull-right ">
-                        <label class="control-label col-sm-8 col-lg-9 text-right">No. of Tags to Create :</label>
+                        <label class="control-label col-sm-8 col-lg-9 text-right">Generate fields :</label>
                         <div class="col-sm-4 col-lg-3 pull-right" style="padding:0;">
                             <div class="input-group">
                                 <input type="text" class="form-control"  value="1" placeholder="" ng-model="tagsNum" ng-init="tagsNum=1" ng-maxlength="2" numbers-only="numbers-only">
@@ -244,13 +244,13 @@
                                    {{$index+1}}
                                    <input type="hidden" id="tag-{{$index}}" ng-model="tag.id" />
                                </td>
-                               <td><input type="text" id="tag-pre-{{$index}}" class="form-control form-control-small" ng-model="tag.pre" numbers-only="numbers-only" /></td>
-                               <td><input type="text" id="tag-tagName-{{$index}}" ng-required="true" class="form-control form-control-small" ng-model="tag.tagName" /></td>
-                               <td><input type="text" id="tag-post-{{$index}}" class="form-control form-control-small" ng-model="tag.post" numbers-only="numbers-only" /></td>
-                               <td><input type="text" id="tag-productCode-{{$index}}" class="form-control form-control-small" ng-model="tag.productCode" /></td>
+                               <td><input type="text" id="tag-pre-{{$index}}" class="form-control" ng-model="tag.pre" numbers-only="numbers-only" size="3" maxlength="3" /></td>
+                               <td><input type="text" id="tag-tagName-{{$index}}" ng-required="true" class="form-control" ng-model="tag.tagName" maxlength="64" /></td>
+                               <td><input type="text" id="tag-post-{{$index}}" class="form-control" ng-model="tag.post" numbers-only="numbers-only" size="3" maxlength="3" /></td>
+                               <td><input type="text" id="tag-productCode-{{$index}}" class="form-control form-control-small" ng-model="tag.productCode" size="16" maxlength="16" /></td>
                                <td>
                                    <div class="input-group">
-                                       <input type="text" id="tag-tagDescription-{{$index}}" class="form-control form-control-small" ng-model="tag.tagDescription" maxlength="100" />
+                                       <input type="text" id="tag-tagDescription-{{$index}}" class="form-control" ng-model="tag.tagDescription" maxlength="256" />
                                        <span class="input-group-btn">
                                            <button ng-click="(tagDetails.tags.length>1?tagDetails.tags.splice($index,1):0)" type="button" class="btn btn-default" style="padding:3px 10px;"><i class="fa fa-trash"></i></button>
                                        </span>

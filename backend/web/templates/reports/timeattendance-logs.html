@@ -175,7 +175,7 @@
                             </td>
                             <td class="text-center">{{dat.user.first_name}} {{dat.user.last_name}}</td>
                             <td class="text-center">
-                                {{dat.location}}<br />
+                                <a googlemap header="Timeattendance Location:" footer="" latlong="{{dat.location.lat}},{{dat.location.long}}">View Location</a><br />
                                 ({{dat.device}})
                             </td>
                             <td class="text-center">{{dat.login_time}}</td>

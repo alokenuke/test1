@@ -46,7 +46,7 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
     var path = '/templates/';
     
     $routeProvider
-
+    
         .when('/login', {
             templateUrl: SiteUrl+'/site/login',
             controller: 'SiteIndex',
@@ -249,23 +249,47 @@ app.controller('SiteIndex', ['$scope', 'rest', 'breadcrumbsService', '$http', "$
             
             $.getScript('/js/Chart.min.js', function()
             {
-                $scope.loadChart({});
+                //$scope.loadChart({});
             });
             
+            $scope.projectProgress = function(project) {
+                
+                $scope.chartForProject = project;
+                
+                angular.element("#graphPopupBox").modal("show");
+                
+                //code before the pause
+                setTimeout(function(){
+                    $scope.loadChart({'project': project});
+                    //do what you need here
+                }, 500);
+            }
+            
             $scope.loadChart = function(params) {
+                
+                if(typeof window.myBar != 'undefined') {
+                    window.myBar.destroy();
+                }
+                
                 $http.post("projects/getchartstats", params).success(function (data) {
                     var $completedTags = [];
                     var $totalTags = [];
                     var $labels = [];
                     var $i=0
-                    angular.forEach(data.items, function(val) {
-                        //if(val['totalTags']>0) {
-                            $labels[$i] = val['project_name'];
-                            $completedTags[$i] = val['completedTags'];
-                            $totalTags[$i++] = val['totalTags'];
-                        //}
-                    });
                     
+                    if(typeof data['labels'] == 'undefined')
+                        angular.forEach(data.items, function(val) {
+                            //if(val['totalTags']>0) {
+                                $labels[$i] = val['project_name'];
+                                $completedTags[$i] = val['completedTags'];
+                                $totalTags[$i++] = val['totalTags'];
+                            //}
+                        });
+                    else {
+                        $labels = data['labels'];
+                        $completedTags = data['completedTags'];
+                        $totalTags = data['totalTags'];
+                    }
                     if($labels.length>0) {
                         var barChartData = {
                             labels : $labels,
@@ -288,12 +312,13 @@ app.controller('SiteIndex', ['$scope', 'rest', 'breadcrumbsService', '$http', "$
                                 }
                             ]
                         }
-                        var ctx = document.getElementById("canvas").getContext("2d");
+                        var canvas = angular.element("canvas");
+                        var ctx = canvas[0].getContext("2d");
                         window.myBar = new Chart(ctx).Bar(barChartData, {
                                 responsive : true,
                                 multiTooltipTemplate: "<%if (datasetLabel ){%><%=datasetLabel %>: <%}%><%= value %>",
                                 //String - A legend template
-                                legendTemplate : "<ul id=\"chart_legend\" class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].fillColor%>;display: inline-block; width: 20px;\">&nbsp;</span> <%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
+                                legendTemplate : "<ul id=\"chart_legend\" class=\"<%=name.toLowerCase()%>-legend nav navbar-nav mt-5 pl-10\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].fillColor%>;display: inline-block; width: 20px;\">&nbsp;</span> <%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
                         });
                         
                         $("#chart_legend").remove();

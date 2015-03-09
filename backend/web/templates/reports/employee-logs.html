@@ -22,15 +22,30 @@
                     <div class="col-md-6 col-lg-7">
                         <div class="form-group">
                             <label class="col-sm-4 col-lg-3 control-label text-right">Login Between :</label>
-                            <div class="col-sm-3">
+                            <div class="col-sm-6">
                                 <div class="input-group">
-                                    <input type="text" style="padding:6px 6px;" name="q" placeholder="From date..." class="form-control search-control" datepicker-popup="{{format}}" ng-model="search.date_range.from_date" is-open="datepickers.fromDate" max-date="today" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" close-text="Close">
+                                    <input type="text" style="padding:6px 6px;" name="q" placeholder="To date..." class="form-control search-control" datepicker-popup="{{format}}" ng-model="search.date_range.to_date" is-open="datepickers.toDate" max-date="today" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" close-text="Close">
                                     <div class="input-group-btn">
-                                        <button type="button" class="btn btn-primary search-btn" ng-click="openCalendar($event, 'fromDate')"><i class="fa fa-calendar"></i></button>
+                                        <button type="button" class="btn btn-primary search-btn" ng-click="openCalendar($event, 'toDate')"><i class="fa fa-calendar"></i></button>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-3">
+                        </div>
+                    </div>
+                </div><!--/row-->
+                <div class="row">
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label text-right">Employee Name :</label>
+                            <div class="col-sm-6">
+                                <input type="text" ng-model="search.employee_name" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-7">
+                        <div class="form-group">
+                            <label class="col-sm-4 col-lg-3 control-label text-right">Login Between :</label>
+                            <div class="col-sm-6">
                                 <div class="input-group">
                                     <input type="text" style="padding:6px 6px;" name="q" placeholder="To date..." class="form-control search-control" datepicker-popup="{{format}}" ng-model="search.date_range.to_date" is-open="datepickers.toDate" max-date="today" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" close-text="Close">
                                     <div class="input-group-btn">
@@ -77,10 +92,11 @@
                             <td class="text-center">{{dat.user.first_nastame}} {{dat.user.last_name}}</td>
                             <td class="text-center">{{dat.user.username}}</td>
                             <td class="text-center">
-                                {{dat.login_location}}<br />
+                                <a ng-if="dat.login_latlong != 'Not available'" googlemap header="Location: {{dat.login_location}}" footer="" latlong="{{dat.login_latlong}}">{{dat.login_location}}</a>
+                                <span ng-if="dat.login_location == 'Not available'">{{dat.login_location}}</span><br />
                                 ({{dat.request_from}})
                             </td>
-                            <td class="text-center">{{dat.created_on * 1000| date: 'dd MMM yy H:i:s'}}</td>
+                            <td class="text-center">{{dat.created_on * 1000| date: 'dd MMM yy h:mm:ss'}}</td>
                             <td class="text-center">
                                 <span ng-if="dat.expire_on > time && dat.expiry_status == 0">Active</span>
                                 <span ng-if="dat.expire_on <= time || dat.expiry_status == 1">Logged Out</span>

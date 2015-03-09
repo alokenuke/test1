@@ -383,6 +383,13 @@ app.controller('TimeAttendanceView', ['$scope', 'rest', '$location', '$route','$
         $scope.status = {
             isopen: false
         };
+        
+        $scope.downloadReport = function() {
+            $http.post("reports/generate-time-attendance-reports", {'search': {'tag_id': $routeParams.id}}).success(function(data) {
+                var tabWindowId = window.open("_new");
+                tabWindowId.location.href = data;
+            }).error(function(data) {errorCallback(data)});
+        }
 		
         $http.post("/timeattendance-log/search?expand=user",{'search': {'tag_id':$routeParams.id}}).success(function(data) {
             $scope.activity = data.items;

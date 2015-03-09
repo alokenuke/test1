@@ -6,7 +6,7 @@
                 Log Activity
             </h2>
         </div><!--/row-->
-        <div class="row">
+        <div class="row" ng-if="tagDetails.tagActivityLog && !$scope.select.tag_id[0]">
             <div class="form-group">
                 <div class="col-sm-2"></div>
                 <div class="col-xs-8 mt-10" style="font-size: 1.1em">
@@ -17,12 +17,12 @@
                 </div>
             </div>
         </div><!--/row-->
-        <form ng-submit="logActivity()" role="form" class="form-horizontal form-horizontal-typ1 form-wrapper" id="form">
+        <form ng-submit="logActivity()" role="form" class="form-horizontal form-horizontal-typ1 form-wrapper" id="form" ng-if="process">
             <div class="row">
                 <div class="form-group">
                     <label class="col-sm-4 control-label text-right">Process Stages :</label>
                     <div class="col-sm-6">
-                        <select class="form-control form-control-medium" ng-model="process_stage" ng-options="stage.process_name for stage in process" ng-disabled="process.length<=1" ng-required="true">
+                        <select class="form-control form-control-medium" ng-model="selected.process_stage" ng-options="stage.process_name for stage in process" ng-disabled="process.length<=1" ng-required="true">
                             <option value="">-- Select Process Stage --</option>
                         </select>
                     </div>
@@ -32,19 +32,19 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label text-right">Status :</label>
                     <div class="col-sm-6">
-                        <div ng-if="!process_stage">Please select a process to show related options.</div>
-                        <div ng-if="process_stage">
-                            <div ng-if="process_stage.option_type==1">
-                                <div class="col-sm-12 " ng-repeat="option in process_stage.childOptions">
+                        <div ng-if="!selected.process_stage.id">Please select a process to show related options.</div>
+                        <div ng-if="selected.process_stage.id">
+                            <div ng-if="selected.process_stage.option_type==1">
+                                <div class="col-sm-12 " ng-repeat="option in selected.process_stage.childOptions">
                                     <input type="checkbox" ng-model="select.process_stage_answer" ng-value="{{option.id}}" name="stage_answer" ng-required="true" /> {{option.process_name}}
                                 </div>
                             </div>
-                            <div ng-if="process_stage.option_type==2">
-                                <div class="col-sm-12 " ng-repeat="option in process_stage.childOptions">
+                            <div ng-if="selected.process_stage.option_type==2">
+                                <div class="col-sm-12 " ng-repeat="option in selected.process_stage.childOptions">
                                     <input type="radio" ng-model="select.process_stage_answer" ng-value="{{option.id}}" name="stage_answer" ng-required="true" /> {{option.process_name}}
                                 </div>
                             </div>
-                            <div ng-if="process_stage.option_type==3">
+                            <div ng-if="selected.process_stage.option_type==3">
                                 
                                 <rating state-on="'fa fa-circle fa-2x clickable'" state-off="'fa fa-circle-o fa-2x clickable'" ng-model="select.process_stage_answer" max="max" readonly="isReadonly" ng-init='percent = 100 * (select.process_stage_answer/ max);' on-hover="overStar = value;percent = 100 * (value / max)" on-leave="overStar = null"></rating>
                                 
@@ -58,12 +58,12 @@
                                     <strong>Status: {{100* (select.process_stage_answer /max)}}%</strong>
                                 </div>
                             </div>
-                            <div ng-if="process_stage.option_type==4">
-                                <select class="form-control form-control-medium" ng-model="select.process_stage_answer" ng-options="stage.id as stage.process_name for stage in process_stage.childOptions" ng-required="true">
+                            <div ng-if="selected.process_stage.option_type==4">
+                                <select class="form-control form-control-medium" ng-model="select.process_stage_answer" ng-options="stage.id as stage.process_name for stage in selected.process_stage.childOptions" ng-required="true">
                                     <option value="">-- Select option --</option>
                                 </select>
                             </div>
-                            <div ng-if="process_stage.option_type==5">
+                            <div ng-if="selected.process_stage.option_type==5">
                                 <input type="text" ng-model="select.process_stage_answer" max="100" ng-required="true" />
                             </div>
                         </div>
@@ -96,6 +96,14 @@
                 </div>
             </div><!--/row-->
         </form>
+        <div class="row mt-20" ng-if="!process">
+            <div class="form-group">
+                <div class="col-sm-2"></div>
+                <h2 class="col-sm-8">
+                    You are not allowed to log activity on this tag.
+                </h2>
+            </div>
+        </div>
     </div><!--/search-tag-box-->
 </div><!--/secondary-bg-->
 <style>

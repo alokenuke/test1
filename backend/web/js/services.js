@@ -185,6 +185,66 @@ appServices.directive('openlightbox',
    return openLightBox;
 });
 
+appServices.directive('googlemap', 
+   function() {
+      var openLightBox = {
+         link :   function(scope, element, attrs) {
+             element.bind("click", function() {
+                
+                var header = $(this).attr("header");
+                var footer = $(this).attr("footer");
+                var latlong = $(this).attr("latlong").split(",");
+                
+                var element = angular.element('\
+                    <div class="modal fade">\n\
+                        <div class="modal-dialog" style="top: 10%;">\n\
+                            <div class="modal-content">\n\
+                                <div class="modal-header">\n\
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>\n\
+                                    <h4 class="modal-title">'+header+'</h4>\n\
+                                </div>\n\
+                                <div class="modal-body text-center">\n\
+                                    <div id="map-canvas" style="width: 100%;height: 300px;"></div>\n\
+                                </div>\n\
+                                <div class="modal-footer">\n\
+                                    <h4 class="text-center">'+footer+'</h4>\n\
+                                </div>\n\
+                            </div>\n\
+                        </div>\n\
+                    </div>').on('hidden.bs.modal', function (e) {
+                        element.remove();
+                    });
+                   
+                var body = $('body');
+                body.append(element);
+                element.modal('show');
+                
+                setTimeout(function() { createMap();}, 200);
+                
+                var createMap = function() {                
+                    var myLatlng = new google.maps.LatLng(parseInt(latlong[0]),parseInt(latlong[1]));
+
+                    var mapOptions = {
+                        center: { lat: parseInt(latlong[0]), lng: parseInt(latlong[1])},
+                        zoom: 8
+                    };
+
+                    var mapCanvas = $("#map-canvas", element);
+
+                    var map = new google.maps.Map(mapCanvas[0], mapOptions);
+
+                    var marker = new google.maps.Marker({
+                        position: myLatlng,
+                        map: map,
+                        title: header
+                    });
+                }
+            });
+       }
+   }
+   return openLightBox;
+});
+
  appServices.directive("clickToEdit", function() {
           
     return {

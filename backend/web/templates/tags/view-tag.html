@@ -291,7 +291,9 @@
                                 <span ng-hide="act.attachments.length>0">No attachments available</span>
                             </td>
                             <td class="text-center">
-                                <a>{{act.location}}</a><br /><small>{{act.device}}</small>
+                                <a ng-if="act.location" googlemap header="Timeattendance Location:" footer="" latlong="{{act.location.lat}},{{act.location.long}}">View Location</a>
+                                <span ng-if="!act.location">Not Available</span><br />
+                                <small>{{act.device}}</small>
                             </td>
                             <td class="text-center">
                                 {{act.user.first_name}} {{act.user.last_name}} <br/>

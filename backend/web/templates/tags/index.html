@@ -2,9 +2,9 @@
     <div class="row">
         <div class="col-xs-12 search-box mb-sm-large">
             <div class="row">
-                <h2 class="col-xs-12 search-title clickable" ng-click="showSearchBox = !showSearchBox;">
+                <h2 class="col-xs-12 search-title clickable" ng-click="showSearchBox = !showSearchBox;" style="text-decoration: underline;">
                     Search Tags <strong ng-hide="!search.globalSearch">: {{search.globalSearch}}</strong>
-                    <button class="pull-right btn icon-btn">
+                    <button class="pull-left btn icon-btn">
                         <i ng-class="{'fa fa-sort-desc fa-2x': !showSearchBox,'fa fa-sort-asc fa-2x': showSearchBox}"></i>
                     </button>
                 </h2>
@@ -119,7 +119,7 @@
                         <div class="form-group">
                             <label class="col-sm-4 col-lg-3 control-label text-right">Process Flow:</label>
                             <div class="col-sm-8 multi-level">
-                                <ui-select ng-repeat="process in processes"  ng-model="tag_process[$index].selected"
+                                <ui-select ng-repeat="process in processes"  ng-model="select.tag_process[$index].selected"
                                            theme="bootstrap" ng-disabled="disabled" class="{{((processes.length - 1) === $index ? 'last-child ' : '')}}">
                                     <ui-select-match placeholder="Select process">{{$select.selected.process_name}}</ui-select-match>
                                     <ui-select-choices repeat="p in process | filter: $select.search"
@@ -206,6 +206,9 @@
         <div class="row mt-15">
             <div class="">
                 <div class="clearfix table-responsive table-responsive-cust">
+                    <div class="pull-left mt-20" ng-if="allowLogActivity">
+                        <button class="btn btn-primary" type="button" ng-click="logActivity()">Log Activity for selected Tags</button>
+                    </div>
                     <div class="pull-right">
                         <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
                         <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px" ng-change="setPageLimit()" ng-model="numPerPage" ng-options="k as v for (k,v) in page_dropdown">
@@ -218,21 +221,21 @@
                                     <input type="checkbox" checkbox-all="data" />
                                 </th>
                                 <th class="text-center">Type</th>
-                                <th class="text-center" style="width: 20%;">Project Level</th>
+                                <th class="text-center" style="width: 15%;">Project Level</th>
                                 <th class="text-center">
                                     <a href="" ng-click="order('uid')">UID <i class="fa fa-sort{{sort.uid}}"></i></a>
                                 </th>
-                                <th class="text-center">Item Type</th>
-                                <th class="text-center">
+                                <th class="text-center" style="width: 10%;">Item Type</th>
+                                <th class="text-center" style="width: 15%;">
                                     <a href="" ng-click="order('tag_name')">Tag Name <i class="fa fa-sort{{sort.tag_name}}"></i></a>
                                 </th>
-                                <th class="text-center">
+                                <th class="text-center" style="width: 15%;">
                                     <a href="" ng-click="order('tag_description')">Tag Description <i class="fa fa-sort{{sort.tag_description}}"></i></a>
                                 </th>
                                 <th class="text-center">
                                     <a href="" ng-click="order('product_code')">Products Code <i class="fa fa-sort{{sort.product_code}}"></i></a>
                                 </th>
-                                <th class="text-center">
+                                <th class="text-center" style="width: 15%;">
                                     Last status updated
                                 </th>
                                 <th class="text-center" style="width: 125px;">Actions</th>
@@ -266,12 +269,12 @@
                                     </div>
                                 </td>
                                 <td class="text-center">
-                                    <a href="/#/tags/{{dat.id}}" class="btn icon-btn"><i class="fa fa-list-alt fa-lg"></i></a>
-                                    <a class="btn icon-btn" image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}}" type="YmFyY29kZQ==" imageUrl="{{dat.uid}}.png" openlightbox><i class="fa fa-barcode fa-lg"></i></a>
-                                    <a class="btn icon-btn"  image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}} " type="cXJjb2Rl" imageUrl="{{dat.uid}}.png" openlightbox><i class="fa fa-qrcode fa-lg"></i></a><br />
-                                    <a class="btn icon-btn" href="/reportsdownload/print-tag-report/{{dat.id}}-{{print.report_template.id}}" target="_new"><i class="fa fa-print fa-lg"></i></a>
-                                    <a class="btn icon-btn" href="/#/tags/update{{dat.type=='mT'?'master':''}}/{{dat.id}}/{{dat.project_id}}" ><i class="fa fa-pencil-square-o fa-lg"></i></a>
-                                    <a ng-click="deleteTag(dat, $index)" class="btn icon-btn" ng-confirm-click="Are you sure to delete this tag."><i class="fa fa-trash fa-lg"></i></a>
+                                    <a href="/#/tags/{{dat.id}}" class="btn icon-btn" title="Tag analysis"><i class="fa fa-list-alt fa-lg"></i></a>
+                                    <a class="btn icon-btn" image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}}" type="YmFyY29kZQ==" imageUrl="{{dat.uid}}.png" openlightbox title="Bar code"><i class="fa fa-barcode fa-lg"></i></a>
+                                    <a class="btn icon-btn"  image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}} " type="cXJjb2Rl" imageUrl="{{dat.uid}}.png" openlightbox title="QR code"><i class="fa fa-qrcode fa-lg"></i></a><br />
+                                    <a class="btn icon-btn" href="/reportsdownload/print-tag-report/{{dat.id}}-{{print.report_template.id}}" target="_new" title="Print Report"><i class="fa fa-print fa-lg"></i></a>
+                                    <a class="btn icon-btn" href="/#/tags/update{{dat.type=='mT'?'master':''}}/{{dat.id}}/{{dat.project_id}}" title="Edit Tag"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                    <a ng-click="deleteTag(dat, $index)" class="btn icon-btn" ng-confirm-click="Are you sure to delete this tag." title="Delete Tag"><i class="fa fa-trash fa-lg"></i></a>
                                 </td>
                             </tr>
                         </tbody>
@@ -281,7 +284,7 @@
                         <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px" ng-change="setPageLimit()" ng-model="numPerPage" ng-options="k as v for (k,v) in page_dropdown">
                         </select>
                     </div>
-                </div>          
+                </div>
             </div>
         </div><!--/row-->
     </form>

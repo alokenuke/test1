@@ -44,25 +44,10 @@
                         </h3>
                     </div>
                 </div><!--/wrapper-->
-                <div class="search-box">
-                    <h2 class="col-xs-12 search-title clickable" ng-click="hideChart=!hideChart;">
-                        Project Progress
-                        <button class="pull-right btn icon-btn">
-                            <i ng-class="{'fa fa-sort-desc fa-2x': !hideChart,'fa fa-sort-asc fa-2x': hideChart}"></i>
-                        </button>
-                    </h2>
-                    <div class="wrapper slide" ng-hide="hideChart">
-                        <div class="col-xs-12 col-sm-12" style="background-color: #fff;">
-                            <select ng-if="!chart.projects" class="form-control form-control-small pull-right mt-10" ng-model="chartstats_duration" ng-change="loadChart({'duration': chartstats_duration});">
-                                <option value="">-- Lifetime --</option>
-                                <option value="7days">In 7 days</option>
-                                <option value="1month">In 1 month</option>
-                                <option value="3months">In 3 months</option>
-                                <option value="1year">In 1 year</option>
-                            </select>
-                            <canvas id="canvas" height="200" width="600"></canvas>
-                        </div>
-                    </div>
+                <div class="pull-right">
+                    <button class="btn btn-warning" ng-click="projectProgress(0)">
+                        All Projects Progress <i class="fa fa-bar-chart"></i>
+                    </button>
                 </div>
                 <div class="wrapper mt-20">
                     <div class="col-sm-7 col-md-8 col-lg-9 cust-col">
@@ -70,7 +55,7 @@
                             <div ng-repeat="project in projects" class="projectbox col-md-6 col-lg-4 cust-col">
                                 <div class="box">
                                     <h5 class="project-title mt-0">
-                                        <strong>Project: <span class="project-name">{{project.project_name}}</span></strong><br />
+                                        <strong>Project: <span class="project-name">{{project.project_name}}</span></strong><button class="btn icon-btn btn-primary pull-right" ng-click="projectProgress(project.id)"> Progress <i class="fa fa-bar-chart"></i></button><br />
                                         <span>{{project.project_location}}, {{project.project_city}}, {{project.project_country}}</span>
                                     </h5>
                                     <ul ng-class="{showfull: project.showFull}">
@@ -147,3 +132,39 @@
         </div>
     </div><!--/row-->
 </section>
+<div class="modal fade" id="graphPopupBox">
+    <div class="modal-lg modal-dialog" style="top: 10%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Project Progress</h4>
+                </div>
+                <div class="modal-body text-center">
+                    <!--/shadow-box-->
+                    <div class="table-responsive table-responsive-cust">
+                        <div class="search-box">
+                            <div class="wrapper slide">
+                                <div class="" style="background-color: #fff;">
+                                    <select ng-if="!chartForProject" class="form-control form-control-small pull-right mt-10" ng-model="chartstats_duration" ng-change="loadChart({'duration': chartstats_duration});">
+                                        <option value="">-- Lifetime --</option>
+                                        <option value="7days">In 7 days</option>
+                                        <option value="1month">In 1 month</option>
+                                        <option value="3months">In 3 months</option>
+                                        <option value="1year">In 1 year</option>
+                                    </select>
+                                    <select ng-if="chartForProject" class="form-control form-control-small pull-right mt-10" ng-model="chartstats_duration" ng-change="loadChart({'duration': chartstats_duration, 'project': chartForProject});" ng-init="chartstats_duration = 'daily'">
+                                        <option value="daily">Daily</option>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly">Monthly</option>
+                                        <option value="quarterly">Quarterly</option>
+                                        <option value="yearly">Yearly</option>
+                                    </select>
+                                    <canvas id="canvas" height="200" width="600"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

@@ -1,4 +1,4 @@
-var app = angular.module('siteTrackApp', ['ngRoute','ngSanitize', 'ngAnimate', 'ui.bootstrap', 'ngResource', 'appApp.services', 'angularFileUpload', 'angular-loading-bar']);
+var app = angular.module('siteTrackApp', ['ngRoute','ngSanitize', 'ui.bootstrap', 'ngResource', 'appApp.services', 'angularFileUpload', 'angular-loading-bar']);
 
 app.constant('page_dropdown', {
     '10': "10",
