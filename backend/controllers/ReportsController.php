@@ -427,7 +427,7 @@ class ReportsController extends ApiController
                     }
 
                     $record = array(
-                        $index + 1,
+                        ++$index,
                         $dat['stageInfo']['process_name'] . ' ' . $dat['answer']['rocess_name'],
                         $dat['comment'],
                         $files,
@@ -591,6 +591,219 @@ class ReportsController extends ApiController
 //                }
 //            }
             $filename = "temp/TimeAttendanceReport-". date("d-m-Y_").\yii::$app->session->id.".xlsx";
+            $phpExcel->output($filename, false, 'S');
+            return $filename;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+
+
+	public function actionGenerateProjectReports() {
+        if (!$_POST) {
+            error_reporting(0);
+            $post = \Yii::$app->request->post();
+            
+            $phpExcel = new \backend\models\GenerateExcel();
+            
+            $phpExcel->createWorksheet();
+            $phpExcel->setDefaultFont('Calibri', 13);
+
+            $default = array(
+                array('label' => 'ID', 'width' => 'auto'),
+                array('label' => 'Project Name', 'width' => 'auto'),
+                array('label' => 'Location', 'width' => 'auto'),
+                array('label' => 'Project Manager', 'width' => 'auto'),
+                array('label' => 'Project Director', 'width' => 'auto'),
+                array('label' => 'Client Name', 'width' => 'auto'),
+                array('label' => 'Client-Project Manager', 'width' => 'auto'),
+                array('label' => 'Contractor', 'width' => 'auto'),
+                array('label' => 'Consultant', 'width' => 'auto'),
+                array('label' => 'Consultant-Project Manager', 'width' => 'auto'),
+                array('label' => 'Description', 'width' => 'auto'),
+                array('label' => 'Project Address/Location', 'width' => 'auto'),
+                array('label' => 'Project City', 'width' => 'auto'),
+                array('label' => 'Project Country', 'width' => 'auto'),
+                array('label' => 'Timezone ID', 'width' => 'auto'),
+                array('label' => 'Timezone Name', 'width' => 'auto'),
+                array('label' => 'Client Address', 'width' => 'auto'),
+                array('label' => 'Client City', 'width' => 'auto'),
+                array('label' => 'Client Country', 'width' => 'auto'),
+            );
+
+            $phpExcel->addTableHeader($default, array('name' => 'Cambria', 'bold' => true));
+
+            $phpExcel->setDefaultFont('Calibri', 12);
+            
+            $phpExcel->addTableFooter();
+            /* * ******************************************** */
+
+            //-> Create and add the sheets and also check if the form type is pre-defined or custom
+            $index = 0;
+            $files ;
+            //foreach ($post as $data) {
+                
+                foreach ($post as $dat) {
+                    
+                    
+                    $timezone =  \backend\models\Timezones::findOne($dat['timezone_id']);
+                    $record = array(
+                        $dat['id'],
+                        $dat['project_name'],
+                        $dat['project_location'].','.$dat['project_city'],
+                        $dat['project_manager'],
+                        $dat['project_director'],
+                        $dat['client_name'],
+                        $dat['client_project_manager'],
+                        $dat['main_contractor'],
+                        $dat['consultant'],
+                        $dat['consultant_project_manager'],
+                        $dat['about'],
+                        $dat['project_address'],
+                        $dat['project_city'],
+                        $dat['project_country'],
+                        $timezone->id,
+                        $timezone->name,
+                        $dat['client_address'],
+                        $dat['client_city'],
+                        $dat['client_country']
+                        );
+                    $phpExcel->addTableRow($record);
+                }
+            //}
+
+            $phpExcel->addTableFooter();
+            
+            $filename = "temp/ProjectReport-". date("d-m-Y_").\yii::$app->session->id.".xlsx";
+            $phpExcel->output($filename, false, 'S');
+            return $filename;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
+    public function actionGenerateUserReports() {
+        if (!$_POST) {
+            error_reporting(0);
+            $post = \Yii::$app->request->post();
+            
+            $phpExcel = new \backend\models\GenerateExcel();
+            
+            $phpExcel->createWorksheet();
+            $phpExcel->setDefaultFont('Calibri', 13);
+
+            $default = array(
+                array('label' => 'Sr.', 'width' => 'auto'),
+                array('label' => 'Name', 'width' => 'auto'),
+                array('label' => 'Username', 'width' => 'auto'),
+                array('label' => 'Designation', 'width' => 'auto'),
+                array('label' => 'Email', 'width' => 'auto'),
+                array('label' => 'Phone Number', 'width' => 'auto'),
+                array('label' => 'Receive Notification', 'width' => 'auto'),
+                array('label' => 'Allow BE', 'width' => 'auto'),
+            );
+
+            $phpExcel->addTableHeader($default, array('name' => 'Cambria', 'bold' => true));
+
+            $phpExcel->setDefaultFont('Calibri', 12);
+            
+            $phpExcel->addTableFooter();
+            /* * ******************************************** */
+
+            //-> Create and add the sheets and also check if the form type is pre-defined or custom
+            $index = 0;
+            $files ;
+            //foreach ($post as $data) {
+                
+                foreach ($post as $dat) {
+                    
+                    $allow_be = ($dat['allow_be'])?'Yes':'No';
+                    $status = ($dat['project_status'])?'Active':'Inactive';
+                    
+                    $record = array(
+                        ++$index,
+                        $dat['first_name'].' '.$dat['last_name'],
+                        $dat['username'],
+                        $dat['designation'],
+                        $dat['email'],
+                        $dat['contact_number'],
+                        $dat['rec_notification'],
+                        $allow_be,
+                        );
+                    $phpExcel->addTableRow($record);
+                }
+            //}
+
+            $phpExcel->addTableFooter();
+            
+            $filename = "temp/ProjectReport-". date("d-m-Y_").\yii::$app->session->id.".xlsx";
+            $phpExcel->output($filename, false, 'S');
+            return $filename;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
+    public function actionGenerateEmployeeLogsReports() {
+        if (!$_POST) {
+            error_reporting(0);
+            $post = \Yii::$app->request->post();
+            
+            $phpExcel = new \backend\models\GenerateExcel();
+            
+            $phpExcel->createWorksheet();
+            $phpExcel->setDefaultFont('Calibri', 13);
+
+            $default = array(
+                array('label' => 'Sr.', 'width' => 'auto'),
+                array('label' => 'Employee Name', 'width' => 'auto'),
+                array('label' => 'Username', 'width' => 'auto'),
+                array('label' => 'Geolocation', 'width' => 'auto'),
+                array('label' => 'Login Time', 'width' => 'auto'),
+                array('label' => 'Status', 'width' => 'auto'),
+            );
+
+            $phpExcel->addTableHeader($default, array('name' => 'Cambria', 'bold' => true));
+
+            $phpExcel->setDefaultFont('Calibri', 12);
+            
+            $phpExcel->addTableFooter();
+            /* * ******************************************** */
+
+            //-> Create and add the sheets and also check if the form type is pre-defined or custom
+            $index = 0;
+            $files ;
+            
+            //print_r($post);die;
+            //foreach ($post as $data) {
+                
+                foreach ($post as $dat) {
+                    
+                        $name = $dat['user']['first_name'].' '.$dat['user']['last_name'];
+                        $username = $dat['user']['username'];
+                    
+                    $time = time();
+                    if( $dat['expire_on'] > $time && $dat['expiry_status'] == 0 ){
+                        $status = 'Active';
+                    } else if ( $dat['expire_on'] <= $time || $dat['expiry_status'] == 1){
+                        $status = 'Logged Out';
+                    }
+                        
+                    $record = array(
+                        ++$index,
+                        $name,
+                        $username,
+                        $dat['login_location']."\n(".$dat['request_from'].')',
+                        date('d M y H:i:s',  strtotime($dat['created_on'])),
+                        $status
+                        );
+                    $phpExcel->addTableRow($record);
+                }
+            //}
+
+            $phpExcel->addTableFooter();
+            
+            $filename = "temp/ProjectReport-". date("d-m-Y_").\yii::$app->session->id.".xlsx";
             $phpExcel->output($filename, false, 'S');
             return $filename;
         } else {

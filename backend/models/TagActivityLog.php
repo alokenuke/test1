@@ -51,7 +51,20 @@ class TagActivityLog extends \yii\db\ActiveRecord
             'id',
             'tag_id',
             'stageInfo',
-            'answer',
+            'answer' => function() {
+                $stageInfo = $this->stageInfo;
+                if(!$stageInfo)
+                    return;
+                
+                if($stageInfo->option_type == "1")
+                    return $this->process_stage_answer;
+                else if($stageInfo->option_type == "3")
+                    return $this->process_stage_answer."%";
+                else if($stageInfo->option_type == 5)
+                    return $this->process_stage_answer;
+                else
+                    return $this->answer;
+            },
             'loggedBy',
             'comment',
             'location' => function() {

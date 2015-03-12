@@ -71,21 +71,19 @@ class TagsController extends ApiController
                         
                         if(!isset($lastActivity) || !isset($lastActivity['stageInfo'])) {
                             return \backend\models\TagProcess::find()->andWhere(['parent_id' => $tagProcessFlow->id])
-                                ->andWhere(['>=', "position", $processStart])
-                                ->andWhere(['<=', "position", $processEnd])
+                                ->andWhere(['between', "position", $processStart, $processEnd])
                                 ->orderBy("position")->one();
                         }
-                        if($lastActivity['stageInfo']['flagCompletion']==$lastActivity['answer']['id']) {
+                        if(($lastActivity['stageInfo']['option_type']==3 && $lastActivity['answer']==100) || ($lastActivity['stageInfo']['option_type']==5 && $lastActivity['answer']!="") || ($lastActivity['stageInfo']['option_type']==1 && array_search($lastActivity['stageInfo']['flagCompletion'], explode(",", $lastActivity['answer']))) || (isset($lastActivity['answer']['id']) && $lastActivity['stageInfo']['flagCompletion']==$lastActivity['answer']['id'])) {
                             return \backend\models\TagProcess::find()->andWhere(['parent_id' => $tagProcessFlow->id])
-                                ->andWhere(['>=', "position", $processStart])
-                                ->andWhere(['<=', "position", $processEnd])
+                                ->andWhere(['between', "position", $processStart, $processEnd])
+                                ->andWhere(['>', "position", $lastActivity['stageInfo']['position']])
                                 ->andWhere(["<>", 'id', $lastActivity['stageInfo']['id']])
                                 ->orderBy("position")->one();
                         }
                         else {
                             return \backend\models\TagProcess::find()->andWhere(['parent_id' => $tagProcessFlow->id])
-                                ->andWhere(['>=', "position", $processStart])
-                                ->andWhere(['<=', "position", $processEnd])
+                                ->andWhere(['between', "position", $processStart, $processEnd])
                                 ->andWhere(['id' => $lastActivity['stageInfo']['id']])
                                 ->orderBy("position")->one();
                         }
@@ -777,7 +775,7 @@ class TagsController extends ApiController
             
             $models[$i]->type = "sT";
             $models[$i]->project_id = $data['project_id'];
-            $models[$i]->tag_name = $tag['pre'].$tag['tagName'].$tag['post'];
+            $models[$i]->tag_name = $tag['pre']."-".$tag['tagName']."-".$tag['post'];
             $models[$i]->tag_description = $tag['tagDescription'];
             $models[$i]->product_code = $tag['productCode'];
             $models[$i]->user_group_id = $data['user_group_id'];

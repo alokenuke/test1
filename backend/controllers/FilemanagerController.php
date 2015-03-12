@@ -104,7 +104,29 @@ class FilemanagerController extends Controller
         }
     }
     
-    public function actionDownload() {
+	//upload document
+    
+    public function actionUploaddoc() {
+        
+        $extension = end(explode('.', $_FILES['file']['name']));
+        
+        if(in_array($extension, ['csv', 'xls', 'xlsx'])) {
+            
+            $fileManager = new \backend\models\FileManager();
+            
+            $filename = uniqid().".".$_FILES['file']['name'];
+            
+            $filePath = 'temp'. "/" . $filename;
+            
+            move_uploaded_file($_FILES['file']['tmp_name'], $filePath);
+            
+            return $filePath;
+        }
+        else {
+            Yii::$app->getResponse()->setStatusCode(422, 'Invalid image format.');
+            return 'error';
+        }
+    }    public function actionDownload() {
         $type = base64_decode($_GET['type']);
         $filename = $_GET['file'];
                 

@@ -67,7 +67,7 @@ class User extends ActiveRecord implements IdentityInterface
             $company = \yii::$app->user->identity->company_id;
                 
         return [
-            [['first_name', 'last_name', 'company_id', 'email', 'username', 'role'], 'required'],
+            [['first_name', 'last_name', 'email', 'username', 'role'], 'required'],
             ['email', 'email','message'=>'Invalid email'],
             [['allow_be'], 'integer'],
             [['username','email'], 'unique','message'=>'Already exist'],
@@ -99,15 +99,6 @@ class User extends ActiveRecord implements IdentityInterface
                 }catch(Exception $e) {}
             }
         }
-        if($insert) {
-            $this->newPassword = Yii::$app->security->generateRandomString(6);
-            
-            $this->setPassword($this->newPassword);
-            
-            $this->company = Company::findOne($this->company_id);
-            
-            SendMails::send("newUserConfirmation", $this->email, "New User confirmation", $this);
-        }
         return parent::beforeSave($insert);
     }
     
@@ -118,6 +109,15 @@ class User extends ActiveRecord implements IdentityInterface
             $path = $fileManager->getPath("user_image")."/";
             if(file_exists($path.$changedAttributes['photo']))
                 unlink($path.$changedAttributes['photo']);
+        }
+        if($insert) {
+            $this->newPassword = Yii::$app->security->generateRandomString(6);
+            
+            $this->setPassword($this->newPassword);
+            
+            $this->company = Company::findOne($this->company_id);
+            
+            SendMails::send("newUserConfirmation", $this->email, "New User confirmation", $this);
         }
         
         parent::afterSave($insert, $changedAttributes);
@@ -191,11 +191,14 @@ class User extends ActiveRecord implements IdentityInterface
     //default scope to check company_id
     public static function find()
     {
-        if(isset(\yii::$app->user->identity) && \yii::$app->user->identity->company_id > 0)
-            return parent::find()->where(['user.company_id' => \yii::$app->user->identity->company_id])->andWhere(['<>', 'user.status', self::STATUS_DELETED]);
+        if(!\yii::$app->requestedRoute=='user/create' && !\yii::$app->requestedRoute=='users/multiinsert') {
+            if(isset(\yii::$app->user->identity) && \yii::$app->user->identity->company_id > 0)
+                return parent::find()->where(['user.company_id' => \yii::$app->user->identity->company_id])->andWhere(['<>', 'user.status', self::STATUS_DELETED]);
+            else
+                return parent::find()->andWhere(['<>', 'user.status', self::STATUS_DELETED]);
+        }
         else
-            return parent::find()->andWhere(['<>', 'user.status', self::STATUS_DELETED]);
-        
+            return parent::find();
     }
 
     /**
@@ -343,12 +346,14 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getRoleDetails()
     {
+        
+        $role = "";
+        if(isset(\yii::$app->user->identity))
+            $role = \yii::$app->user->identity->role;
+        else
+            $role = $this->role;
+        
         if(!\Yii::$app->session->get('user.role_details')) {
-            
-            $role = "";
-            if(\yii::$app->user->identity)
-                $role = \yii::$app->user->identity->role;
-            
             $this->role_details = Roles::find()->andWhere(['id' => ($role?$role:$this->role)])->one();
             \Yii::$app->session->set('user.role_details',$this->role_details);
         }

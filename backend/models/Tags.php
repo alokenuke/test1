@@ -150,6 +150,8 @@ class Tags extends \yii\db\ActiveRecord
             'project_level_id',
             'tag_description',
             'product_code',
+            'completed',
+            'completed_date',
             'created_date',
         ];
     }
