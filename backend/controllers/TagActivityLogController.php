@@ -60,6 +60,32 @@ class TagActivityLogController extends ApiController
         }
     }
     
+    public function actionGetLog() {
+        if (!$_POST) {
+            
+            $uid = \Yii::$app->request->post("uid");
+            
+            $model = new $this->modelClass;
+            
+            $query = $model->find();
+            
+            $query->joinWith("tag");
+            $query->andWhere(['tags.uid' => $uid]);
+            
+            try {
+                $provider = new ActiveDataProvider ([
+                    'query' => $query,
+                    'pagination' => false
+                ]);
+            } catch (Exception $ex) {
+                throw new \yii\web\HttpException(500, 'Internal server error');
+            }
+            return $provider;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
     public function actionLogactivity() {
         if (!$_POST) {
             

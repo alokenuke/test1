@@ -137,4 +137,10 @@ class TagActivityLog extends \yii\db\ActiveRecord
         $this->status = 2;
         return $this->save();
     }    
+    
+    public function getTag()
+    {
+        return $this->hasOne(Tags::className(), ['id' => 'tag_id']);
+    }
+	
 }
