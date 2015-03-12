@@ -221,6 +221,16 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
             controller: 'error'
         })
 
+		
+        .when('/import/projects', {
+            templateUrl: path + 'import/projects.html',
+            controller: 'ImportsProjects'
+        })
+        
+        .when('/import/users', {
+            templateUrl: path + 'import/users.html',
+            controller: 'ImportsUsers'
+        })
         .otherwise({
             templateUrl: path + 'site/error.html',
             controller: 'error'

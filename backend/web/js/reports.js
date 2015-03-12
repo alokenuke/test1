@@ -566,6 +566,23 @@ app.controller('ReportsEmployeeLogs', ['$scope', 'rest', '$location', '$route','
                 alertService.add('error', "Error in processing your request. Please try again.");
             }
         };
+		$scope.downloadReport = function() {
+            
+            criteria = {'search': $scope.search,'da':'all'};
+            
+            rest.customModelData("reports/employee-logs?field=login_location,login_ip,created_on,request_from,expire_on,expiry_status&expand=user", criteria).success(function (data) {
+                
+                $http.post("exports/generate-employee-logs-reports", data.items).success(function (data) {
+                    var tabWindowId = window.open("_new");
+                    tabWindowId.location.href = data;
+                }).error(function (data) {
+                    errorCallback(data)
+                });
+
+
+            }).error(errorCallback);
+        }
+
     }])
 
 app.controller('ReportsTimeattendanceLogs', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'page_dropdown', '$rootScope',
@@ -676,3 +693,105 @@ app.controller('ReportsTimeattendanceLogs', ['$scope', 'rest', '$location', '$ro
         rest.setData("projects/getall", ['id', 'project_name'], {'project_status': null}).success(function(data) {$scope.projects = data.items;});
         rest.setData("usergroups/getall", {}, {}).success(function(data) {$scope.usergroups = data.items;});
     }])
+app.controller('ImportsProjects', ['$scope', 'rest', '$location', '$route', '$routeParams', 'alertService', '$http', 'breadcrumbsService', '$upload', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, $upload) {
+
+        rest.path = "imports";
+        $scope.files ={};
+        
+        breadcrumbsService.clearAll();
+        breadcrumbsService.setTitle("Import Projects");
+        breadcrumbsService.add("/#/", "Home");
+        breadcrumbsService.add("/#/import/projects", "Imports Projects");
+        
+        $scope.onFileSelect = function ($files, modelName) {
+            //$files: an array of files selected, each file has name, size, and type.
+            for (var i = 0; i < $files.length; i++) {
+                var file = $files[i];
+                $scope.upload = $upload.upload({
+                    url: 'filemanager/uploaddoc', //upload.php script, node.js route, or servlet url
+                    data: {myObj: $scope.myModelObj},
+                    file: file,
+                }).progress(function (evt) {
+                    console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
+                }).success(function (data, status, headers, config) {
+                    // file is uploaded successfully
+                    //console.log(data);
+                    $scope.files[modelName] = data;
+                });
+            }
+        };
+        
+        $scope.saveProjects = function () {
+            
+            $http.post("/imports/import-projects",{'data':$scope.files}).success(function (data) {
+                alertService.clearAll();
+                alertService.add("success", data);
+                return;
+            }).error(function (data) {
+                alertService.clearAll();
+                alertService.add("error", "Error in project import!!");
+                return;
+            });
+        }
+        
+        $scope.downloadTemplate = function () {
+            
+            $http.post("/exports/download-project-template").success(function(data) {
+                var tabWindowId = window.open("_new");
+                tabWindowId.location.href = data;
+            }).error(function(data) {errorCallback(data)});
+        }
+        
+}])
+
+app.controller('ImportsUsers', ['$scope', 'rest', '$location', '$route', '$routeParams', 'alertService', '$http', 'breadcrumbsService', '$upload', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, $upload) {
+
+        rest.path = "imports";
+        $scope.files ={};
+        breadcrumbsService.clearAll();
+        breadcrumbsService.setTitle("Import Users");
+        breadcrumbsService.add("/#/", "Home");
+        breadcrumbsService.add("/#/import/users", "Imports Users");
+        
+        $scope.onFileSelect = function ($files, modelName) {
+            //$files: an array of files selected, each file has name, size, and type.
+            for (var i = 0; i < $files.length; i++) {
+                var file = $files[i];
+                $scope.upload = $upload.upload({
+                    url: 'filemanager/uploaddoc', //upload.php script, node.js route, or servlet url
+                    data: {myObj: $scope.myModelObj},
+                    file: file,
+                }).progress(function (evt) {
+                    console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
+                }).success(function (data, status, headers, config) {
+                    // file is uploaded successfully
+                    //console.log(data);
+                    $scope.files[modelName] = data;
+                });
+            }
+        };
+        
+        $scope.saveUsers = function () {
+            
+            $http.post("/imports/import-users",{'data':$scope.files}).success(function (data) {
+                alertService.clearAll();
+                alertService.add("success", data);
+                return;
+            }).error(function (data) {
+                alertService.clearAll();
+                alertService.add("error", "Error in user import!!");
+                $scope.error = data;
+                console.log($scope.error);
+                return;
+            });
+        }
+        
+        $scope.downloadTemplate = function () {
+            
+            $http.post("/exports/download-user-template").success(function(data) {
+                var tabWindowId = window.open("_new");
+                tabWindowId.location.href = data;
+            }).error(function(data) {errorCallback(data)});
+        }
+        
+}])

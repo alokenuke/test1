@@ -1,0 +1,42 @@
+<div role="tabpanel" class="tab-pane col-xs-12 active" id="List_Tags">
+     <div class="row">
+        <div class="col-xs-12 search-box mb-sm-large">
+            <form enctype="multipart/form-data" ng-submit="saveProjects()" id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form">
+               
+                <div class="row mt-20">
+                    <div class="col-md-6 col-lg-5">
+                        <button class="btn btn-primary mb-sm-5 mr-10" ng-click="downloadTemplate()" type="button">Download import template</button>
+                        <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">Browse File :</label>
+                            <div class="col-sm-4">
+                                <input type="file" class="upload" onchange="angular.element(this).scope().onFileSelect(this.files, 'project_files')" ng-model="files">
+                            </div>
+                            
+                            
+                        </div>
+                    </div><!--/.col-md-->
+                   
+                </div><!--/row-->
+                
+                <div class="alert alert-info">
+                    <strong>Note: </strong> Please uncheck the below fields you don't want in printout on labels.
+                </div>
+                
+                <div class="row-fluid">
+
+                    <div class="row mt-20">
+                        <div class="col-sm-10 text-center">
+                            <button class="btn btn-primary mb-sm-5 mr-10" type="submit">Import</button>
+                            
+                        </div> 
+                    </div>
+                </div><!--/search-tag-box-->
+        </form>
+    </div><!--/row-->
+</div>
+</div>
+<style>
+    input[type=number] {-moz-appearance: textfield;}
+    ::-webkit-inner-spin-button { -webkit-appearance: none;}
+    ::-webkit-outer-spin-button { -webkit-appearance: none;}
+</style>

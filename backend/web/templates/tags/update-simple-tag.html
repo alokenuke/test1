@@ -191,8 +191,8 @@
                                      </td>
                                      <td class="text-center" style="width: 200px;">
                                          <div class="dropdown">
-                                            <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.notification_frequency[relateUser.users.id]" style="width: 100%;" ng-init="search.notification_frequency[relateUser.users.id]={'id': (tagAssignment.notification_frequency?tagAssignment.notification_frequency:relateUser.users.rec_notification), 'name': (tagAssignment.notification_frequency?tagAssignment.notification_frequency:relateUser.users.rec_notification)}">
-                                                <ui-select-match placeholder="Select status">{{$select.selected.name | titlecase}}</ui-select-match>
+                                            <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.notification_frequency[relateUser.users.id]" style="width: 100%;" ng-init="search.notification_frequency[relateUser.users.id]={'id': (tagAssignment.notification_frequency?tagAssignment.notification_frequency:relateUser.users.rec_notification), 'name': (tagAssignment.notification_frequency?tagAssignment.notification_frequency:relateUser.users.rec_notification)}" multiple>
+                                                <ui-select-match placeholder="Select status">{{$item.name | titlecase}}</ui-select-match>
                                                 <ui-select-choices repeat="frequency in noti_frequency | filter: $select.search"
                                                          refresh-delay="0">
                                                     <div ng-bind-html="frequency.name"></div>
@@ -207,35 +207,27 @@
                </div>
            </div><!--/row-->
            <div class="wrapper mt-20">
-               <div class="table-responsive table-responsive-cust">
-                   <table class="table table-bordered form-horizontal-typ1">
-                       <thead>
-                           <tr>
-                               <th class="text-center">S.No</th>
-                               <th class="text-center">Pre</th>
-                               <th class="text-center">Tag Name</th>
-                               <th class="text-center">Post</th>
-                               <th class="text-center">Product Code</th>
-                               <th class="text-center">Tag Description</th>
-                           </tr>
-                       </thead>
-                       <tbody>
-                           <tr>
-                               <td>
-                                   {{$index+1}}
-                                   <input type="hidden" id="tag-{{$index}}" ng-model="tag.id" />
-                               </td>
-                               <td><input type="text" id="tag-pre-{{$index}}" class="form-control form-control-small" ng-model="tagDetails.pre" numbers-only="numbers-only" /></td>
-                               <td><input type="text" id="tag-tagName-{{$index}}" ng-required="true" class="form-control form-control-small" ng-model="tagDetails.tag_name" /></td>
-                               <td><input type="text" id="tag-post-{{$index}}" class="form-control form-control-small" ng-model="tagDetails.post" numbers-only="numbers-only" /></td>
-                               <td><input type="text" id="tag-productCode-{{$index}}" class="form-control form-control-small" ng-model="tagDetails.product_code" /></td>
-                               <td>
-                                   <div class="input-group">
-                                       <input type="text" id="tag-tagDescription-{{$index}}" class="form-control form-control-small" ng-model="tagDetails.tag_description" maxlength="100" />
-                                   </div>
-                               </td>
-                           </tr>
-                   </table>
+               <div class="tag-btn-wrapper row">
+                   <div class="col-sm-5 pull-right ">
+                        <table class="table no-border" id="rt1">
+                             <tr><th class="text-right">Tag Name: </th>
+                                 <td class="text-right" style="padding-right:0;">
+                                     <input type="text" ng-model="tagDetails.tag_name" placeholder="Enter Tag Name" class="form-control" required />
+                                     <span style="color:red">{{tagError.tag_name}}</span>
+                                 </td>
+                             </tr>
+                             <tr><th class="text-right">Product Code: </th>
+                                 <td class="text-right" style="padding-right:0;">
+                                     <input type="text" id="tag-productCode-{{$index}}" class="form-control" ng-model="tagDetails.product_code" />
+                                     <span style="color:red">{{tagError.product_code}}</span>
+                                 </td>
+                             </tr>
+                             <tr><th class="text-right">Tag Description: </th>
+                                 <td class="text-right" style="padding-right:0;">
+                                     <textarea class="form-control" ng-model="tagDetails.tag_description" maxlength="100"  placeholder="Enter Tag Description"></textarea>
+                                 </td></tr>
+                         </table>
+                    </div>
                </div>
                <div class="text-right">
                    <button type="submit" ng-disabled="working" class="btn btn-primary btn-lg mr-10 plr-large mb-sm-5">

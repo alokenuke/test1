@@ -96,11 +96,20 @@
                 </div>
             </div><!--/row-->
         </form>
-        <div class="row mt-20" ng-if="!process">
+        <div class="row mt-20" ng-if="process==[]">
             <div class="form-group">
                 <div class="col-sm-2"></div>
                 <h2 class="col-sm-8">
                     You are not allowed to log activity on this tag.
+                </h2>
+            </div>
+        </div>
+        {{process}}
+        <div class="row mt-20" ng-if="!process">
+            <div class="form-group">
+                <div class="col-sm-2"></div>
+                <h2 class="col-sm-8">
+                    Loading....
                 </h2>
             </div>
         </div>

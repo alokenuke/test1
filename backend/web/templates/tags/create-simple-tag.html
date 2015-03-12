@@ -244,10 +244,10 @@
                                    {{$index+1}}
                                    <input type="hidden" id="tag-{{$index}}" ng-model="tag.id" />
                                </td>
-                               <td><input type="text" id="tag-pre-{{$index}}" class="form-control" ng-model="tag.pre" numbers-only="numbers-only" size="3" maxlength="3" /></td>
-                               <td><input type="text" id="tag-tagName-{{$index}}" ng-required="true" class="form-control" ng-model="tag.tagName" maxlength="64" /></td>
-                               <td><input type="text" id="tag-post-{{$index}}" class="form-control" ng-model="tag.post" numbers-only="numbers-only" size="3" maxlength="3" /></td>
-                               <td><input type="text" id="tag-productCode-{{$index}}" class="form-control form-control-small" ng-model="tag.productCode" size="16" maxlength="16" /></td>
+                               <td style="min-width: 100px;"><input type="text" id="tag-pre-{{$index}}" class="form-control" ng-model="tag.pre" numbers-only="numbers-only" size="3" maxlength="3" /></td>
+                               <td style="min-width: 350px;"><input type="text" id="tag-tagName-{{$index}}" ng-required="true" class="form-control" ng-model="tag.tagName" maxlength="64" /></td>
+                               <td style="min-width: 100px;"><input type="text" id="tag-post-{{$index}}" class="form-control" ng-model="tag.post" numbers-only="numbers-only" size="3" maxlength="3" /></td>
+                               <td style="min-width: 250px;"><input type="text" id="tag-productCode-{{$index}}" class="form-control" ng-model="tag.productCode" size="16" maxlength="16" /></td>
                                <td>
                                    <div class="input-group">
                                        <input type="text" id="tag-tagDescription-{{$index}}" class="form-control" ng-model="tag.tagDescription" maxlength="256" />

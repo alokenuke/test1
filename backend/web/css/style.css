@@ -486,6 +486,16 @@ color: #59caf2;
     width: 100%;
     border: 1px solid #dddddd;  
 }
+.search-box i, .search-box .search-title {
+    color: #58abe1
+}
+.search-box i {
+    margin-right: 5px
+}
+.search-box:hover i, .search-box:hover .search-title {
+    color: #333
+}
+
 .search-title {
     font-size: 29px;
     font-size: 2.2rem;

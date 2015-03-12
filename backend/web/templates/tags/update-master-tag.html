@@ -250,8 +250,8 @@
                             </td>
                             <td class="text-center" style="width: 200px;">
                                 <div class="dropdown">
-                                    <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.notification_frequency[relateUser.users.id]" style="width: 100%;" ng-init="search.notification_frequency[relateUser.users.id]={'id': (tagAssignment.notification_frequency?tagAssignment.notification_frequency:relateUser.users.rec_notification), 'name': (tagAssignment.notification_frequency?tagAssignment.notification_frequency:relateUser.users.rec_notification)}">
-                                        <ui-select-match placeholder="Select status">{{$select.selected.name| titlecase}}</ui-select-match>
+                                    <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.notification_frequency[relateUser.users.id]" style="width: 100%;" ng-init="search.notification_frequency[relateUser.users.id]={'id': (tagAssignment.notification_frequency?tagAssignment.notification_frequency:relateUser.users.rec_notification), 'name': (tagAssignment.notification_frequency?tagAssignment.notification_frequency:relateUser.users.rec_notification)}" multiple>
+                                        <ui-select-match placeholder="Select status">{{$item.name| titlecase}}</ui-select-match>
                                         <ui-select-choices repeat="frequency in noti_frequency | filter: $select.search"
                                                            refresh-delay="0">
                                             <div ng-bind-html="frequency.name"></div>

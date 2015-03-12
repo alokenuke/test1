@@ -286,6 +286,23 @@ app.controller('UserIndex', ['$scope', 'rest', '$location', '$route','$routePara
         }
         
         $scope.sortUser("-id");
+
+		$scope.downloadReport = function () {
+
+            criteria = {'search': $scope.$search, 'da': 'all'};
+
+            rest.models(criteria).success(function (data) {
+                
+                //console.log(data.items);return;
+                $http.post("exports/generate-user-reports", data.items).success(function (data) {
+                    var tabWindowId = window.open("_new");
+                    tabWindowId.location.href = data;
+                }).error(function (data) {
+                    errorCallback(data)
+                });
+
+            }).error(errorCallback);
+        }
     }])
 
 app.controller('UserCreate', 

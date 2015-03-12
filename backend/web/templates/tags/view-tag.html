@@ -121,7 +121,9 @@
             <div class="row" style="padding:10px;" ng-if="tagAnalytic.type=='mT'">
                 <div class="col-xs-12 search-box mb-sm-large">
                     <div class="row">
-                        <h2 class="col-xs-12 search-title">Related Tags
+                        <h2 class="col-xs-12 search-title">
+                            <i class="fa fa-search"></i>
+                            Related Tags
                             <button class="pull-right btn icon-btn" ng-click="showRelatedTagBox=!showRelatedTagBox;">
                                 <i ng-class="{'fa fa-sort-desc fa-2x': !showRelatedTagBox,'fa fa-sort-asc fa-2x': showRelatedTagBox}"></i>
                             </button>
@@ -282,7 +284,8 @@
                     <tbody>
                         <tr ng-repeat="act in activity">
                             <td class="text-center">{{$index+1}}</td>
-                            <td class="text-center">{{act.stageInfo.process_name}} - <strong>{{act.answer.process_name}}</strong></td>
+                            <td class="text-center">
+                                {{act.stageInfo.process_name}} - <strong>{{(act.answer.process_name?act.answer.process_name:act.answer)}}</strong></td>
                             <td class="text-center">{{act.comment}}</td>
                             <td class="text-center">
                                 <span  ng-repeat="attach in act.attachments">

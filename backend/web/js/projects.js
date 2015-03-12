@@ -56,6 +56,23 @@ app.controller('ProjectIndex', ['$scope', 'rest', '$location', '$route', '$route
             $scope.countries = data.items;
         });
 
+
+		$scope.downloadReport = function() {
+            
+           criteria = {'search': $scope.search,'da':'all'};
+            
+            rest.models(criteria).success(function (data) {
+                
+                $http.post("exports/generate-project-reports", data.items).success(function (data) {
+                    var tabWindowId = window.open("_new");
+                    tabWindowId.location.href = data;
+                }).error(function (data) {
+                    errorCallback(data)
+                });
+
+            }).error(errorCallback);
+            
+        }
     }])
 
 app.controller('ProjectForm', ['$scope', 'rest', '$location', '$route', '$routeParams', 'alertService', '$http', 'breadcrumbsService', '$upload', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, $upload) {

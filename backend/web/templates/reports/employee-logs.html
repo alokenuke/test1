@@ -70,6 +70,9 @@
     <div class="row mt-15">
         <div class="">
             <div class="clearfix table-responsive table-responsive-cust">
+			<button class="pull-left btn btn-primary btn-lg mt-10" type="button" ng-click="downloadReport()">
+                    <i class="fa fa-print mr-10 fa-lg"></i>Download Report
+                </button>
                 <div class="pull-right">
                     <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
                     <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px" ng-change="setPageLimit()" ng-model="numPerPage" ng-options="k as v for (k,v) in page_dropdown">

@@ -2,7 +2,9 @@
     <div class="row">
         <div class="col-xs-12 search-box mb-sm-large">
             <div class="row">
-                <h2 class="col-xs-12 search-title clickable" ng-click="showSearchBox=!showSearchBox;">Search Users
+                <h2 class="col-xs-12 search-title clickable" ng-click="showSearchBox=!showSearchBox;">
+                    <i class="fa fa-search"></i>
+                    Search Users
                     <button class="pull-right btn icon-btn">
                         <i ng-class="{'fa fa-sort-desc fa-2x': showSearchBox,'fa fa-sort-asc fa-2x': !showSearchBox}"></i>
                     </button>
@@ -90,6 +92,9 @@
     </div><!--/row-->
     <div class="row mt-20">
         <a href="/#/users/create" class="btn btn-default add-new-btn"><i class="fa fa-plus-circle fa-1x"></i>Create Users</a>
+		<button class="pull-right btn btn-primary btn-lg mt-10" type="button" ng-click="downloadReport()">
+            <i class="fa fa-print mr-10 fa-lg"></i>Export listed users
+        </button>
     </div><!--/row-->
     <div class="row mt-15">
         <div class="">

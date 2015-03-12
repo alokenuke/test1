@@ -2234,6 +2234,12 @@ app.controller('SelectTagsPopup', function ($scope, $modalInstance, $http, items
     $http.get("tags/"+itemScope+"?expand=tagActivityLog").success(function(data) {
         $scope.tagDetails = data;
         $scope.select.uid = data.uid;
+        if($scope.tagDetails.tagActivityLog.stageInfo.option_type==3)
+            $scope.select.process_stage_answer = parseInt($scope.tagDetails.tagActivityLog.answer);
+        else if($scope.tagDetails.tagActivityLog.stageInfo.option_type==5)
+            $scope.select.process_stage_answer = $scope.tagDetails.tagActivityLog.answer;
+        else
+            $scope.select.process_stage_answer = $scope.tagDetails.tagActivityLog.answer.id;
         
         $http.post("tags/getstages", {'uid': data.uid}).success(function(data) {
             if(!data)
@@ -2298,6 +2304,7 @@ app.controller('SelectTagsPopup', function ($scope, $modalInstance, $http, items
     $scope.selected = {};
     $scope.selected.process_stage = {};
     $scope.select.process_stage_answer = 0;
+    $scope.select.device = 'web';
     $scope.serverError = {};
     
     $scope.close = function () {
