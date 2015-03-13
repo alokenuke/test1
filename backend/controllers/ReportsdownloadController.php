@@ -15,7 +15,10 @@ class ReportsdownloadController extends Controller
         
     public function actionPreviewtemplate()
     {
+        
+        error_reporting(0);
         $template_param = \Yii::$app->request->post();
+        $checkedLabels = $template_param['checked_labels'];
      
         //-----------------------------Set hardcoded values if not set---------------------------------------------------------------
         $data['leftMargin'] = isset($template_param['left_margin']) ? (int) $template_param['left_margin'] : 5;
@@ -40,8 +43,8 @@ class ReportsdownloadController extends Controller
         elseif (!empty($template_param['old_logo_file']))
             $data['logo'] = isset($template_param['old_logo_file']) ? $template_param['old_logo_file'] : '';
         
-        if($data['type']=='bar')
-            $nfcLogo = 'images/bar.png';
+        if($data['type']=='qr')
+            $nfcLogo = 'images/qr-code.jpg';
         else if($data['type']=='nfc' && isset($data['logo']) && file_exists($data['logo']))
             $nfcLogo = $data['logo'];
         else if($data['type']=='nfc' && isset($data['logo'])) {
@@ -54,18 +57,19 @@ class ReportsdownloadController extends Controller
 
         $imageUrl = "images/logo.png";
         
-        $sampleLabels = array('Company:' => '------25 characters------',
-            'Project:' => 'Red Avenue Building 2ndf',
-            'Owner:' => 'Al Hatimi Trading FZEXXX',
-            'Address:' => '203,Red Avenue BuildingX',
-            'Tel:' => '00-9714-2955681/2955682',
-            'Site:' => 'Red Avenue Building 2ndf',
-            'Area:' => 'First floor,Electrical Rm',
-            'Location:' => 'Above False Ceiling ACXX',
-            'Sub-Loc:' => 'Inside AC duct low levelX',
-            'Summary:' => 'First Fix of AC duct chk'
-        );
-
+        if($checkedLabels['company_name']) $sampleLabels["Company:"] = "------------------------64  characters------------------------";
+        if($checkedLabels['client_name']) $sampleLabels["Client Name:"] = "Al Hatimi Trading FZEXXX";
+        if($checkedLabels['client_location']) $sampleLabels["Client Location:"] = "Test client location, Test city, Country";
+        if($checkedLabels['main_contractor']) $sampleLabels["Main Contractor:"] = "Mr. Test Contractor Name";
+        if($checkedLabels['project_name']) $sampleLabels["Project:"] = "Red Avenue Building 2ndf";
+        if($checkedLabels['project_address']) $sampleLabels["Project Address:"] = "203,Red Avenue BuildingX";
+        if($checkedLabels['project_location']) $sampleLabels["Area:"] = "Red Avenue Building 2ndf";
+        if($checkedLabels['project_level']) $sampleLabels["Project Level:"] = "Area 1 > Section B > Floor X > Room 4";
+        if($checkedLabels['tag_item']) $sampleLabels["Item:"] = "Construction Items > AC";
+        if($checkedLabels['process']) $sampleLabels["Process:"] = "Construction Process > AC Installation";
+        if($checkedLabels['uid']) $sampleLabels["Uid:"] = "SOpqwr54f0ddx";
+        if($checkedLabels['tag_description']) $sampleLabels["Summary:"] = "Tag description related to First Fix of AC duct chk.";
+        
         $textFields = array('', 'Al Hatimi', 'Al Hatimi', 'Sharjaha', '9854578285828',
             'Abu Dhabi', 'Abu Dhabi', 'Abu Dhabi', 'False Celling', 'False Celling', 'Text-11:', 'Text-12:');
 
@@ -104,18 +108,39 @@ class ReportsdownloadController extends Controller
     //-----------------------------QR-code and NFC AREA---------------------------------------------------------------     
                 $pdf->SetXY($x + $pdf->getProportionalX(7), $pdf->GetY() + 0.5);
                 $inc = (($pdf->font_size * 50) / 100) >= 8 ? 8 : ($pdf->font_size * 50) / 100;
-                if ($data['type'] == "qr") {
+
+                if ($data['type'] == "bar") {
+
+                    $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $data['qr_height']);
+                    $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $data['qr_height']) / 2;
+
+                    $QR_w = $len_x;
+                    $QR_h = $len_y;
+                    $pdf->Image("images/bar-code.png" ,$pdf->GetX(), $pdf->GetY(), $QR_w, $QR_h, 'png');
+                    $pdf->SetXY($x + $pdf->getProportionalX(6), $pdf->GetY() + $QR_h + 0.5);
+                    $pdf->SetTextColor(111, 106, 106);
+                    $pdf->SetFont('Arial', '', $pdf->font_size);
+                    $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $QR_h);
+                    $z = $pdf->setapprFontSize((($len_x * 80) / 100), 'Bar Code', $pdf->font_size);
+                    $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $z);
+                    $pdf->Cell($len_x, $len_y - (($len_y * 50) / 100), 'Bar Code', 0, 0, 'C');
+                    $pdf->SetFont('Arial', 'B', $pdf->font_size);
+                } else if ($data['type'] == "qr") {
+
+                    //list($nfc_logo_width, $nfc_logo_height) = getimagesize($filename);
 
                     $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $data['qr_height']);
                     $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $data['qr_height']);
 
-                    $QR_hw = ($len_x < $len_y) ? $len_x : $len_y;
-                    $pdf->Image("images/bar-code.jpg" ,$pdf->GetX(), $pdf->GetY(), $QR_hw, $QR_hw, 'jpg');
-                    $pdf->SetXY($x + $pdf->getProportionalX(6), $pdf->GetY() + $QR_hw + 0.5);
+                    $NFC_hw = ($len_x < $len_y) ? $len_x : $len_y;
+                    $pdf->Image($nfcLogo, $pdf->GetX(), $pdf->GetY(), $NFC_hw, $NFC_hw);
+
+                    $pdf->SetXY($x + $pdf->getProportionalX(6), $pdf->GetY() + $NFC_hw + 0.5);
                     $pdf->SetTextColor(111, 106, 106);
                     $pdf->SetFont('Arial', '', $pdf->font_size);
-                    $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $QR_hw);
-                    $z = $pdf->setapprFontSize((($len_x * 80) / 100), 'QR Code', $pdf->font_size);
+
+                    $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $NFC_hw);
+                    $z = $pdf->setapprFontSize((($len_x * 50) / 100), 'QR Code', $pdf->font_size);
                     $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $z);
                     $pdf->Cell($len_x, $len_y - (($len_y * 50) / 100), 'QR Code', 0, 0, 'C');
                     $pdf->SetFont('Arial', 'B', $pdf->font_size);
@@ -139,6 +164,7 @@ class ReportsdownloadController extends Controller
                     $pdf->Cell($len_x, $len_y - (($len_y * 50) / 100), 'Tap to Read NFC Tag', 0, 0, 'C');
                     $pdf->SetFont('Arial', 'B', $pdf->font_size);
                 }
+                
                 $pdf->SetTextColor(0, 0, 0);
     ////-----------------------------LOGO---------------------------------------------------------------     
                 $pdf->SetXY($x + $pdf->getProportionalX(6), $pdf->GetY() + $pdf->getProportionalY(7 + $inc + 2));
@@ -159,7 +185,7 @@ class ReportsdownloadController extends Controller
                 $pdf->SetFont('Arial', 'B', $pdf->font_size);
                 $k = $pdf->getProportionalY(7);
                 $left_space = $data['qr_height'];
-                $label_width = $pdf->GetStringWidth("Location:  ");
+                $label_width = $pdf->GetStringWidth("--------------------------");
                 foreach ($sampleLabels as $key => $value) {
                     if ($key != "logo" && $key != "unique code:") {
                         $pdf->SetXY($x + $left_space + $pdf->getProportionalX(15), $y + $k);

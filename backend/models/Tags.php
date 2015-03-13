@@ -227,7 +227,17 @@ class Tags extends \yii\db\ActiveRecord
                     
                     $temp['notification_status'] = $noti_status;
                     $temp['mandatory'] = $v['mandatory'];
-                    $temp['notification_frequency'] = $v['notification_frequency'];
+                    
+                    $frequency = explode(",", $v['notification_frequency']);
+                    $noti_frequency = [];
+                    foreach($frequency as $r) {
+                        if($r=='onupdate')
+                            $noti_frequency[] = ['id' => $r, 'name' => "On update"];
+                        else
+                            $noti_frequency[] = ['id' => $r, 'name' => ucfirst($r)];
+                    }
+
+                    $temp['notification_frequency'] = $noti_frequency;
                     
                     $tagAssignment["$v[user_id]"] = $temp;
                     

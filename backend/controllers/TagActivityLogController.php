@@ -65,6 +65,11 @@ class TagActivityLogController extends ApiController
             
             $uid = \Yii::$app->request->post("uid");
             
+            if(!isset($_GET['expand']))
+                $_GET['expand'] = "attachments,user";
+            else
+                $_GET['expand'] = "attachments,user,".$_GET['expand'];
+            
             $model = new $this->modelClass;
             
             $query = $model->find();

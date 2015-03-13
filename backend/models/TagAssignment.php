@@ -46,7 +46,14 @@ class TagAssignment extends \yii\db\ActiveRecord
             'process_stage_to',
             'mandatory',
             'status',
-            'notification_frequency',
+            'notification_frequency' => function() {
+                $temp = explode(",", $this->notification_frequency);
+                $return = [];
+                foreach($temp as $r) {
+                    $return[] = ['id' => $r, 'name' => ucfirst($r)];
+                }
+                return $return;
+            },
         ];
     }
     /**

@@ -2,15 +2,20 @@
 namespace backend\controllers;
 
 use yii;
-use yii\web\Controller;
+use yii\filters\auth\QueryParamAuth;
+use yii\rest\ActiveController;
+use yii\data\ActiveDataProvider;
 use yii\base\Model;
 /**
  * Class TagsController
  * @package rest\versions\v1\controllers
  */
-class FilemanagerController extends Controller
+class FilemanagerController extends ApiController
 {
-    public $partialMatchFields;
+    
+    public function init() {
+        parent::init();
+    }
     
     public $documentPath = 'temp/';
 

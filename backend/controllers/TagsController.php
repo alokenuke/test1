@@ -302,20 +302,13 @@ class TagsController extends ApiController
         if (!$_POST) {
             $_GET['field'] = "id";
             
-            $post = \yii::$app->request->post();
-            
-            if(isset($post['search']['project_id'])) {
-                $projectId = $post['search']['project_id'];
-                
-                $model = new \backend\models\Tags();
-                $data = $model->find()->andWhere(['project_id' => $projectId, 'tag_status' => 1, 'type' => 'sT'])->orderBy("created_date DESC")->one();
-                
-                if($data)
-                    return $data->id;
-                else
-                    return 0;
-                
-            }
+            $model = new \backend\models\Tags();
+            $data = $model->find()->andWhere(['tag_status' => 1, 'type' => 'sT'])->orderBy("created_date DESC")->one();
+
+            if($data)
+                return $data->id;
+            else
+                return 0;
         } else {
             throw new \yii\web\HttpException(404, 'Invalid Request');
         }
@@ -356,7 +349,12 @@ class TagsController extends ApiController
                             $temp['mandatory'] = (int) $v['mandatory'];
                             $notification_status = [];
                             
-                            $temp['notification_frequency'] = $v['notification_frequency']['id'];
+                            $notification_frequency = [];
+                            if(isset($v['notification_frequency']))
+                                foreach($v['notification_frequency'] as $frequency)
+                                    $notification_frequency[] = $frequency['id'];
+                            
+                            $temp['notification_frequency'] = implode(",", $notification_frequency);
 
                             $tagAssignmentModel = new \backend\models\TagAssignment();
                             
@@ -462,8 +460,13 @@ class TagsController extends ApiController
                             $tagAssignmentModel->mandatory = (int) $v['mandatory'];
                         else
                             $tagAssignmentModel->mandatory = 0;
-                        if(isset($v['notification_frequency']))
-                            $tagAssignmentModel->notification_frequency = $v['notification_frequency']['id'];
+                        
+                        $notification_frequency = [];
+                            if(isset($v['notification_frequency']))
+                                foreach($v['notification_frequency'] as $frequency)
+                                    $notification_frequency[] = $frequency['id'];
+                            
+                        $tagAssignmentModel->notification_frequency = implode(",", $notification_frequency);
                         
                         if(isset($v['notification_status']) && $this->in_array_r('id', 'all', $v['notification_status'])) {
                             $tagAssignmentModel->notification_status = "all";
@@ -478,7 +481,7 @@ class TagsController extends ApiController
                             $hasError = true;
                             return $tagAssignmentModel;
                         }
-
+                        
                         $notification_status = [];
                         
                         \backend\models\TagUserNotificationStatus::deleteAll(['tag_id' => $model->id, 'tag_assignment_id' => $tagAssignmentModel->id]);
@@ -568,7 +571,12 @@ class TagsController extends ApiController
                         $temp['mandatory'] = (int) $v['mandatory'];
                         $notification_status = [];
 
-                        $temp['notification_frequency'] = $v['notification_frequency']['id'];
+                        $notification_frequency = [];
+                            if(isset($v['notification_frequency']))
+                                foreach($v['notification_frequency'] as $frequency)
+                                    $notification_frequency[] = $frequency['id'];
+                            
+                        $temp['notification_frequency'] = implode(",", $notification_frequency);
                             
                         $tagAssignmentModel = new \backend\models\TagAssignment();
                         
@@ -675,7 +683,13 @@ class TagsController extends ApiController
                         $tagAssignmentModel->process_stage_from = (int) $v['process_stage_from']['id'];
                         $tagAssignmentModel->process_stage_to = (int) $v['process_stage_to']['id'];
                         $tagAssignmentModel->mandatory = (int) $v['mandatory'];
-                        $tagAssignmentModel->notification_frequency = $v['notification_frequency']['id'];
+                        
+                        $notification_frequency = [];
+                            if(isset($v['notification_frequency']))
+                                foreach($v['notification_frequency'] as $frequency)
+                                    $notification_frequency[] = $frequency['id'];
+                            
+                        $tagAssignmentModel->notification_frequency = implode(",", $notification_frequency);
                         
                         if($this->in_array_r('id', 'all', $v['notification_status'])) {
                             $tagAssignmentModel->notification_status = "all";
