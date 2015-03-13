@@ -64,6 +64,9 @@ h4 {
     color: #fff;
     color: #000101
 }
+.mr-0 {
+    margin-right: 0px !important;
+}
 .mt-0 {
     margin-top: 0px !important
 }
@@ -486,7 +489,7 @@ color: #59caf2;
     width: 100%;
     border: 1px solid #dddddd;  
 }
-.search-box i, .search-box .search-title {
+.search-box .search-title i, .search-box .search-title {
     color: #58abe1
 }
 .search-box i {
@@ -588,8 +591,8 @@ color: #59caf2;
 }
 /*----------/tab------*/
 .table-responsive-cust {
-    font-size: 17px;
-    font-size: 1.7rem
+    font-size: 15px;
+    font-size: 1.5rem
 }
 .table-responsive-cust a {
     text-decoration: underline;

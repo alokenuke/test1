@@ -4,7 +4,7 @@
             <form ng-submit="saveTemplate()" id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form">
                 <div class='row'>
                     <div class="col-md-2 col-lg-2">
-                        <button type="button" class="btn btn-primary" ng-click="label_template = undefined">Add New Template</button>
+                        <button type="button" class="btn btn-primary" ng-click="addNewTemplate()">Add New Template</button>
                     </div>
                     <div class="col-md-3 col-lg-2">
                         <select class="form-control" ng-model="label_template" ng-options="label_template.template_name for label_template in templates"

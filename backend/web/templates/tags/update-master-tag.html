@@ -52,7 +52,7 @@
                                 <ui-select-match placeholder="Select item {{$index==0?'Group':$index==1?'Type':'Sub Type'}}">{{$select.selected.item_name}}</ui-select-match>
                                 <ui-select-choices repeat="i in item | filter: $select.search"
                                                    refresh-delay="0">
-                                    <div ng-bind-html="i.item_name" ng-click="updateSelectBox('items', tagDetails.project_id, $parent.$index, i.id)"></div>
+                                    <div ng-bind-html="i.item_name" ng-click="updateSelectBox('items', tagDetails.project_id, $parent.$index+1, i.id)"></div>
                                 </ui-select-choices>
                             </ui-select>
                             <span ng-if="!(items.length && tagDetails.project_id)">
@@ -72,7 +72,7 @@
                                 <ui-select-match placeholder="Select process {{$index==0?'Type':'Flow'}}">{{$select.selected.process_name}}</ui-select-match>
                                 <ui-select-choices repeat="p in process | filter: $select.search"
                                                    refresh-delay="0">
-                                    <div ng-bind-html="p.process_name" ng-click="updateSelectBox('processes', tagDetails.project_id, $parent.$index, p.id)"></div>
+                                    <div ng-bind-html="p.process_name" ng-click="updateSelectBox('processes', tagDetails.project_id, $parent.$index+1, p.id)"></div>
                                 </ui-select-choices>
                             </ui-select>
 
@@ -171,8 +171,8 @@
         </div><!--/shadow-box-->
         <div class="slide" ng-class="{'ng-hide':levels.length <= 0}">
             <div class="wrapper mt-35 shadow-box">
-                <div class="table-responsive table-responsive-cust">
-                    <div class="form-horizontal-typ1" style="max-height: 400px;overflow:auto;">
+                <div class="table-responsive table-responsive-cust" style="overflow: visible;">
+                    <div class="form-horizontal-typ1">
                         <table class="table table-bordered" id="rt1">
                             <thead>
                                 <tr>
@@ -205,7 +205,7 @@
                                     <td class="text-center"></td>
                                     <td class="text-center"></td>
                                     <td class="text-center">
-                                        <div class="checkbox">
+                                        <div class="">
                                             <label ng-init="tagAssignment = tagDetails.tagAssignment[relateUser.users.id]">
                                                 <input type="checkbox" ng-model="relateUser.isSelected" class="checkUserLevel" ng-init="relateUser.isSelected = (tagAssignment != null)">
                                                 {{relateUser.users.first_name}} {{relateUser.users.last_name}}<br /><small>{{relateUser.users.designation?'(' + relateUser.users.designation + ')':''}}</small>
@@ -231,11 +231,9 @@
                             </ui-select>
                             </td>
                             <td class="text-center">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" ng-model="search.mandatory[relateUser.users.id]" ng-init="search.mandatory[relateUser.users.id] = (tagAssignment.mandatory == 1)"> &nbsp;
-                                    </label>
-                                </div>
+                                <label>
+                                    <input type="checkbox" ng-model="search.mandatory[relateUser.users.id]" ng-init="search.mandatory[relateUser.users.id] = (tagAssignment.mandatory == 1)"> &nbsp;
+                                </label>
                             </td>
                             <td class="text-center" style="width: 200px;">
                                 <div class="dropdown">
@@ -250,7 +248,7 @@
                             </td>
                             <td class="text-center" style="width: 200px;">
                                 <div class="dropdown">
-                                    <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.notification_frequency[relateUser.users.id]" style="width: 100%;" ng-init="search.notification_frequency[relateUser.users.id]={'id': (tagAssignment.notification_frequency?tagAssignment.notification_frequency:relateUser.users.rec_notification), 'name': (tagAssignment.notification_frequency?tagAssignment.notification_frequency:relateUser.users.rec_notification)}" multiple>
+                                    <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.notification_frequency[relateUser.users.id]" style="width: 100%;" ng-init="search.notification_frequency[relateUser.users.id]=tagAssignment.notification_frequency" multiple>
                                         <ui-select-match placeholder="Select status">{{$item.name| titlecase}}</ui-select-match>
                                         <ui-select-choices repeat="frequency in noti_frequency | filter: $select.search"
                                                            refresh-delay="0">

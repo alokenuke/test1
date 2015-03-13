@@ -121,6 +121,18 @@ app.controller('ManageLabelTemplates', function($scope, rest, $location, alertSe
         }
     };
     
+    $scope.addNewTemplate = function() {
+        $scope.label_template.id = undefined;
+        $scope.label_template.template_name = undefined;
+        $scope.label_template.paper_size = "custom";
+        $scope.label_template.num_label_horizontal = undefined;
+        $scope.label_template.num_label_vertical = undefined;
+        $scope.label_template.hor_label_spacing = undefined;
+        $scope.label_template.ver_label_spacing = undefined;
+        $scope.label_template.logo_width = undefined;
+        $scope.label_template.checked_labels = {};
+    }
+    
     $scope.range = function(min, max, step){
         step = step || 1;
         var input = [];

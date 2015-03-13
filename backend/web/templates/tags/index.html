@@ -215,6 +215,7 @@
                         <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px" ng-change="setPageLimit()" ng-model="numPerPage" ng-options="k as v for (k,v) in page_dropdown">
                         </select>
                     </div>
+                    <div class="clearfix"></div>
                     <table class="table table-bordered" id="rt1">
                         <thead>
                             <tr>
@@ -269,17 +270,18 @@
                                         Not started
                                     </div>
                                 </td>
-                                <td class="text-center">
-                                    <a href="/#/tags/{{dat.id}}" class="btn icon-btn" title="Tag analysis"><i class="fa fa-list-alt fa-lg"></i></a>
-                                    <a class="btn icon-btn" image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}}" type="YmFyY29kZQ==" imageUrl="{{dat.uid}}.png" openlightbox title="Bar code"><i class="fa fa-barcode fa-lg"></i></a>
-                                    <a class="btn icon-btn"  image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}} " type="cXJjb2Rl" imageUrl="{{dat.uid}}.png" openlightbox title="QR code"><i class="fa fa-qrcode fa-lg"></i></a><br />
-                                    <a class="btn icon-btn" href="/reportsdownload/print-tag-report/{{dat.id}}-{{print.report_template.id}}" target="_new" title="Print Report"><i class="fa fa-print fa-lg"></i></a>
-                                    <a class="btn icon-btn" href="/#/tags/update{{dat.type=='mT'?'master':''}}/{{dat.id}}/{{dat.project_id}}" title="Edit Tag"><i class="fa fa-pencil-square-o fa-lg"></i></a>
-                                    <a ng-click="deleteTag(dat, $index)" class="btn icon-btn" ng-confirm-click="Are you sure to delete this tag." title="Delete Tag"><i class="fa fa-trash fa-lg"></i></a>
+                                <td class="text-center" style="padding: 0;">
+                                    <a href="/#/tags/{{dat.id}}" class="btn icon-btn mr-0" title="Tag analysis"><i class="fa fa-list-alt fa-lg"></i></a>
+                                    <a class="btn icon-btn mr-0" image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}}" type="YmFyY29kZQ==" imageUrl="{{dat.uid}}.png" openlightbox title="Bar code"><i class="fa fa-barcode fa-lg"></i></a>
+                                    <a class="btn icon-btn mr-0"  image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}} " type="cXJjb2Rl" imageUrl="{{dat.uid}}.png" openlightbox title="QR code"><i class="fa fa-qrcode fa-lg"></i></a><br />
+                                    <a class="btn icon-btn mr-0" href="/reportsdownload/print-tag-report/{{dat.id}}-{{print.report_template.id}}" target="_new" title="Print Report"><i class="fa fa-print fa-lg"></i></a>
+                                    <a class="btn icon-btn mr-0" href="/#/tags/update{{dat.type=='mT'?'master':''}}/{{dat.id}}/{{dat.project_id}}" title="Edit Tag"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                    <a ng-click="deleteTag(dat, $index)" class="btn icon-btn mr-0" ng-confirm-click="Are you sure to delete this tag." title="Delete Tag"><i class="fa fa-trash fa-lg"></i></a>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                    <div class="clearfix"></div>
                     <div class="pull-right">                    
                         <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
                         <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px" ng-change="setPageLimit()" ng-model="numPerPage" ng-options="k as v for (k,v) in page_dropdown">

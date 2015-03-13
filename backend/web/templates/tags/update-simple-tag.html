@@ -112,8 +112,8 @@
         </div><!--/shadow-box-->
         <div class="slide" ng-class="{'ng-hide':levels.length<=0}">
             <div class="wrapper mt-35 shadow-box">
-               <div class="table-responsive table-responsive-cust">
-                   <div class="form-horizontal-typ1" style="max-height: 400px;overflow:auto;">
+               <div class="table-responsive table-responsive-cust" style="overflow: visible;">
+                   <div class="form-horizontal-typ1">
                        <table class="table table-bordered" id="rt1">
                            <thead>
                                <tr>
@@ -172,7 +172,7 @@
                                            </ui-select>
                                      </td>
                                      <td class="text-center">
-                                         <div class="checkbox">
+                                         <div class="">
                                              <label>
                                                  <input type="checkbox" ng-model="search.mandatory[relateUser.users.id]" ng-init="search.mandatory[relateUser.users.id] = (tagAssignment.mandatory==1)"> &nbsp;
                                              </label>
@@ -180,7 +180,7 @@
                                      </td>
                                      <td class="text-center" style="width: 200px;">
                                          <div class="dropdown">
-                                            <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.notification_status[relateUser.users.id]" multiple style="width: 100%;"  ng-init="search.notification_status[relateUser.users.id]=tagAssignment.notification_status">
+                                            <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.notification_status[relateUser.users.id]" multiple style="width: 100%;" ng-init="search.notification_status[relateUser.users.id]=tagAssignment.notification_status">
                                                 <ui-select-match placeholder="No task selected">{{$item.name}}</ui-select-match>
                                                 <ui-select-choices repeat="status in noti_status | filter: $select.search"
                                                          refresh-delay="0">
@@ -191,7 +191,7 @@
                                      </td>
                                      <td class="text-center" style="width: 200px;">
                                          <div class="dropdown">
-                                            <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.notification_frequency[relateUser.users.id]" style="width: 100%;" ng-init="search.notification_frequency[relateUser.users.id]={'id': (tagAssignment.notification_frequency?tagAssignment.notification_frequency:relateUser.users.rec_notification), 'name': (tagAssignment.notification_frequency?tagAssignment.notification_frequency:relateUser.users.rec_notification)}" multiple>
+                                            <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.notification_frequency[relateUser.users.id]" style="width: 100%;" ng-init="search.notification_frequency[relateUser.users.id]=tagAssignment.notification_frequency" multiple>
                                                 <ui-select-match placeholder="Select status">{{$item.name | titlecase}}</ui-select-match>
                                                 <ui-select-choices repeat="frequency in noti_frequency | filter: $select.search"
                                                          refresh-delay="0">

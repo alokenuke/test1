@@ -242,11 +242,13 @@
                                     </td>
                                     <td class="text-center">
                                         <span ng-repeat="status in level.notification_status">
-                                            <span class="mr-5">{{status.name}}</span>
+                                            <span class="mr-10">{{status.name}}</span>
                                         </span>
                                     </td>
                                     <td class="text-center">
-                                        {{level.notification_frequency}}
+                                        <span ng-repeat="frequency in level.notification_frequency">
+                                            <span class="mr-10">[<strong>{{frequency.name}}</strong>]</span>
+                                        </span>
                                     </td>
                                 </tr>                 
                             </tbody>
