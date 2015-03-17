@@ -82,7 +82,7 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
                 levels: [],
                 editing: true,
             });
-            scope.collapsed = true;
+            scope.expand();
         }
     };
     
@@ -125,14 +125,14 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
                 scope.users_currentPage = (data._meta.currentPage);
                 scope.users_numPerPage = data._meta.perPage;
                 scope.loading = false;
-                scope.collapsed = !scope.collapsed;
+                scope.toggle();
             }).error(function() {
                 errorCallback();
                 scope.loading = false;
             });
         }
         else
-            scope.collapsed = !scope.collapsed;
+            scope.toggle();
     }
     
     $scope.assignUsersModal = function (scope) {
@@ -588,6 +588,9 @@ app.controller('UserUpdate',
         breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/users", "Manage Users");
         breadcrumbsService.add("/#/users/update", "Update User");
+		//change photo in update
+        
+        var photoState = false;
             
         $scope.rec_noti = [
             {id: 'daily', name:'Daily'},
@@ -622,6 +625,7 @@ app.controller('UserUpdate',
                     // file is uploaded successfully
                     //console.log(data);
                     $scope.user.photo = data;
+					photoState = true;
                 });
             }
         }; 
@@ -631,7 +635,9 @@ app.controller('UserUpdate',
          }
          
         $scope.updateUser  = function(){
-            
+            if(!photoState){
+                delete($scope.user.photo);
+            }
             rest.putModel($scope.user).success(function(data) {
                 alertService.clearAll();
                 alertService.add("success", "User updated.");

@@ -106,7 +106,7 @@ app.controller('PrintLabel', ['$scope', 'rest', '$location', '$route','$routePar
                 if(  Object.keys($scope.print.labels).length>0) {
                     var tabWindowId = window.open('about:blank', '_blank');
                     
-                    $http.post("/reportsdownload/printlabel", {'print': $scope.print, 'print_type': $scope.print_type}).success(function(response) {
+                    $http.post("/reportsdownload/printlabel", {'print': $scope.print, 'print_type': $scope.print.label_template.print_type}).success(function(response) {
                         tabWindowId.location.href = response;
                     }).error(errorCallback);
                 }
@@ -176,14 +176,17 @@ app.controller('PrintLabel', ['$scope', 'rest', '$location', '$route','$routePar
         }
                 
         $scope.viewLabels = function() {
+            $(".has-error").removeClass("has-error");
             if(typeof $scope.search.project_id == 'undefined' || $scope.search.project_id <= 0) {
                 alertService.clearAll();
                 alertService.add("error", " You must have a project selected before moving ahead!!");
+                $("#projects").addClass("has-error");
                 return;
             }
             if(typeof $scope.print.label_template == 'undefined' || $scope.print.label_template.id <= 0) {
                 alertService.clearAll();
                 alertService.add("error", " Please select a template to print!!");
+                $("#label_template").addClass("has-error");
                 return;
             }
             var params = {'search': $scope.search, 'filter': $scope.filter, 'print_type': $scope.print_type};
@@ -778,10 +781,7 @@ app.controller('ImportsUsers', ['$scope', 'rest', '$location', '$route', '$route
                 alertService.add("success", data);
                 return;
             }).error(function (data) {
-                alertService.clearAll();
-                alertService.add("error", "Error in user import!!");
                 $scope.error = data;
-                console.log($scope.error);
                 return;
             });
         }

@@ -112,6 +112,7 @@
                             <th class="text-center"><a ng-href="" ng-click="sortUser('contact_number')">Phone Number <i class="fa fa-sort{{sort.contact_number}}"></i></a></th>
                             <th class="text-center"><a ng-href="" ng-click="sortUser('rec_notification')">Receive Notification <i class="fa fa-sort{{sort.rec_notification}}"></i></a></th>
                             <th class="text-center"><a ng-href="" ng-click="sortUser('allow_be')">Allow BE <i class="fa fa-sort{{sort.allow_be}}"></i></a></th>
+							<th class="text-center"><a ng-href="" ng-click="sortUser('status')">Status<i class="fa fa-sort{{sort.status}}"></i></a></th>
                             <th class="text-center"></th>
                         </tr>
                     </thead>
@@ -128,6 +129,9 @@
                             </td>
                             <td class="text-center">
                                 <span class="label" ng-class="{'label-success': user.allow_be, 'label-danger': !user.allow_be}">{{user.allow_be?"Yes":"No"}}</span>
+                            </td>
+							<td class="text-center">
+                                <span class="label" ng-class="{'label-success': user.status, 'label-danger': !user.status}">{{user.status?"Active":"Inactive"}}</span>
                             </td>
                             <td class="text-center">
 				<a href="/#/users/update/{{user.id}}" class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></a>

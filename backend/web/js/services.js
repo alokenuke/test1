@@ -289,7 +289,7 @@ appServices.directive('ckEditor', function() {
     require: '?ngModel',
     link: function(scope, elm, attr, ngModel) {
       var params = {
-            extraPlugins: 'placeholder',
+            extraPlugins: 'strinsert',
             filebrowserImageUploadUrl: '/filemanager/uploadimage',
             toolbar :
             [
@@ -299,8 +299,9 @@ appServices.directive('ckEditor', function() {
                     ['Link', 'Unlink'],
                     ['Image', 'Table', 'HorizontalRule'],
                     ['Maximize'],
-                    ['Preview', 'Source'],
-                    ['CreatePlaceholder'],
+                    ['Source'],
+                    ['strinsert'],
+                    ['Preview'],
                     '/',
                     ['FontSize', 'Styles','Format', 'Font', 'TextColor', 'Bold', 'Italic','Underline'],
                     ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
@@ -314,7 +315,7 @@ appServices.directive('ckEditor', function() {
         }
         
         var ck = CKEDITOR.replace(elm[0], params);
-
+        
         if (!ngModel) return;
 
         ck.on('instanceReady', function() {

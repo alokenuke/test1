@@ -221,8 +221,7 @@ app.controller('ProjectLevel', ['$scope', 'rest', '$location', '$route', '$route
                 var sourceLevel = sourceNodeScope.$modelValue;
                 // Allow dragging only if element is not top level (group shouldn't be dragged).
                 if (sourceLevel.parent_id > 0) {
-                    if ((typeof destNodesScope.$modelValue == 'undefined')) {
-                        alert("Not allowed");
+                    if ((typeof destNodesScope.$modelValue[destIndex] == 'undefined') || (typeof destNodesScope.$modelValue[destIndex].parent_id == 'undefined') || (!destNodesScope.$modelValue[destIndex].parent_id)) {
                         return false;
                     }
                     $scope.draggingInitiated = true;
@@ -268,7 +267,7 @@ app.controller('ProjectLevel', ['$scope', 'rest', '$location', '$route', '$route
                     parent_id: nodeData.id,
                     editing: true,
                 });
-                scope.collapsed = true;
+                scope.expand();
             }
         };
 
@@ -339,17 +338,28 @@ app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route', '$routeP
     };
     
     $scope.setFlag = function(scope, type) {
-        $scope.flagUpdatedLevels = true;
         if(type=='default') {
             var item = scope.$parent.$parent.$parent.$modelValue;
-            item.flagDefault = scope.$modelValue.id;
+            if(item.flagDefault != scope.$modelValue.id) {
+                item.flagDefault = scope.$modelValue.id;
+                $scope.flagUpdatedLevels = true;
+            }
+            else
+                item.flagDefault = 0;
         }
         else if(type=='completion') {
             var item = scope.$parent.$parent.$parent.$modelValue;
-            item.flagCompletion = scope.$modelValue.id;
+            if(item.flagCompletion != scope.$modelValue.id) {
+                item.flagCompletion = scope.$modelValue.id;
+                $scope.flagUpdatedLevels = true;
+            }
+            else
+                item.flagCompletion = 0;
         }
-        else
+        else {
             scope.flagHierarchy = !scope.flagHierarchy;
+            $scope.flagUpdatedLevels = true;
+        }
     }
     
     $scope.getFlag = function(scope, type) {
@@ -432,7 +442,7 @@ app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route', '$routeP
                 parent_id: nodeData.id,
                 editing: true,
             });
-            scope.collapsed = true;
+            scope.expand();
         }
     };
 

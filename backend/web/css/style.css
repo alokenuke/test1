@@ -978,6 +978,10 @@ form .multi-level{margin-top: 7px;padding-bottom: 7px;}
     margin-top: 5px;
 }
 
+.placeholder .cke_combo_text.cke_combo_inlinelabel {
+    width: 75px;
+}
+
 /*------------/footer----------*/
 @media (min-width: 1200px) {
     .projectbox:nth-child(3n+1) {

@@ -320,7 +320,7 @@ app.controller('UserCreate',
             
        $scope.serverError = [];
         
-        rest.setData("roles/getall", ['id', 'role_name'], {}).success(function(data) {
+        rest.setData("roles/getall", ['id', 'role_name'], {"company_id": 0}).success(function(data) {
             $scope.roles = data.items;
         });
         
@@ -426,6 +426,10 @@ app.controller('Companies', ['$scope', 'rest', '$location', '$route','$routePara
                 $scope.numPerPage = data._meta.perPage;
             }).error(errorCallback);
         }
+        
+        rest.setData("membership/getall", ['id', 'name'], {'project_status': null}).success(function (data) {
+            $scope.memberships = data.items;
+        });
         
         $scope.sortCompany("-id");
     }])

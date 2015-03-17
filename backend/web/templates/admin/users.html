@@ -31,12 +31,9 @@
                 <div class="row">
                     <div class="col-md-6 col-lg-5">
                         <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">User Status :</label>
+                            <label class="col-sm-4 control-label text-right">Phone Number :</label>
                             <div class="col-sm-6">
-                                <select class="form-control" ng-model="$search.status">
-                                    <option value="1" selected="selected">Active</option>
-                                    <option value="0">Inactive</option>
-                                </select>
+                                <input class="form-control" ng-model="$search.contact_number" />
                             </div>
                         </div>
                     </div>
@@ -52,9 +49,13 @@
                 <div class="row">
                     <div class="col-md-6 col-lg-5">
                         <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">Phone Number :</label>
+                            <label class="col-sm-4 control-label text-right">User Status :</label>
                             <div class="col-sm-6">
-                                <input class="form-control" ng-model="$search.contact_number" />
+                                <select class="form-control" ng-model="$search.status">
+                                    <option value="">-- Select Status--</option>
+                                    <option value="1" selected="selected">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -93,8 +94,7 @@
                             <th class="text-center"><a ng-href="" ng-click="sortUser('designation')">Designation <i class="fa fa-sort{{sort.designation}}"></i></a></th>
                             <th class="text-center"><a ng-href="" ng-click="sortUser('email')">Email <i class="fa fa-sort{{sort.email}}"></i></a></th>
                             <th class="text-center"><a ng-href="" ng-click="sortUser('contact_number')">Phone Number <i class="fa fa-sort{{sort.contact_number}}"></i></a></th>
-                            <th class="text-center"><a ng-href="" ng-click="sortUser('rec_notification')">Receive Notification <i class="fa fa-sort{{sort.rec_notification}}"></i></a></th>
-                            <th class="text-center"><a ng-href="" ng-click="sortUser('allow_be')">Allow BE <i class="fa fa-sort{{sort.allow_be}}"></i></a></th>
+                            <th class="text-center"><a ng-href="" ng-click="sortUser('status')">Status <i class="fa fa-sort{{sort.status}}"></i></a></th>
                             <th class="text-center"></th>
                         </tr>
                     </thead>
@@ -107,10 +107,7 @@
                             <td>{{user.email}}</td>
                             <td class="text-right">{{user.contact_number}}</td>
                             <td class="text-center">
-                                {{user.rec_notification | titlecase}}
-                            </td>
-                            <td class="text-center">
-                                <span class="label" ng-class="{'label-success': user.allow_be, 'label-danger': !user.allow_be}">{{user.allow_be?"Yes":"No"}}</span>
+                                <span class="label" ng-class="{'label-success': user.status, 'label-danger': !user.status}">{{user.status?"Yes":"No"}}</span>
                             </td>
                             <td class="text-center">
 				<a href="/#/update/user/{{user.id}}" class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></a>

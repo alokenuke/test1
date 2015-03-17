@@ -105,7 +105,7 @@ app.controller('RolesUpdate', ['$scope', 'rest', '$location', '$route','$routePa
         });
     }])
 
-app.controller('ManageLabelTemplates', function($scope, rest, $location, alertService, $http, breadcrumbsService, $window, $upload) {
+app.controller('ManageLabelTemplates', function($scope, rest, $location, alertService, $http, breadcrumbsService, $window, $upload, $route) {
     rest.path = "labeltemplates";
     
     breadcrumbsService.clearAll();
@@ -204,11 +204,13 @@ app.controller('ManageLabelTemplates', function($scope, rest, $location, alertSe
             $http.put("/labeltemplates/"+$scope.label_template.id, $scope.label_template).success(function(data) {
                 alertService.add('success', "Template updated successfully.");
                 $scope.label_template = data;
+                $route.reload();
             }).error(errorCallback);        
         else
             rest.postModel($scope.label_template).success(function(data) {
                 alertService.add('success', "Template created successfully.");
                 $scope.label_template = data;
+                $route.reload();
             }).error(errorCallback);
     }
     
@@ -240,7 +242,7 @@ app.controller('ManageLabelTemplates', function($scope, rest, $location, alertSe
     
 })
 
-app.controller('ManageReportTemplates', function($scope, rest, $location, alertService, $http, breadcrumbsService, $window, $upload) {
+app.controller('ManageReportTemplates', function($scope, rest, $location, alertService, $http, breadcrumbsService, $window, $upload, $route) {
     rest.path = "reporttemplates";
     
     breadcrumbsService.clearAll();
@@ -308,11 +310,13 @@ app.controller('ManageReportTemplates', function($scope, rest, $location, alertS
             $http.put("/reporttemplates/"+$scope.report_template.id, $scope.report_template).success(function(data) {
                 alertService.add('success', "Template updated successfully.");
                 $scope.report_template = data;
+                $route.reload();
             }).error(errorCallback);        
         else
             rest.postModel($scope.report_template).success(function(data) {
                 alertService.add('success', "Template created successfully.");
                 $scope.report_template = data;
+                $route.reload();
             }).error(errorCallback);
     }
     

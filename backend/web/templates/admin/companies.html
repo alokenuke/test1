@@ -40,7 +40,16 @@
                             </div>
                         </div>
                     </div>
-                    
+                    <div class="col-md-6 col-lg-5">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Membership :</label>
+                            <div class="col-sm-6" ng-class="{ 'has-error': serverError.email}">
+                                <select class="form-control" ng-model="$search.membership_id" ng-options="membership.id as membership.name for membership in memberships" >
+                                    <option value="">-- Filter by membership--</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div><!--/row-->
                 
                 <div class="row mt-20">
@@ -66,9 +75,9 @@
                                 <a ng-href="" ng-click="sortCompany('company_name')">Company Name <i class="fa fa-sort{{sort.company_name}}"></i></a>
                             </th>
                             <th class="text-center"><a ng-href="" ng-click="sortCompany('company_owner')">Company Owner<i class="fa fa-sort{{sort.company_owner}}"></i></a></th>
-                            <th class="text-center"><a ng-href="" ng-click="sortCompany('company_status')">Company Status <i class="fa fa-sort{{sort.company_status}}"></i></a></th>
                             <th class="text-center"><a ng-href="" ng-click="sortCompany('membership_id')">Membership<i class="fa fa-sort{{sort.membership_id}}"></i></a></th>
                             <th class="text-center"><a ng-href="" ng-click="sortCompany('expiry_date')">Expiry Date <i class="fa fa-sort{{sort.expiry_date}}"></i></a></th>
+                            <th class="text-center"><a ng-href="" ng-click="sortCompany('company_status')">Company Status <i class="fa fa-sort{{sort.company_status}}"></i></a></th>
                             <th class="text-center"></th>
                         </tr>
                     </thead>
@@ -77,9 +86,13 @@
                             <td class="text-center">{{$index+1}}</td>
                             <td>{{company.company_name}}</td>
                             <td>{{company.company_owner}}</td>
-                            <td>{{company.company_status?"Active":"Not Active"}}</td>
                             <td>{{company.membership.name}}</td>
                             <td>{{company.expiry_date}}</td>
+                            <td class="text-center">
+                                <span class="label" ng-class="{'label-success': company.company_status, 'label-danger': (!company.company_status || company.expiry_status)}">
+                                    {{company.expiry_status?"Expired":(company.company_status?"Active":"Not Active")}}
+                                </span>
+                            </td>
                             <td class="text-center">
 				<a href="/#/company/update/{{company.id}}" class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></a>
                                 <button type="button" ng-confirm-click="Are you sure to remove this company?" title="Click to remove." ng-click="removeCompany(company, $index)"><i class="fa fa-trash"></i></button>

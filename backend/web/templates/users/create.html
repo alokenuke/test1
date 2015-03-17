@@ -1,20 +1,20 @@
 <div class="col-xs-12 secondary-bg">
     <div class="col-xs-12 shadow-box">
-            <div class="tag-btn-wrapper row">
-                <div class="col-sm-5 pull-right mt-15">
-                        <label class="control-label col-sm-8 col-lg-9 text-right mt-5">Add more:</label>
-                        <div class="col-sm-4 col-lg-3 pull-right" style="padding:0;">
-                            <form role="form" class="input-group" ng-submit="copyUser(fieldNum)">
-                                <input type="text" class="form-control" ng-required="true" ng-init="fieldNum=1" placeholder="" size="2" ng-model="fieldNum" numbers-only max="2">
-                                <span class="input-group-btn">
-                                    <button class="btn btn-default" type="submit">
-                                        <i class="fa fa-plus-circle fa-lg"></i>
-                                    </button>
-                                </span>
-                            </form><!-- /input-group -->
-                        </div><!-- /.col-lg-6 -->
-                </div>
+        <div class="tag-btn-wrapper row">
+            <div class="col-sm-5 pull-right mt-15">
+                <label class="control-label col-sm-8 col-lg-9 text-right mt-5">Add more:</label>
+                <div class="col-sm-4 col-lg-3 pull-right" style="padding:0;">
+                    <form role="form" class="input-group" ng-submit="copyUser(fieldNum)">
+                        <input type="text" class="form-control" ng-required="true" ng-init="fieldNum = 1" placeholder="" size="2" ng-model="fieldNum" numbers-only max="2">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit">
+                                <i class="fa fa-plus-circle fa-lg"></i>
+                            </button>
+                        </span>
+                    </form><!-- /input-group -->
+                </div><!-- /.col-lg-6 -->
             </div>
+        </div>
         <form id="form" name="frmCreateUsers" ng-submit="createUser()" class="form-wrapper form-horizontal form-horizontal-typ1 createUser" role="form">
             <div class="row mt-15">
                 <div class="col-xs-12">
@@ -41,30 +41,30 @@
                                     </td>
                                     <td class="text-center form-group">
                                         <div  ng-class="{ 'has-error': serverError[$index].first_name}">
-                                            <input type="text" placeholder="First Name" class="form-control form-control-small" ng-model="user.first_name" name="first_name" ng-required="true" />
+                                            <input type="text" placeholder="First Name" class="form-control form-control-small" ng-model="user.first_name" name="first_name" ng-required="true" maxlength="64"/>
                                             <div class="help-block help-block-error">{{serverError[$index].first_name}}</div>
                                         </div>
                                         <div ng-class="{ 'has-error': serverError[$index].last_name}">
-                                            <input type="text" class="form-control form-control-small" placeholder="Last Name" ng-model="user.last_name" ng-required="true"/>
-                                            
+                                            <input type="text" class="form-control form-control-small" placeholder="Last Name" ng-model="user.last_name" ng-required="true" maxlength="64"/>
+
                                             <div class="help-block help-block-error">{{serverError[$index].last_name}}</div>
                                         </div>
                                     </td>
                                     <td ng-class="{ 'has-error': serverError[$index].username}">
-                                        <input type="text" placeholder="Username" class="form-control form-control-small" ng-model="user.username" ng-required="true"/>
+                                        <input type="text" placeholder="Username" class="form-control form-control-small" ng-model="user.username" ng-required="true" maxlength="64"/>
                                         <div class="help-block help-block-error">{{serverError[$index].username}}</div>
                                     </td>
                                     <td ng-class="{ 'has-error': serverError[$index].designation}">
-                                        <input type="text" placeholder="Designation" class="form-control form-control-small" ng-model="user.designation"/>
+                                        <input type="text" placeholder="Designation" class="form-control form-control-small" ng-model="user.designation" maxlength="64"/>
                                         <div class="help-block help-block-error">{{serverError[$index].designation}}</div>
                                     </td>
                                     <td>
                                         <div ng-class="{ 'has-error': serverError[$index].email}">
-                                            <input type="email" placeholder="Email" class="form-control form-control-small" ng-model="user.email" ng-required="true" />
+                                            <input type="email" placeholder="Email" class="form-control form-control-small" ng-model="user.email" ng-required="true" maxlength="128" />
                                             <div class="help-block help-block-error">{{serverError[$index].email}}</div>
                                         </div>
                                         <div class="text-right" ng-class="{ 'has-error': serverError[$index].contact_number}">
-                                            <input type="text" placeholder="Phone number" class="form-control form-control-small" ng-model="user.contact_number" numbers-only max="10"/>
+                                            <input type="text" placeholder="Phone number" class="form-control form-control-small" ng-model="user.contact_number" maxlength="16"/>
                                             <div class="help-block help-block-error">{{serverError[$index].contact_number}}</div>
                                         </div>
                                     </td>
@@ -81,20 +81,20 @@
                                         <select class="form-control form-control-small" ng-model="user.rec_notification" ng-options="notify.id as notify.name for notify in rec_noti" ng-init="user.rec_notification = rec_noti[0].id"></select>
                                     </td>
                                     <td class="text-center">
-                                        <input type="checkbox" ng-model="user.allow_be" ng-init="user.allow_be=1" ng-true-value="1" ng-false-value="0" />
+                                        <input type="checkbox" ng-model="user.allow_be" ng-init="user.allow_be = 1" ng-true-value="1" ng-false-value="0" />
                                     </td>
                                     <td class="text-center">
                                         <div class="preview-box ">
                                             <div class="fileUpload">
-                                            <div ng-hide="user.photo" style="cursor: pointer;border: 1px solid #ccc;background-color: #fff;padding: 20px;" title="Click to upload">Upload</div>
-                                            <div ng-show="user.photo" class="center" style="border: 1px solid #ccc;height: 104px;width: 104px;background-color: #fff;">
-                                                <button type="button" title="Click to remove image." ng-click="removePhoto($index)" style="position:absolute;right: -22px; top: -14px" class="btn btn-link">
-                                                    <i class="fa fa-times-circle-o fa-lg"></i>
-                                                </button>
-                                                <img ng-src="{{user.photo}}" />
-                                            </div>
-                                            
-                                            <input type="file" class="upload" style="height: 100%;" onchange="angular.element(this).scope().onFileSelect(this.files,angular.element(this).scope().$index)" ng-model="Photo[$index]">
+                                                <div ng-hide="user.photo" style="cursor: pointer;border: 1px solid #ccc;background-color: #fff;padding: 20px;" title="Click to upload">Upload</div>
+                                                <div ng-show="user.photo" class="center" style="border: 1px solid #ccc;height: 104px;width: 104px;background-color: #fff;">
+                                                    <button type="button" title="Click to remove image." ng-click="removePhoto($index)" style="position:absolute;right: -22px; top: -14px" class="btn btn-link">
+                                                        <i class="fa fa-times-circle-o fa-lg"></i>
+                                                    </button>
+                                                    <img ng-src="{{user.photo}}" />
+                                                </div>
+
+                                                <input type="file" class="upload" style="height: 100%;" onchange="angular.element(this).scope().onFileSelect(this.files, angular.element(this).scope().$index)" ng-model="Photo[$index]">
                                             </div>
                                         </div><!--/.preview-box-->
                                         <small>Max: 1 MB</small>
@@ -105,7 +105,7 @@
                     </div>
                 </div>          
             </div><!--/row-->
-            
+
             <div class="pull-right mt-45 mb-30">
                 <div class="col-sm-12 text-center">
                     <button class="btn btn-primary btn-lg mr-10 mb-sm-5 btn-plr-medium" type="submit">Save</button>

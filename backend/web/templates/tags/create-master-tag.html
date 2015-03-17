@@ -53,7 +53,7 @@
                               <ui-select-match placeholder="Select item {{$index==0?'Group':$index==1?'Type':'Sub Type'}}">{{$select.selected.item_name}}</ui-select-match>
                               <ui-select-choices repeat="i in item | filter: $select.search"
                                        refresh-delay="0">
-                                  <div ng-bind-html="i.item_name" ng-click="updateSelectBox('items', tagDetails.project_id, $parent.$index, i.id)"></div>
+                                  <div ng-bind-html="i.item_name" ng-click="updateSelectBox('items', tagDetails.project_id, $parent.$index+1, i.id)"></div>
                               </ui-select-choices>
                             </ui-select>
                             <span ng-if="!(items.length && tagDetails.project_id)">
@@ -73,7 +73,7 @@
                               <ui-select-match placeholder="Select process {{$index==0?'Type':'Flow'}}">{{$select.selected.process_name}}</ui-select-match>
                               <ui-select-choices repeat="p in process | filter: $select.search"
                                        refresh-delay="0">
-                                  <div ng-bind-html="p.process_name" ng-click="updateSelectBox('processes', tagDetails.project_id, $parent.$index, p.id)"></div>
+                                  <div ng-bind-html="p.process_name" ng-click="updateSelectBox('processes', tagDetails.project_id, $parent.$index+1, p.id)"></div>
                               </ui-select-choices>
                             </ui-select>
                             
@@ -211,7 +211,7 @@
                                          </div>
                                      </td>
                                      <td class="text-center">
-                                        <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.stage_from[relateUser.users.id]" ng-init="search.stage_from[relateUser.users.id]=tagAssignment.process_stage_from">
+                                        <ui-select theme="bootstrap" ng-model="search.stage_from[relateUser.users.id]" ng-init="search.stage_from[relateUser.users.id]=tagAssignment.process_stage_from" ng-disabled="!relateUser.isSelected">
                                              <ui-select-match placeholder="No task selected">{{$select.selected.process_name}}</ui-select-match>
                                              <ui-select-choices repeat="stage in process_stages | filter: $select.search"
                                                       refresh-delay="0">
@@ -220,20 +220,18 @@
                                         </ui-select>
                                      </td>
                                      <td class="text-center">
-                                         <ui-select theme="bootstrap" ng-disabled="disabled" ng-model="search.stage_to[relateUser.users.id]" ng-init="search.stage_to[relateUser.users.id]=tagAssignment.process_stage_to">
+                                         <ui-select theme="bootstrap" ng-model="search.stage_to[relateUser.users.id]" ng-init="search.stage_to[relateUser.users.id]=tagAssignment.process_stage_to" ng-required="search.stage_from[relateUser.users.id] != null" ng-disabled="!relateUser.isSelected">
                                              <ui-select-match placeholder="No task selected">{{$select.selected.process_name}}</ui-select-match>
                                              <ui-select-choices repeat="stage in process_stages | filter: $select.search"
                                                       refresh-delay="0">
-                                                 <div ng-bind-html="stage.process_name"></div>
+                                                 <div ng-bind-html="stage.process_name" ng-hide="stage.position < search.stage_from[relateUser.users.id].position"></div>
                                              </ui-select-choices>
                                            </ui-select>
                                      </td>
                                      <td class="text-center">
-                                         <div class="checkbox">
-                                             <label>
-                                                 <input type="checkbox" ng-model="search.mandatory[relateUser.users.id]" ng-init="search.mandatory[relateUser.users.id] = (tagAssignment.mandatory==1)"> &nbsp;
-                                             </label>
-                                         </div>
+                                        <label>
+                                            <input type="checkbox" ng-model="search.mandatory[relateUser.users.id]" ng-init="search.mandatory[relateUser.users.id] = (tagAssignment.mandatory==1)"> &nbsp;
+                                        </label>
                                      </td>
                                      <td class="text-center" style="width: 200px;">
                                          <div class="dropdown">
