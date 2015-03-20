@@ -8,7 +8,7 @@
                     </div>
                     <div class="col-md-3 col-lg-2">
                         <select class="form-control" ng-model="label_template" ng-options="label_template.template_name for label_template in templates"
-                                ng-change="paper_size=(label_template.page_width==216 && label_template.page_height==279?'letter':(label_template.page_width==210 && label_template.page_height==297?'a4':'custom'))">
+                                ng-change="selectTemplate()">
                         </select>
                     </div>
                     <div class="col-md-1" ng-show="label_template.id>0">
@@ -124,6 +124,21 @@
                             </div>
                         </div>
                         <div class="form-group">
+                            <label class="col-sm-7 control-label text-right">QR code / Bar code Position :</label>
+                            <div class="col-sm-4">
+                                <select class='form-control' ng-model="label_template.logo_position" ng-init='label_template.logo_position="topLeft"'>
+                                    <option value='topLeft'>Top Left</option>
+                                    <option value='topRight'>Top Right</option>
+                                    <option value='topMiddle'>Top Middle</option>
+                                    <option value='bottomLeft'>Bottom Left</option>
+                                    <option value='bottomRight'>Bottom Right</option>
+                                    <option value='bottomMiddle'>Bottom Middle</option>
+                                    <option value='leftMiddle'>Left Middle</option>
+                                    <option value='rightMiddle'>Right Middle</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label class="col-sm-7 control-label text-right">Font Size :</label>
                             <div class="col-sm-4">
                                 <select class="form-control" ng-options="font for font in range(1, 30, 1)" ng-model='label_template.font_size' ng-required="true">
@@ -166,105 +181,45 @@
                     </div><!--/.col-md-->
                 </div><!--/row-->
                 
-                <div class="alert alert-info">
-                    <strong>Note: </strong> Please uncheck the below fields you don't want in printout on labels.
+                <div class='row pb-20'>
+                    <div class='col-md-6 col-lg-5'>
+                        <h2 class="col-xs-12 search-title mb-20">Other: </h2>
+                        <div class="form-group">
+                            <label class='col-sm-5 control-label text-right'>Additional Notes: </label>
+                            <div class="col-sm-7">
+                                <textarea class='form-control' ng-model="label_template.additional_notes" maxlength="64"></textarea>
+                                <small>Max 64 characters.</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="row-fluid">
-                    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3">
-                        <div class="form-group">
-                            <label class="control-label">
-                                Company Name:
-                                <input type="checkbox" ng-model="label_template.checked_labels.company_name" ng-init="label_template.checked_labels.company_name=true">
-                            </label>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="alert alert-info">
+                            <strong>Note: </strong> Please uncheck the below fields you don't want in printout on labels.
                         </div>
-
-                        <div class="form-group">
-                            <label class="control-label">
-                                Project Name:
-                                <input type="checkbox" ng-model="label_template.checked_labels.project_name" ng-init="label_template.checked_labels.project_name=true">      
-                            </label>
+                        
+                        <div ui-tree>
+                            <ol ui-tree-nodes ng-model="label_template.checked_labels" style="padding:0;">
+                                <li class="mb-5" ui-tree-node ng-repeat="item in label_template.checked_labels">
+                                    <div ui-tree-handle ng-class="{'level-1': item.isChecked}">
+                                        <div class="clearfix">
+                                            <label class="checkbox-inline" nodrag>
+                                                <input type="checkbox" ng-model="item.isChecked" />
+                                                {{item.label}}
+                                            </label>
+                                            <label class="pull-right checkbox-inline pl-20" nodrag>
+                                                <span>Show Label</span>
+                                                <input class="pl-20" type="checkbox" ng-model='item.showLabel' ng-disabled="!item.isChecked" />
+                                            </label>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ol>
                         </div>
-
-                        <div class="form-group">
-                            <label class="control-label">
-                                Item:
-                                <input type="checkbox" ng-model="label_template.checked_labels.tag_item" ng-init="label_template.checked_labels.tag_item=true">
-                        </div>
-
-                    </div><!-- span4 end --> 
-
-                    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3">
-
-                        <div class="form-group">
-                            <label class="control-label">
-                                Client Name:
-                                <input type="checkbox" ng-model="label_template.checked_labels.client_name" ng-init="label_template.checked_labels.client_name=true">
-                            </label>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="control-label">
-                                Project Address:
-                                <input type="checkbox"  ng-model="label_template.checked_labels.project_address" ng-init="label_template.checked_labels.project_address=true">
-                            </label>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="control-label">
-                                Process:
-                                <input type="checkbox" ng-model="label_template.checked_labels.process" ng-init="label_template.checked_labels.process=true">
-                            </label>
-                        </div>
-
-                    </div><!-- span4 end -->
-
-                    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3">
-
-                        <div class="form-group">
-                            <label class="control-label">
-                                Client Location:
-                                <input type="checkbox" ng-model="label_template.checked_labels.client_location" ng-init="label_template.checked_labels.client_location=true">
-                            </label>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="control-label">Area:
-                                <input type="checkbox" ng-model="label_template.checked_labels.project_location" ng-init="label_template.checked_labels.project_location=true">
-                            </label>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="control-label">
-                                Unique Code:
-                                <input type="checkbox" ng-model="label_template.checked_labels.uid" ng-init="label_template.checked_labels.uid=true">
-                            </label>
-                        </div>
-
                     </div>
-
-                    <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3">
-
-                        <div class="form-group">
-                            <label class="control-label">
-                                Main Contractor:
-                                <input type="checkbox" ng-model="label_template.checked_labels.main_contractor" ng-init="label_template.checked_labels.main_contractor=true">
-                            </label>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="control-label">Project level:
-                                <input type="checkbox" ng-model="label_template.checked_labels.project_level" ng-init="label_template.checked_labels.project_level=true">
-                            </label>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="control-label">Tag Description:
-                                <input type="checkbox" ng-model="label_template.checked_labels.tag_description" ng-init="label_template.checked_labels.tag_description=true">
-                            </label>
-                        </div>
-
-                    </div>
+                    <div class="col-md-6" preview-label-template template-info='label_template' template-url='previewTemplate.html'></div>
                 </div>
                 
                 <div class="row mt-20">
@@ -282,4 +237,20 @@
     input[type=number] {-moz-appearance: textfield;}
     ::-webkit-inner-spin-button { -webkit-appearance: none;}
     ::-webkit-outer-spin-button { -webkit-appearance: none;}
+    .checkbox-inline {
+        padding-top: 0 !important;
+    }
 </style>
+<script type="text/ng-template" id="previewTemplate.html">
+    <div class="search-box mb-25" style="padding: 5px;">
+        <h2 class="search-title">Preview</h2><br />
+        <div class="clearfix"></div>
+        <div style='min-height: 500px;' id="previewContainer">
+            <div id="pdfPreview" style="background-color: #fff;margin:0 auto;padding: 5px;">
+                <div id="previewContainer" style='border: 1px solid #ccc;width: 100%;height: 100%;overflow:hidden;background: #fff url(images/labelLogo.png) no-repeat right bottom;padding: 5px;'>
+                
+                </div>
+            </div>
+        </div>
+    </div>
+</script>

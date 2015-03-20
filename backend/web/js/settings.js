@@ -115,6 +115,61 @@ app.controller('ManageLabelTemplates', function($scope, rest, $location, alertSe
     $scope.paper_size = 'custom';
     $scope.label_template = {};
     
+    $scope.checked_labels = [
+        {
+            name: 'tag_type',
+            label: "Tag Type"
+        },
+        {
+            name: 'tag_name',
+            label: "Tag Name"
+        },
+        {
+            name: 'company_name',
+            label: "Company Name"
+        },
+        {
+            name: 'project_name',
+            label: "Project Name"
+        },
+        {
+            name: "tag_item",
+            label: "Tag Items"
+        },
+        {
+            name: "client_name",
+            label: "Client Name"
+        },
+        {
+            name: "project_address",
+            label: "Project Address"
+        },
+        {
+            name: "process",
+            label: "Process"
+        },
+        {
+            name: "client_location",
+            label: "Client Location"
+        },
+        {
+            name: "project_location",
+            label: "Project Location"
+        },
+        {
+            name: "main_contractor",
+            label: "Main Contractor"
+        },
+        {
+            name: "project_level",
+            label: "Project Level"
+        },
+        {
+            name: "tag_description",
+            label: "Tag Description"
+        }
+    ];
+        
     var errorCallback = function (data) {
         if(data.status!=401) {
             alertService.add('error', "Error in processing your request. Please try again.");
@@ -130,7 +185,8 @@ app.controller('ManageLabelTemplates', function($scope, rest, $location, alertSe
         $scope.label_template.hor_label_spacing = undefined;
         $scope.label_template.ver_label_spacing = undefined;
         $scope.label_template.logo_width = undefined;
-        $scope.label_template.checked_labels = {};
+        
+        $scope.label_template.checked_labels = $scope.checked_labels;
     }
     
     $scope.range = function(min, max, step){
@@ -150,23 +206,50 @@ app.controller('ManageLabelTemplates', function($scope, rest, $location, alertSe
     }
         
     $scope.$watch('paper_size', function(newValue) {
-        if(!$scope.label_template.id) {
-            if(newValue=='letter')
-            {
-                $scope.label_template.page_width = 216;
-                $scope.label_template.page_height = 279;
-            }
-            else if(newValue=='a4')
-            {
-                $scope.label_template.page_width = 210;
-                $scope.label_template.page_height = 297;
-            }
-            else {
+        if(newValue=='letter')
+        {
+            $scope.label_template.page_width = 216;
+            $scope.label_template.page_height = 279;
+        }
+        else if(newValue=='a4')
+        {
+            $scope.label_template.page_width = 210;
+            $scope.label_template.page_height = 297;
+        }
+        else {
+            if(!$scope.label_template.id) {
                 $scope.label_template.page_width = 0;
                 $scope.label_template.page_height = 0;
             }
         }
     });
+    
+    $scope.selectTemplate = function() {
+        $scope.paper_size=($scope.label_template.page_width==216 && $scope.label_template.page_height==279?'letter':($scope.label_template.page_width==210 && $scope.label_template.page_height==297?'a4':'custom'));
+        
+        var temp = [];
+        
+        angular.forEach($scope.checked_labels, function(defaultLabel) {
+            var exists = false;
+            angular.forEach($scope.label_template.checked_labels, function(label) {
+                if(typeof label['name'] != 'undefined' && angular.equals(label['name'], defaultLabel['name'])) {
+                    exists = true;
+                    return;
+                }
+            });
+            if(!exists)
+                temp.push(defaultLabel);
+        });
+        
+        if(temp.length > 0) {
+            if(!angular.isArray($scope.label_template.checked_labels))
+                $scope.label_template.checked_labels = [];
+            
+            angular.forEach(temp, function(val) {
+                $scope.label_template.checked_labels.push(val);
+            })
+        }
+    }
     
     $scope.deleteTemplate = function() {
         if(typeof $scope.label_template == 'undefined' || $scope.label_template.length <= 0) {
@@ -238,6 +321,7 @@ app.controller('ManageLabelTemplates', function($scope, rest, $location, alertSe
     rest.models({}).success(function (data) {
         $scope.templates = data.items;
         $scope.label_template = $scope.templates[0];
+        $scope.label_template.checked_labels = $scope.checked_labels;
     }).error(errorCallback);
     
 })

@@ -343,11 +343,13 @@ app.controller('PrintTimeAttendanceLabel', ['$scope', 'rest', '$location', '$rou
             if(typeof $scope.search.project_id == 'undefined' || $scope.search.project_id <= 0) {
                 alertService.clearAll();
                 alertService.add("error", " You must have a project selected before moving ahead!!");
+                $("#projects").addClass("has-error");
                 return;
             }
             if(typeof $scope.print.label_template == 'undefined' || $scope.print.label_template.id <= 0) {
                 alertService.clearAll();
                 alertService.add("error", " Please select a template to print!!");
+                $("#label_template").addClass("has-error");
                 return;
             }
             var params = {'search': $scope.search, 'filter': $scope.filter, 'print_type': $scope.print_type};
@@ -704,7 +706,7 @@ app.controller('ImportsProjects', ['$scope', 'rest', '$location', '$route', '$ro
         breadcrumbsService.clearAll();
         breadcrumbsService.setTitle("Import Projects");
         breadcrumbsService.add("/#/", "Home");
-        breadcrumbsService.add("/#/import/projects", "Imports Projects");
+        breadcrumbsService.add("/#/import/projects", "Import Projects");
         
         $scope.onFileSelect = function ($files, modelName) {
             //$files: an array of files selected, each file has name, size, and type.
@@ -754,7 +756,7 @@ app.controller('ImportsUsers', ['$scope', 'rest', '$location', '$route', '$route
         breadcrumbsService.clearAll();
         breadcrumbsService.setTitle("Import Users");
         breadcrumbsService.add("/#/", "Home");
-        breadcrumbsService.add("/#/import/users", "Imports Users");
+        breadcrumbsService.add("/#/import/users", "Import Users");
         
         $scope.onFileSelect = function ($files, modelName) {
             //$files: an array of files selected, each file has name, size, and type.

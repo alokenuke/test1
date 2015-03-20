@@ -5,7 +5,7 @@
             <form id="frmLabelFilter" class="form-wrapper form-horizontal form-horizontal-type1 slide" role="form" ng-submit="viewLabels()">
                 <div class="row">
                     <div class="col-md-6 col-lg-5">
-                        <div class="form-group">
+                        <div class="form-group" id="projects">
                             <label class="col-sm-4 control-label text-right">Project Name :</label>
                             <div class="col-sm-6 multi-level">
                                 <ui-select ng-model="search.project"
@@ -81,27 +81,6 @@
                     </div>
                     <div class="col-md-6 col-lg-7">
                         <div class="form-group">
-                            <label class="col-sm-4 col-lg-3 control-label text-right">Print Type</label>
-                            <div class="col-sm-8 multi-level">
-                                <label class="mr-10"> <input type="radio" ng-model="print_type" value="nfc_code" /> NFC Code</label>
-                                <label class="mr-10"> <input type="radio" ng-model="print_type" value="bar_code" /> Bar Code </label>
-                                <label> <input type="radio" ng-model="print_type" value="qr_code" ng-init="print_type='qr_code'" /> QR Code </label>
-                            </div>
-                        </div>
-                    </div>
-                </div><!--/row-->
-
-                <div class="row">
-                    <div class="col-md-6 col-lg-5">
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">Tag Description :</label>
-                            <div class="col-sm-6">
-                                <input type="text" ng-model="search.tag_description" class="form-control" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-7">
-                        <div class="form-group">
                             <label class="col-sm-4 col-lg-3 control-label text-right">Created Between :</label>
                             <div class="col-sm-3">
                                 <div class="input-group">
@@ -126,7 +105,15 @@
                 <div class="row">
                     <div class="col-md-6 col-lg-5">
                         <div class="form-group">
-                            <label class="col-sm-4 control-label text-right">Print Template:</label>
+                            <label class="col-sm-4 control-label text-right">Tag Description :</label>
+                            <div class="col-sm-6">
+                                <input type="text" ng-model="search.tag_description" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-7">
+                        <div class="form-group" id="label_template">
+                            <label class="col-sm-4 col-lg-3 control-label text-right">Label Template:</label>
                             <div class="col-sm-6">
                                 <select class="form-control" ng-model="print.label_template" ng-required="true"
                                     ng-options="template.template_name for template in templates">
@@ -135,6 +122,7 @@
                         </div>
                     </div>
                 </div>
+                
                 <div class="row mt-20">
                     <div class="col-sm-10 text-center">
                         <button class="btn btn-primary mb-sm-5" type="submit">View Labels</button>
@@ -158,7 +146,7 @@
                                         </label>
                                     </div>
                                     <div class="form-group">
-                                        <button class="btn btn-primary btn-xs" type="submit"><i class="fa fa-print"></i> Print Label</button>
+                                        <button class="btn btn-primary" type="submit"><i class="fa fa-print"></i> Print Label</button>
                                     </div>
                                     <div class="form-group">
                                         <button ng-click="collapsed=!collapsed;" class="pull-right btn icon-btn btn-xs" type="button">
@@ -175,8 +163,7 @@
                                         <input type="checkbox" ng-model="label.isSelected" ng-change="checkLabel(label)">
                                         <strong>UID:</strong>{{label.uid}}
                                         <br><br>
-                                        <img style='width: 15em' ng-src="/filemanager/getimage?type={{basePrintType[print_type]}}&file={{(print_type=='nfc_code'?'nfc':label.uid)}}.png"><br>
-                                        <strong>&nbsp;&nbsp;&nbsp;&nbsp;{{print_type | titlecase}}</strong><br><br>
+                                        <img style='width: 15em' ng-src="/filemanager/getimage?type={{basePrintType[(print.label_template.print_type+'_code')]}}&file={{(print.label_template.print_type=='nfc_code'?'nfc':label.uid)}}.png"><br>
                                         <img width="150" height="20" alt="" src="/images/logo.png"><br>
                                         <strong>www.sitetrack-nfc.com</strong>  
                                     </div>

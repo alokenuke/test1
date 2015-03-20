@@ -341,3 +341,137 @@ appServices.directive('ckEditor', function() {
     }
   };
 });
+
+ appServices.directive("previewLabelTemplate", function() {
+          
+    return {
+        restrict: "A",
+        //replace: true,
+        templateUrl: function(elem, attrs) {
+            return attrs.templateUrl || 'previewTemplate.html'
+        },
+        scope: {
+            view: "=previewLabelTemplate"
+        },
+        controller: function($scope, $element, $timeout) {
+            var previewElm = angular.element("#pdfPreview", $element);
+            var container = angular.element("#previewContainer", $element);
+            
+            $scope.refreshTemplate = function() {
+                var previewContainer = angular.element("#previewContainer", previewElm);
+                
+                var template = $scope.$parent.label_template;
+                
+                var widthContainer = container.width();
+                var heightContainer = container.height();
+                
+                var givenWidth = template.cal_label_width;
+                var givenHeight = template.cal_label_height;
+                
+                var previewWidth = widthContainer;
+                var previewHeight = widthContainer * (givenHeight / givenWidth);
+                
+                var ratio = 1;
+                
+                if(previewHeight > 500) {
+                    ratio = 500 / previewHeight ;
+                    
+                    previewWidth *= ratio;
+                    previewHeight *= ratio;
+                }
+                
+                var $imageUrl = "";
+                
+                if(template.print_type=='qr')
+                    $imageUrl = 'images/qr-code.png';
+                else if(template.print_type=='bar')
+                    $imageUrl = 'images/bar-code.png';
+                else if(template.print_type=='nfc' && template.logo)
+                    $imageUrl = "filemanager/getimage?type=&file="+template.logo;
+                
+                var $logoWidth = template.logo_width * (previewWidth / template.cal_label_width);
+                
+                var $logoBox = "<div id='logoContainer' style='text-align:center;'>UID: 4sOMQ95506<br /><img src='"+$imageUrl+"' style='width: "+$logoWidth+"px;' /></div>";
+                
+                var labelInfo = "";
+                angular.forEach(template.checked_labels, function(val) {
+                    if(val.isChecked) {
+                        var tempLabel = "";
+                        if(val.showLabel)
+                            tempLabel = '<strong>'+val.label+'</strong> : ';
+                        labelInfo += '<div>'+tempLabel+'Test '+val.label+'</div>';
+                    }
+                });
+                
+                if(template.additional_notes.length > 0)
+                    labelInfo += '<div><strong>Note</strong> : '+template.additional_notes+'</div>';
+                
+                var $fontSize = 0;
+                if(template.cal_label_height < template.cal_label_width)
+                    $fontSize = (template.font_size * (template.cal_label_height / template.cal_label_width));
+                else
+                    $fontSize = (template.font_size * (template.cal_label_width / template.cal_label_height));
+                
+                var $infoBox = "<div style='float:left;margin-left: 10px;min-width: 300px;font-size: "+$fontSize+"px;'>"+labelInfo+"</div>";
+                
+                previewContainer.html("");
+                
+                if(template.logo_position=='bottomLeft' || template.logo_position=='bottomRight' || template.logo_position=='bottomMiddle') {
+                    previewContainer.append($infoBox);
+                    previewContainer.append($logoBox);
+                }
+                else {
+                    previewContainer.append($logoBox);
+                    previewContainer.append($infoBox);
+                }
+                
+                var $logoContainer = angular.element("#logoContainer", $element);
+                
+                if(template.logo_position=='topLeft') {
+                    $logoContainer.css("float", 'left');
+                }
+                else if(template.logo_position=='topRight') {
+                    $logoContainer.css("float", 'right');
+                }
+                else if(template.logo_position=='topMiddle') {
+                    $logoContainer.css("width", '100%');
+                }
+                else if(template.logo_position=='bottomLeft') {
+                    $logoContainer.css("clear", 'left');
+                    $logoContainer.css("float", 'left');
+                    $logoContainer.css("vertical-align", 'bottom');
+                }
+                else if(template.logo_position=='bottomRight') {
+                    $logoContainer.css("clear", 'left');
+                    $logoContainer.css("float", 'right');
+                    $logoContainer.css("vertical-align", 'bottom');
+                }
+                else if(template.logo_position=='bottomMiddle') {
+                    $logoContainer.css("clear", 'left');
+                    $logoContainer.css("width", '100%');
+                    $logoContainer.css("vertical-align", 'bottom');
+                }
+                else if(template.logo_position=='leftMiddle') {
+                    var imageElm = angular.element("#previewContainer img", $element);
+                    
+                    $logoContainer.css("float", 'left');
+                    $logoContainer.css("padding-top", ((previewHeight - imageElm.height()-25)/2)+'px');
+                }
+                else if(template.logo_position=='rightMiddle') {
+                    var imageElm = angular.element("#previewContainer img", $element);
+                    
+                    $logoContainer.css("float", 'right');
+                    $logoContainer.css("padding-top", ((previewHeight - imageElm.height()-25)/2)+'px');
+                }
+                
+                previewElm.css("width", previewWidth);
+                previewElm.css("height", previewHeight);
+                
+                $timeout($scope.refreshTemplate, 3000);
+                
+            };
+            
+            $timeout($scope.refreshTemplate, 2000);
+        }
+    };
+});
