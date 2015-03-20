@@ -163,6 +163,7 @@ class FileManager extends Model
             'image/jpg',
             'application/msword',
             'application/x-msexcel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             'application/x-mspowerpoint',
             'text/plain',
             'application/pdf',
@@ -189,7 +190,7 @@ class FileManager extends Model
             'video/x-mpeg',
             'text/css',
             'image/png',
-            'video/x-msvideo'
+            'video/x-msvideo',
         ];
     }
     

@@ -26,6 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php $form->errorSummary($model);?>
                 <?= $form->field($model, 'username', ['options' => ['class' => 'input-block-level'], 'inputOptions' => ['placeholder' => 'Username']]) ?>
                 <?= $form->field($model, 'password', ['options' => ['class' => 'input-block-level'], 'inputOptions' => ['placeholder' => 'Password']])->passwordInput() ?>
+				<?= $form->field($model, 'device', ['inputOptions' => ['value' => 'webapp']])->hiddenInput() ?>
                 <?= $form->field($model, 'rememberMe')->checkbox() ?>
                 <div class="form-group">
                     <?= Html::submitButton('Sign In', ['class' => 'btn btn-large btn-primary btn-block', 'name' => 'login-button']) ?>

@@ -642,8 +642,6 @@ class TagsController extends ApiController
             $connection = \Yii::$app->db;
             $transaction = $connection->beginTransaction();
             $model->type = "mT";
-            $model->project_id = $post['project_id'];
-            $model->uid = $model->generateUID(10);
             $model->project_level_id = $post['project_level_id'];
             $model->user_group_id = $post['user_group_id'];
             $model->tag_name = $post['tag_name'];

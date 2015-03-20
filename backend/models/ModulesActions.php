@@ -59,6 +59,16 @@ class ModulesActions extends \yii\db\ActiveRecord
         return ($result?$result:null);
     }
     
+    // default scope to check company_id
+    public static function find()
+    {
+        $query = parent::find()->andWhere(['status' => '1']);
+        if(isset(\yii::$app->user->id) && \yii::$app->user->identity->company_id == 0)
+            $query = $query->where(['company_id' => \yii::$app->user->identity->company_id]);
+        
+        return $query;
+    }
+    
     public function fields() {
         return [
             'module_name',

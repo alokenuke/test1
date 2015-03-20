@@ -80,6 +80,10 @@ class Company extends \yii\db\ActiveRecord
             },
             'membership_id',
             'company_status',
+            'expiry_status' => function() {
+                if(strtotime($this->expiry_date) < time())
+                    return true;
+            },
             'expiry_date' => function() {
                 if(strtotime($this->expiry_date))
                     return date("d M Y", strtotime($this->expiry_date));
@@ -91,10 +95,12 @@ class Company extends \yii\db\ActiveRecord
         return [
             'membership',
             'user' => function() {
-                $role = Roles::find()->where(['company_id' => $this->id, 'role_name' => 'Super Admin'])
-                                ->one()->id;
+                $roleObj = Roles::find()->where(['company_id' => $this->id, 'role_name' => 'Super Admin'])->one();
                 
-                return User::find()->where(['company_id' => $this->id])->andWhere(['role' => $role])->one();
+                if($roleObj) {
+                    $role = $roleObj->id;
+                    return User::find()->where(['company_id' => $this->id])->andWhere(['role' => $role])->one();
+                }
             },
             'stats' => function() {
                 $return = array();

@@ -77,7 +77,7 @@ class User extends ActiveRecord implements IdentityInterface
             ['company_id', 'default', 'value' => $company],
             ['created_date', 'default', 'value' => date("Y-m-d H:i:s")],
             ['role', 'in', 'range' => self::getRoleIds()],
-            [['rec_notification', 'password_reset_token', 'last_login', 'photo', 'contact_number', 'designation'], 'safe']
+            [["password", 'rec_notification', 'password_reset_token', 'last_login', 'photo', 'contact_number', 'designation'], 'safe']
         ];
     }
    
@@ -118,6 +118,8 @@ class User extends ActiveRecord implements IdentityInterface
             $this->company = Company::findOne($this->company_id);
             
             SendMails::send("newUserConfirmation", $this->email, "New User confirmation", $this);
+            
+            $this->save();
         }
         
         parent::afterSave($insert, $changedAttributes);

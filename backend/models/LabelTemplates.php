@@ -47,11 +47,12 @@ class LabelTemplates extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['template_name', 'company_id', 'print_type', 'logo', 'checked_labels'], 'required'],
+            [['template_name', 'company_id', 'print_type', 'logo', 'checked_labels', 'logo_position'], 'required'],
             [['company_id', 'page_width', 'page_height', 'logo_width', 'logo_height', 'font_size', 'top_margin', 'bottom_margin', 'right_margin', 'left_margin', 'num_label_horizontal', 'num_label_vertical', 'hor_label_spacing', 'ver_label_spacing'], 'integer'],
             [['cal_label_width', 'cal_label_height'], 'number'],
             //[['checked_labels'], 'string', 'max' => 512],
             [['template_name'], 'string', 'max' => 50],
+            [['additional_notes'], 'string', 'max' => 64],
             [['print_type', 'logo'], 'string', 'max' => 100],
             ['company_id', 'default', 'value' => \yii::$app->user->identity->company_id],
             ['created_by', 'default', 'value' => \yii::$app->user->identity->id],
@@ -111,12 +112,12 @@ class LabelTemplates extends \yii\db\ActiveRecord
             'id',
             'template_name',
             'print_type',
-            'logo',
             'company_id',
             'page_width',
             'page_height',
             'logo_width',
             'logo_height',
+            'logo_position',
             'font_size',
             'top_margin',
             'bottom_margin',
@@ -139,7 +140,8 @@ class LabelTemplates extends \yii\db\ActiveRecord
                     $fileManager = new FileManager();
                     return '/filemanager/getimage?type=&file='.$this->logo;
                 }
-            }
+            },
+            'additional_notes'
         ];
     }
 

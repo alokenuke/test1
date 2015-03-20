@@ -24,7 +24,7 @@ class LoginForm extends Model
     {
         return [
             // username and password are both required
-            [['username', 'password'], 'required'],
+            [['username', 'password', 'device'], 'required'],
             [['device', 'location'], 'safe'],
             // rememberMe must be a boolean value
             ['rememberMe', 'boolean'],
@@ -47,7 +47,11 @@ class LoginForm extends Model
             if (!$user || !$user->validatePassword($this->password)) {
                 $this->addError($attribute, 'Incorrect username or password.');
             }
-        }
+
+			
+            if ($this->device == 'webapp' && !$user || !$user->allow_be) {
+                $this->addError("password", 'You are not allowed to login through backend. Please contact your administrator.');
+            }        }
     }
 
     /**

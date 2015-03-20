@@ -94,7 +94,8 @@ class Tags extends \yii\db\ActiveRecord
             $randomData = uniqid(Yii::$app->security->generateRandomString(6), true);
         }
         
-        $return = substr(str_replace(".", "", $randomData), 0, $length);
+        $randomData = preg_replace('/[^A-Za-z0-9]/', '', $randomData); // Removes special chars.
+        $return = substr($randomData, 0, $length);
         return $return;
     }
     
@@ -181,6 +182,9 @@ class Tags extends \yii\db\ActiveRecord
             'itemObj' => function() {
                 $items = [];
                 $items[] = $this->itemDetails;
+                if(!$this->itemDetails)
+                    return ["Error in Fetching Items"];
+                
                 $parent = $this->itemDetails->parent_id;
                 
                 while($parentDetails = $this->getItemParentDetails($parent, ['id', 'item_name', 'parent_id'])) {

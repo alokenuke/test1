@@ -299,8 +299,8 @@ class ExportsController extends ApiController
 
             $phpExcel->addTableFooter();
             
-            $filename = "temp/ProjectReport-". date("d-m-Y_").\yii::$app->session->id.".xlsx";
-            $phpExcel->output($filename, false, 'S');
+            $filename = "temp/EmployeeLogs-". date("d-m-Y_").\yii::$app->session->id.".xlsx";
+            $phpExcel->output($filename, false, "S");
             return $filename;
         } else {
             throw new \yii\web\HttpException(404, 'Invalid Request');
@@ -347,9 +347,9 @@ class ExportsController extends ApiController
 
             $phpExcel->addTableFooter();
             
-            $filename = "temp/ProjectTemplate-". date("d-m-Y_").\yii::$app->session->id.".xlsx";
-            $phpExcel->output($filename, false, 'S');
-            return $filename;
+            $filename = "ProjectTemplate-". date("d-m-Y_").\yii::$app->session->id.".xlsx";
+            $phpExcel->output($filename);
+            //return $filename;
         } else {
             throw new \yii\web\HttpException(404, 'Invalid Request');
         }
@@ -358,7 +358,6 @@ class ExportsController extends ApiController
     public function actionDownloadUserTemplate() {
         if (!$_POST) {
             error_reporting(0);
-            $post = \Yii::$app->request->post();
             
             $phpExcel = new \backend\models\GenerateExcel();
             
@@ -387,9 +386,9 @@ class ExportsController extends ApiController
 
             $phpExcel->addTableFooter();
             
-            $filename = "temp/UserTemplate-". date("d-m-Y_").\yii::$app->session->id.".xlsx";
-            $phpExcel->output($filename, false, 'S');
-            return $filename;
+            $filename = "UserTemplate-". date("d-m-Y_").\yii::$app->session->id.".xlsx";
+            $phpExcel->output($filename);
+            //return $filename;
         } else {
             throw new \yii\web\HttpException(404, 'Invalid Request');
         }

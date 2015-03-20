@@ -42,7 +42,7 @@ class AppAsset extends AssetBundle
         'https://maps.googleapis.com/maps/api/js?v=3.exp'
     ];
     public $depends = [
-//        'yii\web\YiiAsset',
+        'yii\web\YiiAsset',
         'yii\web\JqueryAsset',
         'yii\bootstrap\BootstrapAsset',
         'backend\assets\AngularAsset',
@@ -56,7 +56,9 @@ class AppAsset extends AssetBundle
                 $this->js = [];
                 
                 $this->js[] = "js/services.js";
-                $this->js[] = "js/admin.js"; 
+                $this->js[] = "js/admin.js";
+                $this->js[] = 'js/html5shiv.js';
+                $this->js[] = 'js/respond.js';
             }
         }
                     

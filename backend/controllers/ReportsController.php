@@ -201,6 +201,9 @@ class ReportsController extends ApiController
             
             if(isset($post['select']))
                $query->select($post['select']);
+            
+            $query->joinWith("user");
+            $query->andWhere(['user.company_id' => \yii::$app->user->identity->company_id]);
 
             if(isset($post['search'])) {
                 foreach($post['search'] as $key => $val)
@@ -221,8 +224,11 @@ class ReportsController extends ApiController
                             }
                         }
                         else if($key=="employee_name") {
-                            $query->joinWith("user");
                             $query->andWhere("user.first_name LIKE :name OR user.last_name LIKE :name", ['name' => "%$val%"]);
+                        } else if($key=="username") {
+                            $query->andWhere("user.username LIKE :username", ['username' => "%$val%"]);
+                        }else if($key=="email") {
+                            $query->andWhere("user.email LIKE :email", ['email' => "%$val%"]);
                         }
                         else if(in_array($key, $this->partialMatchFields))
                             $query->andWhere(['like', $key, $val]);

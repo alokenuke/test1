@@ -223,9 +223,8 @@ class ReportsdownloadController extends Controller
         }
 
         $file_download = "temp/preview_template_".date("Ymd_His").".pdf";
-        $pdf->Output($file_download, "f");
+        $pdf->Output($fileManager, 'f');
         return $file_download;
-        exit();
     }
     
     public function actionPrintlabel()
