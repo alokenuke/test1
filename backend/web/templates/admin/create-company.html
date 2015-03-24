@@ -26,9 +26,13 @@
                     <div class="form-group">
                         <label class="col-sm-4 col-md-5 control-label">Membership :</label>
                         <div class="col-sm-8 col-md-7" ng-class="{ 'has-error': serverError.email}">
-                            <select class="form-control" ng-model="company.membership_id" ng-options="membership.id as membership.name for membership in memberships" ng-required="true" >
+                            <select class="form-control" ng-model="membership" ng-options="membership.name for membership in memberships track by membership.id" ng-required="true" ng-change="company.membership_id = membership.id" >
                                 <option value="">-- Select Membership--</option>
                             </select>
+                            <small ng-if="membership" style="color: {{membership.status?'#47A447':'#D2322D'}}">
+                                Status: {{(membership.status?"Active": "Not Active")}}<br />
+                                Projects: {{membership.limit_active_projects}}, Tags: {{membership.limit_tags}}, Users: {{membership.limit_users}}, Data: {{membership.limit_data}} MB, Items: {{membership.limit_items}}
+                            </small>
                             <div class="help-block help-block-error">{{serverError.membership_id}}</div>
                         </div>
                     </div>

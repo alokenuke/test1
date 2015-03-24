@@ -63,6 +63,11 @@ app.controller('RolesAdd', ['$scope', 'rest', '$location', '$route','$routeParam
             $scope.role['moduleactions'] = $scope.moduleactions;
             rest.postModel($scope.role).success(function(data) {
                 $location.path("/roles");
+            }).error(function(data) {
+                alertService.clearAll();
+                angular.forEach(data, function (v) {
+                    alertService.add("error", v['message']);
+                });
             });
         }
         
@@ -94,9 +99,11 @@ app.controller('RolesUpdate', ['$scope', 'rest', '$location', '$route','$routePa
                 alertService.clearAll();
                 alertService.add("success", "Role updated.");
                 $location.path('/roles').replace();
-            }).error(function(data) { 
+            }).error(function(data) {
                 alertService.clearAll();
-                alertService.add("error", "Validation Error");
+                angular.forEach(data, function (v) {
+                    alertService.add("error", v['message']);
+                });
             });
         }
         
@@ -118,55 +125,93 @@ app.controller('ManageLabelTemplates', function($scope, rest, $location, alertSe
     $scope.checked_labels = [
         {
             name: 'tag_type',
-            label: "Tag Type"
+            label: "Tag Type",
+            lineBreak: false,
+            showLabel: true,
         },
         {
             name: 'tag_name',
-            label: "Tag Name"
+            label: "Tag Name",
+            lineBreak: false,
+            showLabel: true,
+        },
+        {
+            name: 'uid',
+            label: "UID",
+            lineBreak: false,
+            showLabel: true,
+        },
+        {
+            name: 'product_code',
+            label: "Product Code",
+            lineBreak: false,
+            showLabel: true,
         },
         {
             name: 'company_name',
-            label: "Company Name"
+            label: "Company Name",
+            lineBreak: false,
+            showLabel: true,
         },
         {
             name: 'project_name',
-            label: "Project Name"
+            label: "Project Name",
+            lineBreak: false,
+            showLabel: true,
         },
         {
             name: "tag_item",
-            label: "Tag Items"
+            label: "Tag Items",
+            lineBreak: false,
+            showLabel: true,
         },
         {
             name: "client_name",
-            label: "Client Name"
+            label: "Client Name",
+            lineBreak: false,
+            showLabel: true,
         },
         {
             name: "project_address",
-            label: "Project Address"
+            label: "Project Address",
+            lineBreak: false,
+            showLabel: true,
         },
         {
             name: "process",
-            label: "Process"
+            label: "Process",
+            lineBreak: false,
+            showLabel: true,
         },
         {
             name: "client_location",
-            label: "Client Location"
+            label: "Client Location",
+            lineBreak: false,
+            showLabel: true,
         },
         {
             name: "project_location",
-            label: "Project Location"
+            label: "Project Location",
+            lineBreak: false,
+            showLabel: true,
         },
         {
             name: "main_contractor",
-            label: "Main Contractor"
+            label: "Main Contractor",
+            lineBreak: false,
+            showLabel: true,
         },
         {
             name: "project_level",
-            label: "Project Level"
+            label: "Project Level",
+            lineBreak: false,
+            showLabel: true,
         },
         {
             name: "tag_description",
-            label: "Tag Description"
+            label: "Tag Description",
+            lineBreak: false,
+            showLabel: true,
         }
     ];
         
@@ -279,6 +324,7 @@ app.controller('ManageLabelTemplates', function($scope, rest, $location, alertSe
     }
     
     $scope.saveTemplate = function($e) {
+        
         alertService.clearAll();
         if($scope.returnAction==false)
             $e.preventDefault();

@@ -391,7 +391,7 @@ appServices.directive('ckEditor', function() {
                 
                 var $logoWidth = template.logo_width * (previewWidth / template.cal_label_width);
                 
-                var $logoBox = "<div id='logoContainer' style='text-align:center;'>UID: 4sOMQ95506<br /><img src='"+$imageUrl+"' style='width: "+$logoWidth+"px;' /></div>";
+                var $logoBox = "<div id='logoContainer' style='text-align:center;'>UID: 4SOMQ95506<br /><img src='"+$imageUrl+"' style='width: "+$logoWidth+"px;' /><br />http://sitetrack-nfc.com</div>";
                 
                 var labelInfo = "";
                 angular.forEach(template.checked_labels, function(val) {
@@ -399,7 +399,17 @@ appServices.directive('ckEditor', function() {
                         var tempLabel = "";
                         if(val.showLabel)
                             tempLabel = '<strong>'+val.label+'</strong> : ';
-                        labelInfo += '<div>'+tempLabel+'Test '+val.label+'</div>';
+                        
+                        if(val.name == 'tag_type')
+                            labelInfo += '<span>'+tempLabel+'mT</span>';
+                        else if(val.name == 'uid')
+                            labelInfo += '<span>'+tempLabel+'4SOMQ95506</span>';
+                        else
+                            labelInfo += '<span>'+tempLabel+'Test '+val.label+'</span>';
+                        if(val.lineBreak)
+                            labelInfo += '<br />';
+                        else
+                            labelInfo += ' | ';
                     }
                 });
                 

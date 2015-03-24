@@ -457,12 +457,15 @@ app.factory('authHttpResponseInterceptor',['$q','$location', '$window',function(
             if (response.status === 401) {
                 $location.path('/login').replace();
             }
-
+            
             return response || $q.when(response);
         },
         responseError: function(rejection) {
             if (rejection.status === 401) {
                 $location.path('/login').replace();
+            }
+            else if (rejection.status === 404) {
+                $location.path('/error').replace();
             }
             return $q.reject(rejection);
         },

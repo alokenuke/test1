@@ -133,7 +133,7 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
 app.controller('SiteIndex', ['$scope', 'rest', 'breadcrumbsService', '$http', "$location", function ($scope, rest, breadcrumbsService, $http, $location) {
         
     breadcrumbsService.clearAll();
-    breadcrumbsService.setTitle("Site Track - Dashboard");
+    breadcrumbsService.setTitle("SiteTrack - Owner Admin - Dashboard");    
     breadcrumbsService.headTitle(" ");
     
     if($location.$$path!='/login') {
@@ -154,7 +154,8 @@ app.controller('ChangePassword', ['$scope', 'rest', 'breadcrumbsService', '$http
     rest.path = "site";
     
     breadcrumbsService.clearAll();
-    breadcrumbsService.setTitle("Change Password");
+    breadcrumbsService.setTitle("SiteTrack - Owner Admin - Change Password");
+    breadcrumbsService.headTitle("Change Password");
     breadcrumbsService.add("/#/", "Home");
     breadcrumbsService.add("/#/change-password", "Settings - Change Password");
     
@@ -233,7 +234,8 @@ app.controller('UserIndex', ['$scope', 'rest', '$location', '$route','$routePara
         rest.path = "users";
         
         breadcrumbsService.clearAll();
-        breadcrumbsService.setTitle("Manage Users");
+        breadcrumbsService.setTitle("SiteTrack - Owner Admin - Manage Users");
+        breadcrumbsService.headTitle("Manage Users");
         breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/users", "Manage - Users");
         
@@ -313,7 +315,8 @@ app.controller('UserCreate',
         $scope.user = {};
         
         breadcrumbsService.clearAll();
-        breadcrumbsService.setTitle("Create User");
+        breadcrumbsService.setTitle("SiteTrack - Owner Admin - Create User");
+        breadcrumbsService.headTitle("Create User");
         breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/site-users", "Manage Users");
         breadcrumbsService.add("/#/create-user", "Create User");
@@ -364,7 +367,8 @@ app.controller('Companies', ['$scope', 'rest', '$location', '$route','$routePara
         rest.path = "company";
         
         breadcrumbsService.clearAll();
-        breadcrumbsService.setTitle("Manage Companies");
+        breadcrumbsService.setTitle("SiteTrack - Owner Admin - Manage Companies");
+        breadcrumbsService.headTitle("Manage Companies");
         breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/companies", "Manage - Companies");
         
@@ -427,7 +431,7 @@ app.controller('Companies', ['$scope', 'rest', '$location', '$route','$routePara
             }).error(errorCallback);
         }
         
-        rest.setData("membership/getall", ['id', 'name'], {'project_status': null}).success(function (data) {
+        rest.setData("membership/getall", [], {'project_status': null}).success(function (data) {
             $scope.memberships = data.items;
         });
         
@@ -439,20 +443,13 @@ app.controller('CreateCompany', ['$scope', 'rest', '$location', '$route','$route
         rest.path = "company";
         
         breadcrumbsService.clearAll();
-        breadcrumbsService.setTitle("Manage Companies");
+        breadcrumbsService.setTitle("SiteTrack - Owner Admin - Manage Companies");
+        breadcrumbsService.headTitle("Manage Companies");
         breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/create-company", "Create - Company");
         
         $scope.serverError = {};
         $scope.company = {};
-
-        if ($routeParams.id) {
-            $http.get("company/"+$routeParams.id+"?expand=user").success(function (data) {
-                $scope.company = data;
-                $scope.user = data.user;
-            });
-        }
-        
         
         $scope.datepickers = {fromDate: false,toDate: false}
         $scope.openCalendar = function($event, which) {
@@ -530,6 +527,14 @@ app.controller('CreateCompany', ['$scope', 'rest', '$location', '$route','$route
             $scope.memberships = data.items;
         });
         
+        if ($routeParams.id) {
+            $http.get("company/"+$routeParams.id+"?expand=user,membership").success(function (data) {
+                $scope.company = data;
+                $scope.membership = data.membership;
+                $scope.user = data.user;
+            });
+        }
+        
     }])
 
 app.controller('RolesIndex', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService','page_dropdown',
@@ -538,7 +543,8 @@ app.controller('RolesIndex', ['$scope', 'rest', '$location', '$route','$routePar
         rest.path = "roles";
         $scope.page_dropdown = page_dropdown;
         breadcrumbsService.clearAll();
-        breadcrumbsService.setTitle("Manage Roles");
+        breadcrumbsService.setTitle("SiteTrack - Owner Admin - Manage Roles");
+        breadcrumbsService.headTitle("Manage Roles");
         breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/sites-roles", "Roles manage");
         
@@ -593,7 +599,8 @@ app.controller('RolesAdd', ['$scope', 'rest', '$location', '$route','$routeParam
         rest.path = "roles";
         $scope.page_dropdown = page_dropdown;
         breadcrumbsService.clearAll();
-        breadcrumbsService.setTitle("Create New Role");
+        breadcrumbsService.setTitle("SiteTrack - Owner Admin - Create New Role");
+        breadcrumbsService.headTitle("Create New Role");
         breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/sites-roles", "Roles");
         breadcrumbsService.add("/#/add-role", "Create New Role");
@@ -620,7 +627,8 @@ app.controller('RolesUpdate', ['$scope', 'rest', '$location', '$route','$routePa
         rest.path = "roles";
         $scope.page_dropdown = page_dropdown;
         breadcrumbsService.clearAll();
-        breadcrumbsService.setTitle("Update Role");
+        breadcrumbsService.setTitle("SiteTrack - Owner Admin - Update Role");
+        breadcrumbsService.headTitle("Update Role");
         breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/roles/update/"+$routeParams.id, "Update Role");
         $scope.moduleactions = {};
@@ -656,7 +664,8 @@ app.controller('MembershipIndex', ['$scope', 'rest', '$location', '$route','$rou
         rest.path = "membership";
         $scope.page_dropdown = page_dropdown;
         breadcrumbsService.clearAll();
-        breadcrumbsService.setTitle("Manage Membership");
+        breadcrumbsService.setTitle("SiteTrack - Owner Admin - Manage Membership");
+        breadcrumbsService.headTitle("Manage Membership");
         breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/sites-membership", "Manage Membership");
         
@@ -701,7 +710,8 @@ app.controller('MembershipAdd', ['$scope', 'rest', '$location', '$route','$route
         rest.path = "membership";
         $scope.page_dropdown = page_dropdown;
         breadcrumbsService.clearAll();
-        breadcrumbsService.setTitle("Create New Membership");
+        breadcrumbsService.setTitle("SiteTrack - Owner Admin - Membership");
+        breadcrumbsService.headTitle("Create / Update Membership");
         breadcrumbsService.add("/#/", "Home");
         breadcrumbsService.add("/#/sites-membership", "Membership");
         breadcrumbsService.add("/#/add-membership", "Create New Membership");

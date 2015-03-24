@@ -553,13 +553,13 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
                 if(level==2)
                     $scope.tagDetails['tag_process_flow_id'] = parent;
                 
-                if($scope.search['item'] && $scope.search.item[1]) {
+                if(level < 2) {
                     $scope[variable].splice(level, ($scope[variable].length-level));
                     
                     if(typeof $scope.search.process != 'undefined')
                         $scope.search.process.splice(level, $scope.search.process.length-level);
                     
-                    if(level == 2) {
+                    if($scope.search.item[1] && level != 1) {
                         rest.setData("items/getrelatedprocess/"+$scope.search.item[1].id+"?expand=checkProcessError", ['id', 'process_name'], {'process_parent_id': parent}).success(function(data) {
                             if(data.items.length>0) {
                                 $scope[variable].push(data.items);
@@ -570,7 +570,7 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
                             }
                         });
                     }
-                    else if(level>1) {
+                    else if(level==1) {
                         rest.setData("tagprocess/getall?expand=checkProcessError", ['id', 'process_name'], {'parent_id': parent}).success(function(data) {
                             $scope.process_stages = data.items;
                         });
@@ -2257,16 +2257,21 @@ app.controller('SelectTagsPopup', function ($scope, $modalInstance, $http, items
     $http.get("tags/"+itemScope+"?expand=tagActivityLog").success(function(data) {
         $scope.tagDetails = data;
         $scope.select.uid = data.uid;
+        
+        if($scope.tagDetails.tagActivityLog) {
         if($scope.tagDetails.tagActivityLog.stageInfo.option_type==3)
             $scope.select.process_stage_answer = parseInt($scope.tagDetails.tagActivityLog.answer);
         else if($scope.tagDetails.tagActivityLog.stageInfo.option_type==5)
             $scope.select.process_stage_answer = $scope.tagDetails.tagActivityLog.answer;
         else
             $scope.select.process_stage_answer = $scope.tagDetails.tagActivityLog.answer.id;
+        }
         
         $http.post("tags/getstages", {'uid': data.uid}).success(function(data) {
-            if(!data)
+            if(!data) {
+                $scope.process = [];
                 return;
+            }
             if(typeof data.items == 'undefined') {
                 $scope.process = [];
                 $scope.process.push(data);
