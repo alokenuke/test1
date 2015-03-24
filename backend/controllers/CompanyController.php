@@ -121,8 +121,7 @@ class CompanyController extends ApiController
         
         return parent::actionGetall();
     }
-    
-    
+       
     public function actionSavecompany() {
         
         $data = \Yii::$app->request->post();
@@ -153,11 +152,12 @@ class CompanyController extends ApiController
         
         if($company->save()){
            if (isset($data['company']['id']) && $data['company']['id'] > 0) {
-                $role = \backend\models\Roles::findOne(['company_id' => $data['company']['id']]);
+                $role = \backend\models\Roles::findOne(['company_id' => $data['company']['id'], 'isAdmin' => 1]);
             } else { 
                 $role = new \backend\models\Roles();
                 $role->role_name = 'Super Admin';
                 $role->type = 'Client';
+                $role->isAdmin = 1;
                 $role->company_id = $company->id;
                 $role->status = 1;
                 $role->created_date = date('Y-m-d');

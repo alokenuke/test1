@@ -35,8 +35,22 @@ class Membership extends \yii\db\ActiveRecord
         return [
             [['name', 'limit_data', 'limit_items', 'status'], 'required'],
             [['limit_active_projects', 'limit_tags', 'limit_users', 'limit_data', 'limit_items', 'status'], 'integer'],
+            ['name', 'unique'],
             [['modified_date'], 'safe'],
             [['name'], 'string', 'max' => 128]
+        ];
+    }
+    
+    public function fields() {
+        return [
+            'id',
+            'name',
+            'limit_active_projects',
+            'limit_tags',
+            'limit_users',
+            'limit_data',
+            'limit_items',
+            'status'
         ];
     }
 

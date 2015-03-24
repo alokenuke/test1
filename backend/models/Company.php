@@ -79,6 +79,7 @@ class Company extends \yii\db\ActiveRecord
                     return "filemanager/getimage?company=".$this->id."&type=&file=".$this->company_logo;
             },
             'membership_id',
+            'membership',
             'company_status',
             'expiry_status' => function() {
                 if(strtotime($this->expiry_date) < time())

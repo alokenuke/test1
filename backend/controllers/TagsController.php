@@ -42,9 +42,7 @@ class TagsController extends ApiController
                 
                 $_GET['expand'] = "childOptions";
                 
-                $admin = false;
-                
-                if(!$params['flagHierarchy'] || $admin) {
+                if(!$params['flagHierarchy'] || \Yii::$app->user->identity->role_details->isAdmin) {
                     $query = \backend\models\TagProcess::find()->andWhere(['parent_id' => $tagProcessFlow->id])->orderBy("position");
                     
                     $provider = new ActiveDataProvider ([

@@ -47,6 +47,7 @@ class Roles extends \yii\db\ActiveRecord
     {
         return [
             [['role_name', 'type','status'], 'required'],
+            [['role_name'], 'unique', 'targetAttribute' => ['company_id', 'role_name'], 'message' => "You already have created this role!"],
             [['created_date', 'modified_date'], 'safe'],
             ['company_id', 'default', 'value' => \yii::$app->user->identity->company_id],
             ['created_date', 'default', 'value' => date("Y-m-d")],
@@ -59,6 +60,9 @@ class Roles extends \yii\db\ActiveRecord
         $query = parent::find()->andWhere(['<>', 'status', '2']);
         if(isset(\yii::$app->user->id) && \yii::$app->user->identity->company_id > 0)
             $query = $query->where(['company_id' => \yii::$app->user->identity->company_id]);
+        
+        if(Yii::$app->requestedRoute == "roles/update" || Yii::$app->requestedRoute == "roles/view")
+            $query = $query->andWhere(["<>", 'isAdmin', 1]);
         
         return $query;
     }

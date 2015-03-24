@@ -5,7 +5,6 @@ namespace backend\controllers;
 use yii\filters\auth\QueryParamAuth;
 use yii\rest\ActiveController;
 use yii\data\ActiveDataProvider;
-use kartik\mpdf\Pdf;
 /**
  * Class TagsController
  * @package rest\versions\v1\controllers

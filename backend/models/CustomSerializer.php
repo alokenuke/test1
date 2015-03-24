@@ -2,6 +2,8 @@
 
 namespace backend\models;
 
+error_reporting(0);
+
 use yii\rest\Serializer;
 
 use yii\base\Component;

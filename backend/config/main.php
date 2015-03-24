@@ -16,7 +16,15 @@ return [
     'components' => [
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
-             'useFileTransport'=>false
+            'useFileTransport'=>false,
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.gmail.com',
+                'username' => 'alok.thakur@enukesoftware.com',
+                'password' => 'jugalkishor',
+                'port' => '587',
+                'encryption' => 'tls',
+            ],
          ],
         'response' => [
             'class' => 'yii\web\Response',

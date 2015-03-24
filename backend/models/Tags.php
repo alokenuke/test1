@@ -94,7 +94,7 @@ class Tags extends \yii\db\ActiveRecord
             $randomData = uniqid(Yii::$app->security->generateRandomString(6), true);
         }
         
-        $randomData = preg_replace('/[^A-Za-z0-9]/', '', $randomData); // Removes special chars.
+        $randomData = preg_replace('/[^A-Z0-9]/', '', $randomData); // Removes special chars.
         $return = substr($randomData, 0, $length);
         return $return;
     }

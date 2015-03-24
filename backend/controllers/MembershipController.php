@@ -68,7 +68,7 @@ class MembershipController extends ApiController
     
     public function actionGetall() {
         if(!isset($post['sort']))
-            $_GET['sort'] = "name";
+            $_GET['sort'] = "-status";
         return parent::actionGetall();
     }
     

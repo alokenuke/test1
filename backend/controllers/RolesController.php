@@ -42,7 +42,7 @@ class RolesController extends ApiController
             
             try {
                 $provider = new ActiveDataProvider ([
-                    'query' => $query->andWhere(['company_id' => \yii::$app->user->identity->company_id]),
+                    'query' => $query->andWhere(['company_id' => \yii::$app->user->identity->company_id])->andWhere(["isAdmin" => 0]),
                     'pagination'=>array(
                         'pageSize'=>$pageLimit
                     ),
