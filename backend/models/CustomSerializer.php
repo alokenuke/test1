@@ -1,7 +1,7 @@
 <?php
 
 namespace backend\models;
-
+error_reporting(0);
 error_reporting(0);
 
 use yii\rest\Serializer;
@@ -28,7 +28,7 @@ class CustomSerializer extends Serializer {
      */
     
     public function serialize($data)
-    {
+    { // echo 'In serialize'; exit;
         $identity = json_decode(\Yii::$app->getRequest()->getCookies()->getValue('_identity'));
         
         $token = "";
@@ -42,13 +42,13 @@ class CustomSerializer extends Serializer {
         if($this->tokenDetails->request_from == 'webapp')
             return parent::serialize ($data);
         
-        if ($data instanceof Model && $data->hasErrors()) {
+        if ($data instanceof Model && $data->hasErrors()) {   
             return $this->serializeModelErrors($data);
-        } elseif ($data instanceof Arrayable) {
+        } elseif ($data instanceof Arrayable) {  
             return $this->serializeModel($data);
-        } elseif ($data instanceof DataProviderInterface) {
+        } elseif ($data instanceof DataProviderInterface) {  //  echo '2 ELSE IF'; exit;
             return $this->serializeDataProvider($data);
-        } else {
+        } else {   echo 'ELSE'; exit;
             if ($data instanceof Model) {
                 $model=$data;
                 list ($fields, $expand) = $this->getRequestedFields();
@@ -61,7 +61,7 @@ class CustomSerializer extends Serializer {
     }
     
     protected function serializeModel($model)
-    {
+    { echo 'in serializeModel'; exit;
         if($this->tokenDetails->request_from == 'webapp')
             return parent::serializeModel($model);
         
@@ -98,25 +98,33 @@ class CustomSerializer extends Serializer {
     }
     
     protected function serializeDataProvider($dataProvider)
-    {
-        if($this->tokenDetails->request_from == 'webapp')
+    {  // echo 'in serializeDataProvider'; exit;
+        if($this->tokenDetails->request_from == 'webapp')  //  echo 'webapp'; exit;
             return parent::serializeDataProvider($dataProvider);
         
         $models = $this->serializeModels($dataProvider->getModels());
-
+        
         if (($pagination = $dataProvider->getPagination()) !== false) {
             $this->addPaginationHeaders($pagination);
         }
                 
-        if ($this->request->getIsHead()) {
+        if ($this->request->getIsHead()) {   
             return null;
-        } elseif ($this->collectionEnvelope === null) {
+        } elseif ($this->collectionEnvelope === null) {    
             return $models;
-        } else {
-            if ($pagination !== false) {
+        } else {  //  echo 'In SDP ELSE'; exit;   
+            //echo json_encode($models); exit;
+            if ($pagination !== false) { //echo $this->tokenDetails->request_from; exit;
+                if($this->tokenDetails->request_from != 'webapp'){ //echo 'mobile'; exit;
+                    $models=  array_slice($models, 0, 5);
+                $result = [
+                    $this->collectionEnvelope =>$models,
+                ];
+                } else {
                 $result = [
                     $this->collectionEnvelope => array_merge($models, $this->serializePagination($pagination)),
                 ];
+                }
             } 
             else
             {
