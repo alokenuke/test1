@@ -2,8 +2,6 @@
 
 namespace backend\models;
 error_reporting(0);
-error_reporting(0);
-
 use yii\rest\Serializer;
 
 use yii\base\Component;
@@ -46,9 +44,9 @@ class CustomSerializer extends Serializer {
             return $this->serializeModelErrors($data);
         } elseif ($data instanceof Arrayable) {  
             return $this->serializeModel($data);
-        } elseif ($data instanceof DataProviderInterface) {  //  echo '2 ELSE IF'; exit;
+        } elseif ($data instanceof DataProviderInterface) {  
             return $this->serializeDataProvider($data);
-        } else {   echo 'ELSE'; exit;
+        } else {   
             if ($data instanceof Model) {
                 $model=$data;
                 list ($fields, $expand) = $this->getRequestedFields();
@@ -112,7 +110,7 @@ class CustomSerializer extends Serializer {
             return null;
         } elseif ($this->collectionEnvelope === null) {    
             return $models;
-        } else {  //  echo 'In SDP ELSE'; exit;   
+        } else { 
             //echo json_encode($models); exit;
             if ($pagination !== false) { //echo $this->tokenDetails->request_from; exit;
                 if($this->tokenDetails->request_from != 'webapp'){ //echo 'mobile'; exit;
