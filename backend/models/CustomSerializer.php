@@ -2,6 +2,8 @@
 
 namespace backend\models;
 error_reporting(0);
+
+
 use yii\rest\Serializer;
 
 use yii\base\Component;
@@ -26,7 +28,7 @@ class CustomSerializer extends Serializer {
      */
     
     public function serialize($data)
-    { // echo 'In serialize'; exit;
+    { 
         $identity = json_decode(\Yii::$app->getRequest()->getCookies()->getValue('_identity'));
         
         $token = "";
@@ -59,7 +61,7 @@ class CustomSerializer extends Serializer {
     }
     
     protected function serializeModel($model)
-    { echo 'in serializeModel'; exit;
+    { 
         if($this->tokenDetails->request_from == 'webapp')
             return parent::serializeModel($model);
         
@@ -96,8 +98,8 @@ class CustomSerializer extends Serializer {
     }
     
     protected function serializeDataProvider($dataProvider)
-    {  // echo 'in serializeDataProvider'; exit;
-        if($this->tokenDetails->request_from == 'webapp')  //  echo 'webapp'; exit;
+    {  
+        if($this->tokenDetails->request_from == 'webapp')  
             return parent::serializeDataProvider($dataProvider);
         
         $models = $this->serializeModels($dataProvider->getModels());
@@ -110,10 +112,10 @@ class CustomSerializer extends Serializer {
             return null;
         } elseif ($this->collectionEnvelope === null) {    
             return $models;
-        } else { 
-            //echo json_encode($models); exit;
-            if ($pagination !== false) { //echo $this->tokenDetails->request_from; exit;
-                if($this->tokenDetails->request_from != 'webapp'){ //echo 'mobile'; exit;
+        } else {    
+            
+            if ($pagination !== false) { 
+                if($this->tokenDetails->request_from != 'webapp'){ 
                     $models=  array_slice($models, 0, 5);
                 $result = [
                     $this->collectionEnvelope =>$models,
