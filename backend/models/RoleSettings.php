@@ -52,4 +52,9 @@ class RoleSettings extends \yii\db\ActiveRecord
             'update_date' => 'Update Date',
         ];
     }
+    
+    public function getRoles()
+    {
+        return $this->hasOne(Roles::className(), ['id' => 'role_id']);
+    }
 }

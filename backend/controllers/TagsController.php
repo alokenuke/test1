@@ -20,6 +20,24 @@ class TagsController extends ApiController
         parent::init();
     }
     
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        
+        $behaviors['access'] = [
+                'class' => \backend\models\RoleAccess::className(),
+                'rules' => [
+                    [
+                        'actions' => ['search', 'getstages', 'get-tag', 'getall', 'get-last-tag', 'create-simple-tags', 'updatesimpletags', 'create-master-tags', 'updatemastertags', 'index', 'create', 'update', 'view', 'delete'],
+                        'allow' => true,
+                        'roles' => ['Client'],
+                    ]
+                ]
+        ];
+        
+        return $behaviors;
+    }
+    
     public function actionGetstages() {
         if (!$_POST) {
             try {

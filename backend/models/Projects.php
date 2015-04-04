@@ -163,7 +163,7 @@ class Projects extends \yii\db\ActiveRecord
                 $return['sublevels']['count'] = ProjectLevel::find()->andWhere(['parent_id' => ProjectLevel::find()->select("project_level.id")->andWhere(['parent_id' => 0, 'project_id' => $this->id])])->count();
                 
                 $return['item']['count'] = Items::find()->andWhere(['parent_id' => '0', 'project_id' => $this->id])->count();
-                $return['subitem']['count'] = Items::find()->andWhere(['parent_id' => Items::find()->select("id")->andWhere(['parent_id' => '0', 'project_id' => $this->id]), 'project_id' => $this->id])->count();
+                $return['subitem']['count'] = Items::find()->andWhere(['parent_id' => \yii\helpers\ArrayHelper::getColumn(Items::find()->select("id")->andWhere(['parent_id' => '0', 'project_id' => $this->id])->all(), "id")])->count();
                 
                 $return['usergroups']['count'] = UserGroups::find()->andWhere(['project_id' => $this->id])->count();
                 $return['users']['count'] = RelUserLevelsUsers::find()->andWhere(['user_group_id' => UserGroups::find()->select("user_groups.id")->andWhere(['project_id' => $this->id])])->count();

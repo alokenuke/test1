@@ -193,7 +193,8 @@ class User extends ActiveRecord implements IdentityInterface
     //default scope to check company_id
     public static function find()
     {
-        if(!\yii::$app->requestedRoute=='user/create' && !\yii::$app->requestedRoute=='users/multiinsert') {
+        
+        if(\yii::$app->requestedRoute!='user/create' && \yii::$app->requestedRoute!='users/multiinsert' && \yii::$app->requestedRoute != "company/savecompany") {
             if(isset(\yii::$app->user->identity) && \yii::$app->user->identity->company_id > 0)
                 return parent::find()->where(['user.company_id' => \yii::$app->user->identity->company_id])->andWhere(['<>', 'user.status', self::STATUS_DELETED]);
             else

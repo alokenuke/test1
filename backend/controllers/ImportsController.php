@@ -11,6 +11,24 @@ use yii\data\ActiveDataProvider;
 class ImportsController extends ApiController
 {
     
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        
+        $behaviors['access'] = [
+                'class' => \backend\models\RoleAccess::className(),
+                'rules' => [
+                    [
+                        'actions' => ['employee-logs', 'import-projects', 'users'],
+                        'allow' => true,
+                        'roles' => ['Client'],
+                    ]
+                ]
+        ];
+        
+        return $behaviors;
+    }
+    
     public function actionEmployeeLogs() {
         if (!$_POST) {
             

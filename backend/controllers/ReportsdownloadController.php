@@ -3,20 +3,43 @@
 namespace backend\controllers;
 
 use Yii;
-use yii\filters\AccessControl;
-use yii\web\Controller;
-use backend\models\customPDF\printLabel;
+use mPDF;
+use yii\filters\auth\QueryParamAuth;
+use yii\rest\ActiveController;
 use yii\data\ActiveDataProvider;
+use yii\filters\AccessControl;
 
-class ReportsdownloadController extends Controller
+class ReportsdownloadController extends ApiController
 {
     
     public $enableCsrfValidation = false;
+    
+    public function init() {
+        
+        parent::init();
+        
+    }
+    
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        
+        $behaviors['access'] = [
+                'class' => \backend\models\RoleAccess::className(),
+                'rules' => [
+                    [
+                        'actions' => ['previewtemplate', 'printlabel', 'printtimeattendancelabel', 'print-tag-report', 'print-tag-reports'],
+                        'allow' => true,
+                        'roles' => ['Client'],
+                    ],
+                ]
+        ];
+        
+        return $behaviors;
+    }
         
     public function actionPreviewtemplate()
     {
-        
-        //error_reporting(0);
         $template_param = \Yii::$app->request->post();
         $checkedLabels = $template_param['checked_labels'];
      
@@ -32,9 +55,10 @@ class ReportsdownloadController extends Controller
         $data['vSpace'] = isset($template_param['ver_label_spacing']) ? (int) $template_param['ver_label_spacing'] : 5;
         $data['pageWidth'] = isset($template_param['page_width']) ? (int) $template_param['page_width'] : 216;
         $data['pageHeight'] = isset($template_param['page_height']) ? (int) $template_param['page_height'] : 279;
-        $data['logo_width'] = isset($template_param['logo_width']) ? (int) $template_param['logo_width'] : 15;
+        $data['logo_width'] = isset($template_param['logo_width']) ? $template_param['logo_width'] : 15;
+        $data['logo_height'] = isset($template_param['logo_height']) ? $template_param['logo_height'] : 15;
         $data['type'] = isset($template_param['print_type']) ? $template_param['print_type'] : 'qr';
-        $data['font_size'] = isset($template_param['font_size']) ? (int) $template_param['font_size'] : 5;
+        $data['font_size'] = (isset($template_param['font_size']) ? (int) $template_param['font_size'] : 5) * 0.75;
         $data['logo_height'] = isset($template_param['logo_height']) ? (int) $template_param['logo_height'] : 5;
         
         $data['logo_position'] = isset($template_param['logo_position']) ? $template_param['logo_position'] : 'topLeft';
@@ -45,6 +69,22 @@ class ReportsdownloadController extends Controller
 
         elseif (!empty($template_param['old_logo_file']))
             $data['logo'] = isset($template_param['old_logo_file']) ? $template_param['old_logo_file'] : '';
+        
+        $pdf = new mPDF('', array($data['pageWidth'], $data['pageHeight']));
+        
+        $pdf->SetAutoPageBreak(false);
+        $pdf->HREF = '';
+        $pdf->SetDefaultFont('Arial', 'B', 8);
+        $pdf->SetDefaultFontSize(8);
+        $pdf->SetLeftMargin($data['leftMargin']);
+        $pdf->SetRightMargin($data['rightMargin']);
+        $pdf->SetTopMargin($data['topMargin']);
+        $pdf->DeflMargin = $data['leftMargin'];
+        $pdf->DefrMargin = $data['leftMargin'];
+        $pdf->setAutoTopMargin = $pdf->setAutoBottomMargin = false;
+        
+        $labelW = $this->calculatedLabelW($data);
+        $labelH = $this->calculatedLabelH($data);
         
         $codeImage = "";
         if($data['type']=='qr')
@@ -79,16 +119,46 @@ class ReportsdownloadController extends Controller
                 if($label['lineBreak'])
                     $labelInfo .= '<br />';
                 else
-                    $labelInfo .= ' | ';
+                    $labelInfo .= ' <strong>|</strong> ';
             }
         }
         
         if($data['additional_notes'])
-            $labelInfo .= '<div><strong>Note</strong> : '.$data['additional_notes'].'</div>';
+            $labelInfo .= '<div><strong>Note : '.$data['additional_notes'].'</strong></div>';
         
-        $infoBox = "<div style='float:left;margin-left: 10px;min-width: 300px;font-size: ".$data['font_size']."px;'>".$labelInfo."</div>";
+        $infoBox = "<div style='margin-left: 2mm;float:left;min-width: 40mm;font-size: ".$data['font_size']."px;'>".$labelInfo."</div>";
         
-        $logoBox = "<div id='logoContainer' style='float:left;text-align:center;'>UID: 4SOMQ95506<br /><img src='".$codeImage."' style='width: ".$data['logo_width']."mm;' /><br />http://sitetrack-nfc.com</div>";
+        $logoStyle = "";
+        
+        if($data['logo_position']=='topLeft') {
+            $logoStyle = "float:left;width: ".$data['logo_width']."mm;";
+        }
+        else if($data['logo_position']=='topRight') {
+            $logoStyle = "float:right;width: ".$data['logo_width']."mm;";
+        }
+        else if($data['logo_position']=='topMiddle') {
+            $logoStyle = "width:100%;";
+        }
+        else if($data['logo_position']=='bottomLeft') {
+            $logoStyle = "clear:left;float:left;vertical-align:bottom;width: ".$data['logo_width']."mm;";
+        }
+        else if($data['logo_position']=='bottomRight') {
+            $logoStyle = "clear:left;float:right;vertical-align:bottom;width: ".$data['logo_width']."mm;";
+        }
+        else if($data['logo_position']=='bottomMiddle') {
+            $logoStyle = "clear:left;width: 100%;vertical-align:bottom;";
+        }
+        else if($data['logo_position']=='leftMiddle') {
+            $imageInfo = getimagesize($codeImage);
+            $height = $data['logo_width']*$imageInfo[1]/$imageInfo[0];
+            $logoStyle = "float:left;padding-top:".(($labelH - $height-7 )/2)."mm;width: ".$data['logo_width']."mm;";
+        }
+        else if($data['logo_position']=='rightMiddle') {
+            $height = $data['logo_width']*$imageInfo[1]/$imageInfo[0];
+            $logoStyle = "float:right;padding-top:".(($labelH - $height-7 )/2)."mm;width: ".$data['logo_width']."mm;";
+        }
+        
+        $logoBox = "<div id='logoContainer' style='".$logoStyle."text-align:center;max-height: 10mm;overflow;hidden;position:absolute;'>UID: 4SOMQ95506<br /><img src='".$codeImage."' style='width: ".$data['logo_width']."mm;height: ".$data['logo_height']."mm;' /><br />http://sitetrack-nfc.com</div>";
         
         $labelHtml = "";
         
@@ -99,29 +169,24 @@ class ReportsdownloadController extends Controller
             $labelHtml = $logoBox.$infoBox;
         }
         
-        $pdf = new \mPDF('', array($data['pageWidth'], $data['pageHeight']));
-        
-        $pdf->SetAutoPageBreak(false);
-        $pdf->HREF = '';
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->SetLeftMargin($data['leftMargin']);
-        $pdf->SetRightMargin($data['rightMargin']);
-        $pdf->SetTopMargin($data['topMargin']);
-        
-        $labelW = $this->calculatedLabelW($data);
-        $labelH = $this->calculatedLabelH($data);
-        
-        $content = "<div style='width: 100%;'>";
+        $content = "<div style='margin-left: 0;width: 100%;'>";
 
         for ($vindex = 0; $vindex < $data['numberVertical']; $vindex++) {
-            $content .= "<div style='height: ".$labelH."mm;overflow: hiddent;'>";
+            $marginTop = 0;
+                if($vindex)
+                    $marginTop = $data['vSpace'] / 2;
+            $content .= "<div class='testClass' style='margin-top: ".$marginTop."mm;clear:both;'>";
+            
             for ($hindex = 0; $hindex < $data['numberHorizontal']; $hindex++) {
-                $content .= "<div style='float:left;width: ".$labelW."mm;height: ".$labelH."mm;overflow: hiddent;background: #fff url(images/labelLogo.png) no-repeat right bottom;padding: 5px;'>".$labelHtml;
+                $marginLeft = 0;
+                if($hindex)
+                    $marginLeft = $data['hSpace'] / 2;
+                $content .= "<div style='margin-left: ".$marginLeft."mm;padding: 5px;border: 1px solid #ccc;float:left;width: ".($labelW-3)."mm;background: url(images/labelLogo.png) no-repeat right bottom;padding: 5px;'>".$labelHtml."</div>";
             }
             $content .= "</div>";
         }
         $content .= "<div>";
-        
+                
         $pdf->WriteHTML($content);
         
         $file_download = "temp/preview_template_".date("Ymd_His").".pdf";
@@ -131,14 +196,20 @@ class ReportsdownloadController extends Controller
     
     public function actionPrintlabel()
     {
-        $printDetails = \Yii::$app->request->post("print");
-        $filterDetails = $printDetails['label_template']['checked_labels'];
-        $data['type'] = str_replace("_code", "", \Yii::$app->request->post("print_type"));
-        $data['type'] = $data['type']?$data['type']:$printDetails['print_type'];
-        $template_param = $printDetails['label_template'];
+        $uids = \Yii::$app->request->post("uid");
+        $label_tempalte = \Yii::$app->request->post("label_template");
         
-        if($printDetails && $filterDetails && $template_param) {
-     
+        $labelTemplate = \backend\models\LabelTemplates::findOne(['id' => $label_tempalte]);
+        
+        if(!isset($_GET['expand']))
+            $_GET['expand'] = "project_level,itemObj,processObj,project";
+        else
+            $_GET['expand'] = "project_level,itemObj,processObj,project,".$_GET['expand'];
+        
+        if(count($uids) && $labelTemplate) {
+            
+            $template_param = \yii\helpers\ArrayHelper::toArray($labelTemplate);
+            
             //-----------------------------Set hardcoded values if not set---------------------------------------------------------------
             $data['leftMargin'] = isset($template_param['left_margin']) ? (int) $template_param['left_margin'] : 5;
             $data['topMargin'] = isset($template_param['top_margin']) ? (int) $template_param['top_margin'] : 5;
@@ -151,177 +222,214 @@ class ReportsdownloadController extends Controller
             $data['vSpace'] = isset($template_param['ver_label_spacing']) ? (int) $template_param['ver_label_spacing'] : 5;
             $data['pageWidth'] = isset($template_param['page_width']) ? (int) $template_param['page_width'] : 216;
             $data['pageHeight'] = isset($template_param['page_height']) ? (int) $template_param['page_height'] : 279;
-            $data['qr_height'] = isset($template_param['logo_width']) ? (int) $template_param['logo_width'] : 15;
-            $data['font_size'] = isset($template_param['font_size']) ? (int) $template_param['font_size'] : 5;
+            $data['logo_width'] = isset($template_param['logo_width']) ? $template_param['logo_width'] : 15;
+            $data['logo_height'] = isset($template_param['logo_height']) ? $template_param['logo_height'] : 15;
+            $data['type'] = isset($template_param['print_type']) ? $template_param['print_type'] : 'qr';
+            $data['font_size'] = (isset($template_param['font_size']) ? (int) $template_param['font_size'] : 5) * 0.75;
             $data['logo_height'] = isset($template_param['logo_height']) ? (int) $template_param['logo_height'] : 5;
 
+            $data['logo_position'] = isset($template_param['logo_position']) ? $template_param['logo_position'] : 'topLeft';
+            $data['additional_notes'] = isset($template_param['additional_notes']) ? $template_param['additional_notes'] : "";
+            
             $fileManager = new \backend\models\FileManager();
             
             $nfcLogo = 'images/nfc.png';
 
             $imageUrl = "images/logo.png";
 
-            $labels = array_values($printDetails['labels']);
+            $labels = array_values($uids);
 
             if (isset($labels)) {
                 
                 $index = 0;
-                if ($data['pageWidth'] <= $data['pageHeight'])
-                    $pdf = new printLabel('p', 'mm', array($data['pageWidth'], $data['pageHeight']), $data);
-                else
-                    $pdf = new printLabel('l', 'mm', array($data['pageWidth'], $data['pageHeight']), $data);
+                $content = "";
+                $imageUrl = "images/logo.png";
+                $pdf = new mPDF('', array($data['pageWidth'], $data['pageHeight']));
+        
+                $pdf->SetAutoPageBreak(true);
+                $pdf->HREF = '';
+                $pdf->SetDefaultFont('Arial', 'B', 8);
+                $pdf->SetDefaultFontSize(8);
+                $pdf->SetLeftMargin($data['leftMargin']);
+                $pdf->SetRightMargin($data['rightMargin']);
+                $pdf->SetTopMargin($data['topMargin']);
+                $pdf->DeflMargin = $data['leftMargin'];
+                $pdf->DefrMargin = $data['leftMargin'];
+                $pdf->setAutoTopMargin = $pdf->setAutoBottomMargin = false;
+                
+                $labelW = $this->calculatedLabelW($data);
+                $labelH = $this->calculatedLabelH($data);
+                
                 while (1) {
-            //-----------------------------Print Label-----------------------------------------------------------------
-                    $pdf->AddPage();
-                    $pdf->SetAutoPageBreak(false);
-                    $pdf->SetFont('Arial', 'B', $pdf->font_size);
-                    $pdf->SetDrawColor(34, 53, 519);
-                    $pdf->SetLeftMargin($pdf->l_margin);
-                    $pdf->SetRightMargin($pdf->r_margin);
-                    $pdf->SetTopMargin($pdf->t_margin);
-                    $labelW = $pdf->calculatedLabelW();
-                    $labelH = $pdf->calculatedLabelH();
-                    $textLabels = $labels;
-                    $labelW = $pdf->calculatedLabelW();
-                    $labelH = $pdf->calculatedLabelH();
-                    $x = $pdf->l_margin;
-                    $y = $pdf->t_margin;
+                    //-----------------------------Print Label-----------------------------------------------------------------
+                    //$pdf->AddPage();
+                    
+                    $content .= "<div style='width: 100%;'>";
 
                     for ($vindex = 0; $vindex < $data['numberVertical']; $vindex++) {
-                        $x = $pdf->l_margin;
+                        $marginTop = 0;
+                        if($vindex)
+                            $marginTop = $data['vSpace'] / 2;
+                        
+                        $content .= "<div class='testClass' style='margin-top: ".$marginTop."mm;clear:both;'>";
+                        
                         for ($hindex = 0; $hindex < $data['numberHorizontal']; $hindex++) {
                             
+                            $marginLeft = 0;
+                            if($hindex)
+                                $marginLeft = $data['hSpace'] / 2;
+                            
+                            $tagsQuery = \backend\models\Tags::find()->andWhere(['uid' => $labels[$index]])->one();
+                            
+                            $serializer = new \backend\models\CustomSerializer();
+
+                            $tagDetails = $serializer->serialize($tagsQuery);
+                            
+                            if(!count($tagDetails)) {
+                                $index++;
+                                continue;
+                            }
+                            
+                            $codeImage = "";
+                            
                             if($data['type']=='qr' || $data['type']=='bar') {
-                                $labelImage = $fileManager->getPath($data['type']."code")."/".$labels[$index]['uid'].".png";
+                                $codeImage = $fileManager->getPath($data['type']."code")."/".$tagDetails['uid'].".png";
                                 
-                                if(!file_exists($labelImage))
-                                    $labelImage = "images/noimage.png";
+                                if(!file_exists($codeImage))
+                                    $codeImage = "images/noimage.png";
                             }
-                            $pdf->SetFont('Arial', 'B', $pdf->font_size);
-                            $pdf->SetXY($x, $y);
-                            $pdf->Cell($labelW, $labelH, ' ', 0);
-                            $pdf->SetXY($x + $pdf->getProportionalX(6), $y + $pdf->getProportionalY(8));
-                            $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $data['qr_height']);
-                            $z = $pdf->setapprFontSize($len_x, 'UID: ' . $labels[$index]['uid'], $pdf->font_size);
-                            $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $z);
-    //                        if ($this->request->data['Task']['check_unique_code'] == 1)
-    //                            $pdf->Cell($len_x, $len_y - (($len_y * 50) / 100), 'UID: ' . $labels[$index]['uid'], 0, 1, 'C');
-            //-----------------------------QR-code and NFC AREA---------------------------------------------------------------     
-                            $inc = (($pdf->font_size * 50) / 100) >= 9 ? 9 : ($pdf->font_size * 50) / 100;
-
-                            $pdf->SetXY($x + $pdf->getProportionalX(7), $pdf->GetY() + 0.5);
-
-                            if ($data['type'] == "qr" || $data['type'] == "bar") {
-
-                                $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $data['qr_height']);
-                                $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $data['qr_height']);
-                                $QR_hw = ($len_x < $len_y) ? $len_x : $len_y;
-                                $pdf->Image($labelImage, $pdf->GetX(), $pdf->GetY(), $QR_hw, $QR_hw, 'PNG');
-                                $pdf->SetXY($x + $pdf->getProportionalX(6), $pdf->GetY() + $QR_hw + 0.5);
-                                $pdf->SetTextColor(111, 106, 106);
-                                $pdf->SetFont('Arial', '', $pdf->font_size);
-
-                                $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $QR_hw);
-                                $z = $pdf->setapprFontSize((($len_x * 80) / 100), 'QR Code', $pdf->font_size);
-                                $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $z);
-
-                                $pdf->Cell($len_x, $len_y - (($len_y * 50) / 100), 'QR Code', 0, 0, 'C');
-                                $pdf->SetFont('Arial', 'B', $pdf->font_size);
-                            } else {
-                                $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $data['qr_height']);
-                                $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $data['qr_height']);
-
-                                $NFC_hw = ($len_x < $len_y) ? $len_x : $len_y;
-                                $pdf->Image($nfcLogo, $pdf->GetX(), $pdf->GetY(), $NFC_hw, $NFC_hw);
-
-                                $pdf->SetXY($x + $pdf->getProportionalX(6), $pdf->GetY() + $NFC_hw + 0.5);
-                                $pdf->SetTextColor(111, 106, 106);
-                                $pdf->SetFont('Arial', '', $pdf->font_size);
-
-                                $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $NFC_hw);
-                                $z = $pdf->setapprFontSize((($len_x * 50) / 100), 'Tap to Read NFC Tag', $pdf->font_size);
-                                $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $z);
-                                $pdf->Cell($len_x, $len_y - (($len_y * 50) / 100), 'Tap to Read NFC Tag', 0, 1, 'C');
-                                $pdf->SetFont('Arial', 'B', $pdf->font_size);
+                            else if($data['type']=='nfc' && isset($data['logo']) && file_exists($data['logo']))
+                                $codeImage = $data['logo'];
+                            else if($data['type']=='nfc' && isset($data['logo'])) {
+                                $logoFilename = array_pop(preg_split("/((=)|(\/))/", $data['logo']));
+                                $fileManager = new \backend\models\FileManager();
+                                $codeImage = $fileManager->getPath("")."/".$logoFilename;
                             }
-                            $pdf->SetTextColor(0, 0, 0);
-            ////-----------------------------LOGO---------------------------------------------------------------     
-
-                            $pdf->SetXY($x + $pdf->getProportionalX(6), $pdf->GetY() + $pdf->getProportionalY(7 + $inc + 2));
-                            $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $data['qr_height']);
-
-                            // $len_y = $pdf->get_remain_y($y, $pdf->GetY(), ($len_x * 4) / 15);
-                            $len_y = $pdf->get_remain_y($y, $pdf->GetY(), ((52 / 222) * $len_x));
-                            $pdf->Image($imageUrl, $pdf->GetX(), $pdf->GetY(), $len_x, $len_y);
-            //-----------------------------Link---------------------------------------------------------------     
-                            $pdf->SetXY($x + $pdf->getProportionalX(6), $pdf->GetY() + $len_y + 1);
-                            $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $data['qr_height']);
-                            $z = $pdf->setapprFontSize($len_x, 'www.sitetrack-nfc.com', $pdf->font_size);
-                            $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $z);
-                            $pdf->Cell($len_x, $len_y - (($len_y * 50) / 100), 'www.sitetrack-nfc.com', 0, 0, 'C');
-
-            //-------------------------Text Printing-----------------------------------------------------------
-                            $pdf->SetFont('Arial', 'B', $pdf->font_size);
-                            $k = $pdf->getProportionalY(6);
-                            $left_space = $data['qr_height'];
-                            $label_width = $pdf->GetStringWidth("Project Location:    ");
-                            foreach ($labels[$index] as $key => $value) {
-                                if ($key != "logo" && $key != "uid") {
-                                    $pdf->SetXY($x + $left_space + $pdf->getProportionalX(15), $y + $k);
-                                    $pdf->SetFont('Arial', 'B', $pdf->font_size);
-                                    $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $label_width);
-                                    $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $pdf->font_size);
-
-                                    if ($key == 'task_summary') {
-                                        //FIRE RESISTANCE RATED FIRESTOP
-                                        //$pdf->SetTextColor(255, 0, 0);
-                                        $note_data = explode('\n', $value);
-                                        $pdf->Cell($len_x, $len_y, $pdf->getPrintableStr((string) "Summary :", $len_x, $len_y), 0);
-                                        foreach($note_data as $note) {
-                                            $label_text_width = $pdf->GetStringWidth($note);
-                                            $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $label_text_width);
-                                            $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $pdf->font_size);
-                                        
-                                            $pdf->SetFont('Arial', 'B', $pdf->font_size);
-
-                                            if ($len_y == $pdf->font_size)
-                                                $pdf->Cell($len_x, $len_y, $pdf->getPrintableStr((string) trim($note), $len_x, $len_y), 0);
-                                            $k = $k + $inc;
-                                            $pdf->SetXY($x + $left_space + $pdf->getProportionalX(15) + $label_width, $y + $k);
-                                        }
-                                    } else {
-
-                                        $pdf->SetFont('Arial', 'B', $pdf->font_size);
-                                        $pdf->SetTextColor(0, 0, 0);
-                                        
-                                        $keyLabel = ucwords(str_replace("_", " ", $key))." :";
-
-                                        if ($len_y == $pdf->font_size)
-                                            $pdf->Cell($len_x, $len_y, $pdf->getPrintableStr((string) $keyLabel, $len_x, $len_y), 0);
-                                        else
-                                            $len_y = 0;
-                                        $pdf->SetTextColor(111, 106, 106);
-                                        $pdf->SetFont('Arial', '', $pdf->font_size);
-
-                                        if ($len_y != 0)
-                                            $pdf->SetXY($x + $left_space + $pdf->getProportionalX(15) + $label_width, $y + $k);
-                                        $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $pdf->getProportionalX(35));
-                                        $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $pdf->font_size);
-                                        if ($len_y == $pdf->font_size)
-                                            $pdf->Cell($len_x, $len_y, $pdf->getPrintableStr((string) $value, $len_x, $len_y), 0);
-                                        $pdf->SetTextColor(0, 0, 0);
-                                        $k = $k + $inc; 
+                            else
+                                $codeImage = 'images/nfc.png';
+                            
+                            $labelInfo = "";
+                            
+                            foreach($template_param['checked_labels'] as $label) {
+                                if($label['isChecked']) {
+                                    $tempLabel = "";
+                                    if($label['showLabel'])
+                                        $tempLabel = '<strong>'.$label['label'].'</strong> : ';
+                                    
+                                    $value = "";
+                                    switch ($label['name']) {
+                                        case 'tag_type': 
+                                            $value = $tagDetails['type'];
+                                            break;
+                                        case 'company_name': 
+                                            $value = $tagDetails['project']['company_name'];
+                                            break;
+                                        case 'project_name': 
+                                            $value = $tagDetails['project']['project_name'];
+                                            break;                                        
+                                        case 'client_name': 
+                                            $value = $tagDetails['project']['client_name'];
+                                            break;
+                                        case 'project_address': 
+                                            $value = $tagDetails['project']['project_address']." ".$tagDetails['project']['project_city']." ".$tagDetails['project']['project_country'];
+                                            break;
+                                        case 'client_location': 
+                                            $value = $tagDetails['project']['client_location'];
+                                            break;
+                                        case 'project_location': 
+                                            $value = $tagDetails['project']['project_location'];
+                                            break;
+                                        case 'main_contractor': 
+                                            $value = $tagDetails['project']['main_contractor'];
+                                            break;
+                                        case 'tag_item': 
+                                            $temp = [];
+                                            foreach($tagDetails['itemObj'] as $obj)
+                                            {
+                                                $temp[] = $obj['item_name'];
+                                            }
+                                            $value = implode(" > ", $temp);
+                                            break;
+                                        case 'process': 
+                                            $temp = [];
+                                            foreach($tagDetails['processObj'] as $obj)
+                                            {
+                                                $temp[] = $obj['process_name'];
+                                            }
+                                            $value = implode(" > ", $temp);
+                                            break;
+                                        case 'project_level': 
+                                            $value = implode(" > ", $tagDetails['project_level']);
+                                            break;
+                                        default: 
+                                            $value .= $tagDetails[$label['name']];
                                     }
+                                    
+                                    $labelInfo .= '<span>'.$tempLabel.$value.'</span>';
+                                    
+                                    if($label['lineBreak'])
+                                        $labelInfo .= '<br />';
+                                     else
+                                        $labelInfo .= ' <strong>|</strong> ';   
                                 }
                             }
-                            $x+=$labelW + $pdf->hr_space;
+                            
+                            if($data['additional_notes'])
+                                $labelInfo .= '<div><strong>Note : '.$data['additional_notes'].'</strong></div>';
+
+                            $infoBox = "<div style='margin-left: 10px;".(($labelW - $data['logo_width'])>80?"float:left;min-width: 80mm":"width: 80mm;")."font-size: ".$data['font_size']."px;'>".$labelInfo."</div>";
+                            
+                            $logoStyle = "";
+        
+                            if($data['logo_position']=='topLeft') {
+                                $logoStyle = "float:left;width: ".$data['logo_width']."mm;";
+                            }
+                            else if($data['logo_position']=='topRight') {
+                                $logoStyle = "float:right;width: ".$data['logo_width']."mm;";
+                            }
+                            else if($data['logo_position']=='topMiddle') {
+                                $logoStyle = "width:100%;";
+                            }
+                            else if($data['logo_position']=='bottomLeft') {
+                                $logoStyle = "clear:left;float:left;vertical-align:bottom;width: ".$data['logo_width']."mm;";
+                            }
+                            else if($data['logo_position']=='bottomRight') {
+                                $logoStyle = "clear:left;float:right;vertical-align:bottom;width: ".$data['logo_width']."mm;";
+                            }
+                            else if($data['logo_position']=='bottomMiddle') {
+                                $logoStyle = "clear:left;width: 100%;vertical-align:bottom;";
+                            }
+                            else if($data['logo_position']=='leftMiddle') {
+                                $imageInfo = getimagesize($codeImage);
+                                $height = $data['logo_width']*$imageInfo[1]/$imageInfo[0];
+                                $logoStyle = "float:left;padding-top:".(($labelH - $height-7 )/2)."mm;width: ".$data['logo_width']."mm;";
+                            }
+                            else if($data['logo_position']=='rightMiddle') {
+                                $height = $data['logo_width']*$imageInfo[1]/$imageInfo[0];
+                                $logoStyle = "float:right;padding-top:".(($labelH - $height-7 )/2)."mm;width: ".$data['logo_width']."mm;";
+                            }
+
+                            $logoBox = "<div id='logoContainer' style='".$logoStyle."text-align:center;max-height: 10mm;overflow;hidden;position:absolute;'>UID: 4SOMQ95506<br /><img src='".$codeImage."' style='width: ".$data['logo_width']."mm;height: ".$data['logo_height']."mm;' /><br />http://sitetrack-nfc.com</div>";
+
+                            $labelHtml = "";
+
+                            if($data['logo_position']=='bottomLeft' || $data['logo_position']=='bottomRight' || $data['logo_position']=='bottomMiddle') {
+                                $labelHtml = $infoBox.$logoBox;
+                            }
+                            else {
+                                $labelHtml = $logoBox.$infoBox;
+                            }
+                            
+                            $content .= "<div style='margin-left: ".$marginLeft."mm;padding: 5px;border: 1px solid #ccc;float:left;width: ".($labelW-3)."mm;background: url(images/labelLogo.png) no-repeat right bottom;padding: 5px;'>".$labelHtml."</div>";
+                            
                             $index++;
                             if ($index > count($labels) - 1) {
                                 break;
                             }
+                            
                         }
-                        $y+= $labelH + $pdf->vr_space;
-
+                        $content .= "</div>";
+                        
                         $index++;
                         if ($index > count($labels))
                             break;
@@ -329,18 +437,21 @@ class ReportsdownloadController extends Controller
                             $index--;
                         }
                     }
-
+                    $content .= "<div>";
+                    
                     if ($index > count($labels))
                         break;
                     //else
                       //  $index--;
                 }
             }
-
-            $file_download = "temp/print_template_".date("Ymd_His").".pdf";
-            $pdf->Output($file_download, "f");
+            
+            $pdf->WriteHTML($content);
+            
+            $file_download = "temp/preview_template_".date("Ymd_His").".pdf";
+            $pdf->Output($file_download, 'f');
             return $file_download;
-            exit();
+
         }
         else {
             throw new \yii\web\HttpException(404, 'We have not found your request.');
@@ -348,15 +459,21 @@ class ReportsdownloadController extends Controller
     }
     
     public function actionPrinttimeattendancelabel()
-    {
-        $printDetails = \Yii::$app->request->post("print");
-        $filterDetails = $printDetails['label_template']['checked_labels'];
-        $data['type'] = str_replace("_code", "", \Yii::$app->request->post("print_type"));
-        $data['type'] = $data['type']?$data['type']:$printDetails['print_type'];
-        $template_param = $printDetails['label_template'];
+        {
+        $uids = \Yii::$app->request->post("uid");
+        $label_tempalte = \Yii::$app->request->post("label_template");
         
-        if($printDetails && $filterDetails && $template_param) {
-     
+        $labelTemplate = \backend\models\LabelTemplates::findOne(['id' => $label_tempalte]);
+        
+        if(!isset($_GET['expand']))
+            $_GET['expand'] = "project_level,project";
+        else
+            $_GET['expand'] = "project_level,project,".$_GET['expand'];
+        
+        if(count($uids) && $labelTemplate) {
+            
+            $template_param = \yii\helpers\ArrayHelper::toArray($labelTemplate);
+            
             //-----------------------------Set hardcoded values if not set---------------------------------------------------------------
             $data['leftMargin'] = isset($template_param['left_margin']) ? (int) $template_param['left_margin'] : 5;
             $data['topMargin'] = isset($template_param['top_margin']) ? (int) $template_param['top_margin'] : 5;
@@ -369,177 +486,193 @@ class ReportsdownloadController extends Controller
             $data['vSpace'] = isset($template_param['ver_label_spacing']) ? (int) $template_param['ver_label_spacing'] : 5;
             $data['pageWidth'] = isset($template_param['page_width']) ? (int) $template_param['page_width'] : 216;
             $data['pageHeight'] = isset($template_param['page_height']) ? (int) $template_param['page_height'] : 279;
-            $data['qr_height'] = isset($template_param['logo_width']) ? (int) $template_param['logo_width'] : 15;
-            $data['font_size'] = isset($template_param['font_size']) ? (int) $template_param['font_size'] : 5;
+            $data['logo_width'] = isset($template_param['logo_width']) ? $template_param['logo_width'] : 15;
+            $data['logo_height'] = isset($template_param['logo_height']) ? $template_param['logo_height'] : 15;
+            $data['type'] = isset($template_param['print_type']) ? $template_param['print_type'] : 'qr';
+            $data['font_size'] = (isset($template_param['font_size']) ? (int) $template_param['font_size'] : 5) * 0.75;
             $data['logo_height'] = isset($template_param['logo_height']) ? (int) $template_param['logo_height'] : 5;
 
+            $data['logo_position'] = isset($template_param['logo_position']) ? $template_param['logo_position'] : 'topLeft';
+            $data['additional_notes'] = isset($template_param['additional_notes']) ? $template_param['additional_notes'] : "";
+            
             $fileManager = new \backend\models\FileManager();
             
             $nfcLogo = 'images/nfc.png';
 
             $imageUrl = "images/logo.png";
 
-            $labels = array_values($printDetails['labels']);
+            $labels = array_values($uids);
 
             if (isset($labels)) {
                 
                 $index = 0;
-                if ($data['pageWidth'] <= $data['pageHeight'])
-                    $pdf = new printLabel('p', 'mm', array($data['pageWidth'], $data['pageHeight']), $data);
-                else
-                    $pdf = new printLabel('l', 'mm', array($data['pageWidth'], $data['pageHeight']), $data);
+                $content = "";
+                $imageUrl = "images/logo.png";
+                $pdf = new mPDF('', array($data['pageWidth'], $data['pageHeight']));
+        
+                $pdf->SetAutoPageBreak(true);
+                $pdf->HREF = '';
+                $pdf->SetDefaultFont('Arial', 'B', 8);
+                $pdf->SetDefaultFontSize(8);
+                $pdf->SetLeftMargin($data['leftMargin']);
+                $pdf->SetRightMargin($data['rightMargin']);
+                $pdf->SetTopMargin($data['topMargin']);
+                $pdf->DeflMargin = $data['leftMargin'];
+                $pdf->DefrMargin = $data['leftMargin'];
+                $pdf->setAutoTopMargin = $pdf->setAutoBottomMargin = false;
+                
+                $labelW = $this->calculatedLabelW($data);
+                $labelH = $this->calculatedLabelH($data);
+                
                 while (1) {
-            //-----------------------------Print Label-----------------------------------------------------------------
-                    $pdf->AddPage();
-                    $pdf->SetAutoPageBreak(false);
-                    $pdf->SetFont('Arial', 'B', $pdf->font_size);
-                    $pdf->SetDrawColor(34, 53, 519);
-                    $pdf->SetLeftMargin($pdf->l_margin);
-                    $pdf->SetRightMargin($pdf->r_margin);
-                    $pdf->SetTopMargin($pdf->t_margin);
-                    $labelW = $pdf->calculatedLabelW();
-                    $labelH = $pdf->calculatedLabelH();
-                    $textLabels = $labels;
-                    $labelW = $pdf->calculatedLabelW();
-                    $labelH = $pdf->calculatedLabelH();
-                    $x = $pdf->l_margin;
-                    $y = $pdf->t_margin;
+                    //-----------------------------Print Label-----------------------------------------------------------------
+                    //$pdf->AddPage();
+                    
+                    $content .= "<div style='margin-left: 0;width: 100%;'>";
 
                     for ($vindex = 0; $vindex < $data['numberVertical']; $vindex++) {
-                        $x = $pdf->l_margin;
+                        if($vindex)
+                            $marginTop = $data['vSpace'] / 2;
+                        $content .= "<div class='testClass' style='margin-top: ".$marginTop."mm;clear:both;'>";
+            
                         for ($hindex = 0; $hindex < $data['numberHorizontal']; $hindex++) {
                             
+                            $marginLeft = 0;
+                            if($hindex)
+                                $marginLeft = $data['hSpace'] / 2;
+                            
+                            $tagsQuery = \backend\models\Tags::find()->andWhere(['uid' => $labels[$index]])->one();
+                            
+                            $serializer = new \backend\models\CustomSerializer();
+
+                            $tagDetails = $serializer->serialize($tagsQuery);
+                            
+                            if(!count($tagDetails)) {
+                                $index++;
+                                continue;
+                            }
+                            
+                            $codeImage = "";
+                            
                             if($data['type']=='qr' || $data['type']=='bar') {
-                                $labelImage = $fileManager->getPath("Attendance".$data['type']."code")."/".$labels[$index]['uid'].".png";
+                                $codeImage = $fileManager->getPath($data['type']."code")."/".$tagDetails['uid'].".png";
                                 
-                                if(!file_exists($labelImage))
-                                    $labelImage = "images/noimage.png";
+                                if(!file_exists($codeImage))
+                                    $codeImage = "images/noimage.png";
                             }
-                            $pdf->SetFont('Arial', 'B', $pdf->font_size);
-                            $pdf->SetXY($x, $y);
-                            $pdf->Cell($labelW, $labelH, ' ', 0);
-                            $pdf->SetXY($x + $pdf->getProportionalX(6), $y + $pdf->getProportionalY(8));
-                            $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $data['qr_height']);
-                            $z = $pdf->setapprFontSize($len_x, 'UID: ' . $labels[$index]['uid'], $pdf->font_size);
-                            $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $z);
-    //                        if ($this->request->data['Task']['check_unique_code'] == 1)
-    //                            $pdf->Cell($len_x, $len_y - (($len_y * 50) / 100), 'UID: ' . $labels[$index]['uid'], 0, 1, 'C');
-            //-----------------------------QR-code and NFC AREA---------------------------------------------------------------     
-                            $inc = (($pdf->font_size * 50) / 100) >= 9 ? 9 : ($pdf->font_size * 50) / 100;
-
-                            $pdf->SetXY($x + $pdf->getProportionalX(7), $pdf->GetY() + 0.5);
-
-                            if ($data['type'] == "qr" || $data['type'] == "bar") {
-
-                                $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $data['qr_height']);
-                                $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $data['qr_height']);
-                                $QR_hw = ($len_x < $len_y) ? $len_x : $len_y;
-                                $pdf->Image($labelImage, $pdf->GetX(), $pdf->GetY(), $QR_hw, $QR_hw, 'PNG');
-                                $pdf->SetXY($x + $pdf->getProportionalX(6), $pdf->GetY() + $QR_hw + 0.5);
-                                $pdf->SetTextColor(111, 106, 106);
-                                $pdf->SetFont('Arial', '', $pdf->font_size);
-
-                                $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $QR_hw);
-                                $z = $pdf->setapprFontSize((($len_x * 80) / 100), 'QR Code', $pdf->font_size);
-                                $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $z);
-
-                                $pdf->Cell($len_x, $len_y - (($len_y * 50) / 100), 'QR Code', 0, 0, 'C');
-                                $pdf->SetFont('Arial', 'B', $pdf->font_size);
-                            } else {
-                                $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $data['qr_height']);
-                                $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $data['qr_height']);
-
-                                $NFC_hw = ($len_x < $len_y) ? $len_x : $len_y;
-                                $pdf->Image($nfcLogo, $pdf->GetX(), $pdf->GetY(), $NFC_hw, $NFC_hw);
-
-                                $pdf->SetXY($x + $pdf->getProportionalX(6), $pdf->GetY() + $NFC_hw + 0.5);
-                                $pdf->SetTextColor(111, 106, 106);
-                                $pdf->SetFont('Arial', '', $pdf->font_size);
-
-                                $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $NFC_hw);
-                                $z = $pdf->setapprFontSize((($len_x * 50) / 100), 'Tap to Read NFC Tag', $pdf->font_size);
-                                $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $z);
-                                $pdf->Cell($len_x, $len_y - (($len_y * 50) / 100), 'Tap to Read NFC Tag', 0, 1, 'C');
-                                $pdf->SetFont('Arial', 'B', $pdf->font_size);
+                            else if($data['type']=='nfc' && isset($data['logo']) && file_exists($data['logo']))
+                                $codeImage = $data['logo'];
+                            else if($data['type']=='nfc' && isset($data['logo'])) {
+                                $logoFilename = array_pop(preg_split("/((=)|(\/))/", $data['logo']));
+                                $fileManager = new \backend\models\FileManager();
+                                $codeImage = $fileManager->getPath("")."/".$logoFilename;
                             }
-                            $pdf->SetTextColor(0, 0, 0);
-            ////-----------------------------LOGO---------------------------------------------------------------     
-
-                            $pdf->SetXY($x + $pdf->getProportionalX(6), $pdf->GetY() + $pdf->getProportionalY(7 + $inc + 2));
-                            $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $data['qr_height']);
-
-                            // $len_y = $pdf->get_remain_y($y, $pdf->GetY(), ($len_x * 4) / 15);
-                            $len_y = $pdf->get_remain_y($y, $pdf->GetY(), ((52 / 222) * $len_x));
-                            $pdf->Image($imageUrl, $pdf->GetX(), $pdf->GetY(), $len_x, $len_y);
-            //-----------------------------Link---------------------------------------------------------------     
-                            $pdf->SetXY($x + $pdf->getProportionalX(6), $pdf->GetY() + $len_y + 1);
-                            $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $data['qr_height']);
-                            $z = $pdf->setapprFontSize($len_x, 'www.sitetrack-nfc.com', $pdf->font_size);
-                            $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $z);
-                            $pdf->Cell($len_x, $len_y - (($len_y * 50) / 100), 'www.sitetrack-nfc.com', 0, 0, 'C');
-
-            //-------------------------Text Printing-----------------------------------------------------------
-                            $pdf->SetFont('Arial', 'B', $pdf->font_size);
-                            $k = $pdf->getProportionalY(6);
-                            $left_space = $data['qr_height'];
-                            $label_width = $pdf->GetStringWidth("Project Location:    ");
-                            foreach ($labels[$index] as $key => $value) {
-                                if ($key != "logo" && $key != "uid") {
-                                    $pdf->SetXY($x + $left_space + $pdf->getProportionalX(15), $y + $k);
-                                    $pdf->SetFont('Arial', 'B', $pdf->font_size);
-                                    $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $label_width);
-                                    $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $pdf->font_size);
-
-                                    if ($key == 'task_summary') {
-                                        //FIRE RESISTANCE RATED FIRESTOP
-                                        //$pdf->SetTextColor(255, 0, 0);
-                                        $note_data = explode('\n', $value);
-                                        $pdf->Cell($len_x, $len_y, $pdf->getPrintableStr((string) "Summary :", $len_x, $len_y), 0);
-                                        foreach($note_data as $note) {
-                                            $label_text_width = $pdf->GetStringWidth($note);
-                                            $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $label_text_width);
-                                            $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $pdf->font_size);
-                                        
-                                            $pdf->SetFont('Arial', 'B', $pdf->font_size);
-
-                                            if ($len_y == $pdf->font_size)
-                                                $pdf->Cell($len_x, $len_y, $pdf->getPrintableStr((string) trim($note), $len_x, $len_y), 0);
-                                            $k = $k + $inc;
-                                            $pdf->SetXY($x + $left_space + $pdf->getProportionalX(15) + $label_width, $y + $k);
-                                        }
-                                    } else {
-
-                                        $pdf->SetFont('Arial', 'B', $pdf->font_size);
-                                        $pdf->SetTextColor(0, 0, 0);
-                                        
-                                        $keyLabel = ucwords(str_replace("_", " ", $key))." :";
-
-                                        if ($len_y == $pdf->font_size)
-                                            $pdf->Cell($len_x, $len_y, $pdf->getPrintableStr((string) $keyLabel, $len_x, $len_y), 0);
-                                        else
-                                            $len_y = 0;
-                                        $pdf->SetTextColor(111, 106, 106);
-                                        $pdf->SetFont('Arial', '', $pdf->font_size);
-
-                                        if ($len_y != 0)
-                                            $pdf->SetXY($x + $left_space + $pdf->getProportionalX(15) + $label_width, $y + $k);
-                                        $len_x = $pdf->get_remain_x($x, $pdf->GetX(), $pdf->getProportionalX(35));
-                                        $len_y = $pdf->get_remain_y($y, $pdf->GetY(), $pdf->font_size);
-                                        if ($len_y == $pdf->font_size)
-                                            $pdf->Cell($len_x, $len_y, $pdf->getPrintableStr((string) $value, $len_x, $len_y), 0);
-                                        $pdf->SetTextColor(0, 0, 0);
-                                        $k = $k + $inc; 
+                            else
+                                $codeImage = 'images/nfc.png';
+                            
+                            $labelInfo = "";
+                            
+                            foreach($template_param['checked_labels'] as $label) {
+                                if($label['isChecked']) {
+                                    $tempLabel = "";
+                                    if($label['showLabel'])
+                                        $tempLabel = '<strong>'.$label['label'].'</strong> : ';
+                                    
+                                    $value = "";
+                                    switch ($label['name']) {
+                                        case 'company_name': 
+                                            $value = $tagDetails['project']['company_name'];
+                                            break;
+                                        case 'project_name': 
+                                            $value = $tagDetails['project']['project_name'];
+                                            break;                                        
+                                        case 'client_name': 
+                                            $value = $tagDetails['project']['client_name'];
+                                            break;
+                                        case 'project_address': 
+                                            $value = $tagDetails['project']['project_address']." ".$tagDetails['project']['project_city']." ".$tagDetails['project']['project_country'];
+                                            break;
+                                        case 'client_location': 
+                                            $value = $tagDetails['project']['client_location'];
+                                            break;
+                                        case 'project_location': 
+                                            $value = $tagDetails['project']['project_location'];
+                                            break;
+                                        case 'main_contractor': 
+                                            $value = $tagDetails['project']['main_contractor'];
+                                            break;
+                                        case 'project_level': 
+                                            $value = implode(" > ", $tagDetails['project_level']);
+                                            break;
+                                        default: 
+                                            $value .= $tagDetails[$label['name']];
                                     }
+                                    
+                                    $labelInfo .= '<span>'.$tempLabel.$value.'</span>';
+                                    
+                                    if($label['lineBreak'])
+                                        $labelInfo .= '<br />';
+                                     else
+                                        $labelInfo .= ' <strong>|</strong> ';   
                                 }
                             }
-                            $x+=$labelW + $pdf->hr_space;
+                            
+                            if($data['additional_notes'])
+                                $labelInfo .= '<div><strong>Note : '.$data['additional_notes'].'</strong></div>';
+
+                            $infoBox = "<div style='margin-left: 10px;".(($labelW - $data['logo_width'])>80?"float:left;min-width: 80mm":"width: 80mm;")."font-size: ".$data['font_size']."px;'>".$labelInfo."</div>";
+
+                            $logoStyle = "";
+
+                            if($data['logo_position']=='topLeft') {
+                                $logoStyle = "float:left;width: ".$data['logo_width']."mm;";
+                            }
+                            else if($data['logo_position']=='topRight') {
+                                $logoStyle = "float:right;width: ".$data['logo_width']."mm;";
+                            }
+                            else if($data['logo_position']=='topMiddle') {
+                                $logoStyle = "width:100%;";
+                            }
+                            else if($data['logo_position']=='bottomLeft') {
+                                $logoStyle = "clear:left;float:left;vertical-align:bottom;width: ".$data['logo_width']."mm;";
+                            }
+                            else if($data['logo_position']=='bottomRight') {
+                                $logoStyle = "clear:left;float:right;vertical-align:bottom;width: ".$data['logo_width']."mm;";
+                            }
+                            else if($data['logo_position']=='bottomMiddle') {
+                                $logoStyle = "clear:left;width: 100%;vertical-align:bottom;";
+                            }
+                            else if($data['logo_position']=='leftMiddle') {
+                                $imageInfo = getimagesize($codeImage);
+                                $height = $data['logo_width']*$imageInfo[1]/$imageInfo[0];
+                                $logoStyle = "float:left;padding-top:".(($labelH - $height-7 )/2)."mm;width: ".$data['logo_width']."mm;";
+                            }
+                            else if($data['logo_position']=='rightMiddle') {
+                                $height = $data['logo_width']*$imageInfo[1]/$imageInfo[0];
+                                $logoStyle = "float:right;padding-top:".(($labelH - $height-7 )/2)."mm;width: ".$data['logo_width']."mm;";
+                            }
+
+                            $logoBox = "<div id='logoContainer' style='".$logoStyle."text-align:center;'>UID: 4SOMQ95506<br /><img src='".$codeImage."' style='width: ".$data['logo_width']."mm;' /><br />http://sitetrack-nfc.com</div>";
+
+                            $labelHtml = "";
+
+                            if($data['logo_position']=='bottomLeft' || $data['logo_position']=='bottomRight' || $data['logo_position']=='bottomMiddle') {
+                                $labelHtml = $infoBox.$logoBox;
+                            }
+                            else {
+                                $labelHtml = $logoBox.$infoBox;
+                            }
+                            
+                            $content .= "<div style='margin-left: ".$marginLeft."mm;padding: 5px;border: 1px solid #ccc;float:left;width: ".($labelW-3)."mm;background: url(images/labelLogo.png) no-repeat right bottom;padding: 5px;'>".$labelHtml."</div>";
+                            
                             $index++;
                             if ($index > count($labels) - 1) {
                                 break;
                             }
+                            
                         }
-                        $y+= $labelH + $pdf->vr_space;
-
+                        $content .= "</div>";
+                        
                         $index++;
                         if ($index > count($labels))
                             break;
@@ -547,18 +680,21 @@ class ReportsdownloadController extends Controller
                             $index--;
                         }
                     }
-
+                    $content .= "<div>";
+                    
                     if ($index > count($labels))
                         break;
                     //else
                       //  $index--;
                 }
             }
-
-            $file_download = "temp/print_template_".date("Ymd_His").".pdf";
-            $pdf->Output($file_download, "f");
+            
+            $pdf->WriteHTML($content);
+            
+            $file_download = "temp/preview_template_".date("Ymd_His").".pdf";
+            $pdf->Output($file_download, 'f');
             return $file_download;
-            exit();
+
         }
         else {
             throw new \yii\web\HttpException(404, 'We have not found your request.');
@@ -666,7 +802,7 @@ class ReportsdownloadController extends Controller
         
         $content = str_replace(array_keys($sampleLabels), $sampleLabels, $content);
                 
-        $pdf = new \mPDF('', array($data['pageWidth'], $data['pageHeight']));
+        $pdf = new mPDF('', array($data['pageWidth'], $data['pageHeight']));
         
         $pdf->AddPage();
         $pdf->SetAutoPageBreak(false);
@@ -719,7 +855,7 @@ class ReportsdownloadController extends Controller
         $data['projectlogoWidth'] = isset($template_param['project_logo_width']) ? (int) $template_param['project_logo_width'] : 100;
         $data['projectImageWidth'] = isset($template_param['project_image_width']) ? (int) $template_param['project_image_width'] : 100;
         
-        $pdf = new \mPDF('', array($data['pageWidth'], $data['pageHeight']));
+        $pdf = new mPDF('', array($data['pageWidth'], $data['pageHeight']));
         
         $pdf->SetAutoPageBreak(false);
         $pdf->HREF = '';

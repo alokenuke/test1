@@ -45,7 +45,7 @@ class Tags extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['uid', 'project_id', 'tag_name', 'project_level_id', 'user_group_id'], 'required'],
+            [['uid', 'project_id', 'tag_name', 'project_level_id', 'user_group_id', 'tag_item_id', 'tag_process_flow_id',], 'required'],
             [['project_id', 'project_level_id', 'user_group_id', 'company_id', 'tag_status', 'created_by'], 'integer'],
             [['created_date', 'modified_date'], 'safe'],
             
@@ -65,7 +65,7 @@ class Tags extends \yii\db\ActiveRecord
     
     public function afterSave($insert, $changedAttributes) {
         
-        $fileManager = new FileManager();
+        $fileManager = new FileManager($this->company_id);
         
         $qrCodePath = $fileManager->getPath("qrcode")."/";
         $barCodePath = $fileManager->getPath("barcode")."/";

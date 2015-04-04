@@ -43,6 +43,7 @@ class ModulesActions extends \yii\db\ActiveRecord
         if(!count($modules)) {
             $modules = static::find()
                 ->andWhere(['status' => 1])
+                ->andWhere(['company_id' => (\yii::$app->user->identity->company_id?1:0)])
                 ->orderBy("module_name")
                 ->groupBy("module_name")
                 ->all();
@@ -63,8 +64,10 @@ class ModulesActions extends \yii\db\ActiveRecord
     public static function find()
     {
         $query = parent::find()->andWhere(['status' => '1']);
-        if(isset(\yii::$app->user->id) && \yii::$app->user->identity->company_id == 0)
-            $query = $query->where(['company_id' => \yii::$app->user->identity->company_id]);
+        if(\yii::$app->user->identity->company_id > 0)
+            $query = $query->andWhere(['company_id' => 1]);
+        else
+            $query = $query->andWhere(['company_id' => 0]);
         
         return $query;
     }

@@ -54,7 +54,7 @@ class ApiController extends ActiveController
             ],
         ];
     }
-        
+            
     public function init() {
         
         $this->identity = json_decode(\Yii::$app->getRequest()->getCookies()->getValue('_identity'));
@@ -73,11 +73,34 @@ class ApiController extends ActiveController
     {
         $behaviors = parent::behaviors();
         
-        if(\yii::$app->requestedAction->id!='login' && \yii::$app->requestedAction->id!='request-password-reset')
+        if(\yii::$app->requestedAction->id!='initialize' && \yii::$app->requestedAction->id!='login' && \yii::$app->requestedAction->id!='request-password-reset')
             $behaviors['authenticator'] = [
                 'class' => QueryParamAuth::className(),
             ];
+        
+        if(\yii::$app->controller->id == "api") {
+            $behaviors['access'] = [
+                    'class' => AccessControl::className(),
+                    'rules' => [
+                        [
+                            'actions' => ['initialize', 'login', 'request-password-reset'],
+                            'allow' => true,
+                        ],
+                        [
+                            'actions' => ['logout', 'gettoken', 'gen-code'],
+                            'allow' => true,
+                            'roles' => ['@'],
+                        ]
+                    ]
+            ];
+        }
+        
         return $behaviors;
+    }
+    
+    public function actionInitialize() {
+        echo strip_tags($this->renderPartial('/site/initialize'));
+        die;
     }
     
     public function actionLogin()

@@ -91,6 +91,11 @@ class Items extends \yii\db\ActiveRecord
         return $this->hasMany(ItemsProjects::className(), ['item_id' => 'id']);
     }
     
+    public function getParent()
+    {
+        return $this->hasMany(Items::className(), ['id' => 'parent_id'])->from(['parent' => Items::tableName()]);
+    }
+    
     public function actDelete() {
         $this->status = 2;
         return $this->save();

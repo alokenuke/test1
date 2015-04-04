@@ -20,6 +20,24 @@ class MembershipController extends ApiController
         parent::init();
     }
     
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        
+        $behaviors['access'] = [
+                'class' => \backend\models\RoleAccess::className(),
+                'rules' => [
+                    [
+                        'actions' => ['search', 'getall', 'create', 'update', 'view', 'delete'],
+                        'allow' => true,
+                        'roles' => ['Site'],
+                    ]
+                ]
+        ];
+        
+        return $behaviors;
+    }
+    
     public function actionSearch() {
         if (!$_POST) {
             

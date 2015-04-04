@@ -20,6 +20,24 @@ class TagProcessController extends ApiController
         parent::init();
     }
     
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        
+        $behaviors['access'] = [
+                'class' => \backend\models\RoleAccess::className(),
+                'rules' => [
+                    [
+                        'actions' => ['search', 'getall', 'assignprojects', 'unassignprojects', 'savepositionlevels', 'index', 'create', 'update', 'view', 'delete'],
+                        'allow' => true,
+                        'roles' => ['Client'],
+                    ],
+                ]
+        ];
+        
+        return $behaviors;
+    }
+    
     public function actionSearch() {
         if (!$_POST) {
             

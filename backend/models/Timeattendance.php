@@ -173,8 +173,10 @@ class Timeattendance extends \yii\db\ActiveRecord
                 return $timeAttendanceAssignment;
             },
             'userGroup',
+            'project',
             'timeAttendanceAssignment',
-            'timeattendanceLog'        ];
+            'timeattendanceLog'
+        ];
     }
     
     /**

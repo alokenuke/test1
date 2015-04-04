@@ -29,7 +29,7 @@ class Menu extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['label', 'url', 'position'], 'required'],
+            [['label', 'url', 'position', 'modules', 'actions'], 'required'],
             [['parent_id', 'status'], 'integer'],
             ['parent_id', 'default', 'value' => '0'],
             [['label'], 'string', 'max' => 128],
@@ -63,6 +63,36 @@ class Menu extends \yii\db\ActiveRecord
         $result = []; 
 
         foreach ($items as $item) {
+            
+            if($item->modules && $item->actions) {
+                $modules = json_decode($item->modules);
+                $actions = json_decode($item->actions);
+                
+                $role = Yii::$app->user->identity->role_details;
+                
+                if(!$role->isAdmin) {
+                    
+                    $hasAccess = false;
+
+                    $roleSettings = RoleSettings::findAll(['module' => $modules, 'role_id' => $role->id]);
+                    
+                    foreach($roleSettings as $roleSetting) {
+                        $assignedRoles = (array) json_decode($roleSetting->role_params);
+                        
+                        foreach($actions as $act) {
+                            if(isset($assignedRoles[$act]) && $assignedRoles[$act] == 1) {
+                                $hasAccess = true;
+                                continue;
+                            }
+                        }
+                    }
+                    
+                    if(!$hasAccess) {
+                        continue;
+                    }
+                    
+                }
+            }
             
             $child = static::getMenuRecrusive($item->id);
             

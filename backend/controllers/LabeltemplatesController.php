@@ -17,6 +17,24 @@ class LabeltemplatesController extends ApiController
         parent::init();
     }
     
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        
+        $behaviors['access'] = [
+                'class' => \backend\models\RoleAccess::className(),
+                'rules' => [
+                    [
+                        'actions' => ['search', 'getall', 'index', 'create', 'update', 'view', 'delete'],
+                        'allow' => true,
+                        'roles' => ['Client'],
+                    ]
+                ]
+        ];
+        
+        return $behaviors;
+    }
+    
     public function actionSearch() {
         try {
             $model = new $this->modelClass;

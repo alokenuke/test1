@@ -20,6 +20,24 @@ class ReportsController extends ApiController
         parent::init();
     }
     
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        
+        $behaviors['access'] = [
+                'class' => \backend\models\RoleAccess::className(),
+                'rules' => [
+                    [
+                        'actions' => ['search', 'labels', 'timeattendancelabels', 'employee-logs', 'generate-tag-reports', 'generate-tag-reports-by-id', 'generate-time-attendance-reports', 'generate-user-reports', 'generate-employee-logs-reports'],
+                        'allow' => true,
+                        'roles' => ['Client'],
+                    ],
+                ]
+        ];
+        
+        return $behaviors;
+    }
+    
     // Get list of tags for label printing
     public function actionLabels() {
         if (!$_POST) {

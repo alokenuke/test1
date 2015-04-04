@@ -22,6 +22,24 @@ class ProjectsController extends ApiController
         parent::init();
     }
     
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        
+        $behaviors['access'] = [
+                'class' => \backend\models\RoleAccess::className(),
+                'rules' => [
+                    [
+                        'actions' => ['search', 'export', 'projectsbyprocess', 'usergroup', 'projectsbylevel', 'getchartstats', 'tagitems', 'getall', 'index', 'create', 'update', 'view', 'delete'],
+                        'allow' => true,
+                        'roles' => ['Client'],
+                    ]
+                ]
+        ];
+        
+        return $behaviors;
+    }
+    
     public function actionSearch() {
         if (!$_POST) {
             
@@ -329,6 +347,89 @@ class ProjectsController extends ApiController
     
     public function actionGetall() {
         return parent::actionGetall();
+    }
+    
+    public function actionExport() {
+        if (!$_POST) {
+            error_reporting(0);
+            $post = \Yii::$app->request->post();
+            
+            $phpExcel = new \backend\models\GenerateExcel();
+            
+            $phpExcel->createWorksheet();
+            $phpExcel->setDefaultFont('Calibri', 13);
+
+            $default = array(
+                array('label' => 'ID', 'width' => 'auto'),
+                array('label' => 'Project Name', 'width' => 'auto'),
+                array('label' => 'Location', 'width' => 'auto'),
+                array('label' => 'Project Manager', 'width' => 'auto'),
+                array('label' => 'Project Director', 'width' => 'auto'),
+                array('label' => 'Client Name', 'width' => 'auto'),
+                array('label' => 'Client-Project Manager', 'width' => 'auto'),
+                array('label' => 'Contractor', 'width' => 'auto'),
+                array('label' => 'Consultant', 'width' => 'auto'),
+                array('label' => 'Consultant-Project Manager', 'width' => 'auto'),
+                array('label' => 'Description', 'width' => 'auto'),
+                array('label' => 'Project Address/Location', 'width' => 'auto'),
+                array('label' => 'Project City', 'width' => 'auto'),
+                array('label' => 'Project Country', 'width' => 'auto'),
+                array('label' => 'Timezone ID', 'width' => 'auto'),
+                array('label' => 'Timezone Name', 'width' => 'auto'),
+                array('label' => 'Client Address', 'width' => 'auto'),
+                array('label' => 'Client City', 'width' => 'auto'),
+                array('label' => 'Client Country', 'width' => 'auto'),
+            );
+
+            $phpExcel->addTableHeader($default, array('name' => 'Cambria', 'bold' => true));
+
+            $phpExcel->setDefaultFont('Calibri', 12);
+            
+            $phpExcel->addTableFooter();
+            /* * ******************************************** */
+
+            //-> Create and add the sheets and also check if the form type is pre-defined or custom
+            $index = 0;
+            $files ;
+            //foreach ($post as $data) {
+                
+                foreach ($post as $dat) {
+                    
+                    
+                    $timezone =  \backend\models\Timezones::findOne($dat['timezone_id']);
+                    $record = array(
+                        $dat['id'],
+                        $dat['project_name'],
+                        $dat['project_location'].','.$dat['project_city'],
+                        $dat['project_manager'],
+                        $dat['project_director'],
+                        $dat['client_name'],
+                        $dat['client_project_manager'],
+                        $dat['main_contractor'],
+                        $dat['consultant'],
+                        $dat['consultant_project_manager'],
+                        $dat['about'],
+                        $dat['project_address'],
+                        $dat['project_city'],
+                        $dat['project_country'],
+                        $timezone->id,
+                        $timezone->name,
+                        $dat['client_address'],
+                        $dat['client_city'],
+                        $dat['client_country']
+                        );
+                    $phpExcel->addTableRow($record);
+                }
+            //}
+
+            $phpExcel->addTableFooter();
+            
+            $filename = "temp/ProjectReport-". date("d-m-Y_").\yii::$app->session->id.".xlsx";
+            $phpExcel->output($filename, false, 'S');
+            return $filename;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
     }
     
     function getQuarter( $passedDate = '' ) {

@@ -47,11 +47,20 @@ class LoginForm extends Model
             if (!$user || !$user->validatePassword($this->password)) {
                 $this->addError($attribute, 'Incorrect username or password.');
             }
-
-			
+		
             if ($this->device == 'webapp' && !$user || !$user->allow_be) {
                 $this->addError("password", 'You are not allowed to login through backend. Please contact your administrator.');
-            }        }
+            }
+            else {
+                if($user->company_id > 0) {
+                    $companyModel = Company::findOne(['id' => $user->company_id]);
+                    if(strtotime($companyModel->expiry_date) < time())
+                        $this->addError("password", 'Your subscription has expired. Please contact administrator.');
+                    else if(!$companyModel)
+                        $this->addError("password", 'Your details are removed from the system. Please contact administrator.');
+                }
+            }
+        }
     }
 
     /**

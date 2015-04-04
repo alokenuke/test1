@@ -20,6 +20,29 @@ class TimezonesController extends ApiController
         parent::init();
     }
     
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        
+        $behaviors['access'] = [
+                'class' => \backend\models\RoleAccess::className(),
+                'rules' => [
+                    [
+                        'actions' => ['getall', 'index'],
+                        'allow' => true,
+                        'roles' => ['Client'],
+                    ],
+                    [
+                        'actions' => ['change-password'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ]
+        ];
+        
+        return $behaviors;
+    }
+    
     public function actionSearch() {
         if (!$_POST) {
             

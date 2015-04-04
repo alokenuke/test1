@@ -20,6 +20,59 @@ class RolesController extends ApiController
         parent::init();
     }
     
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        
+        $behaviors['access'] = [
+                'class' => \backend\models\RoleAccess::className(),
+                'rules' => [
+                    [
+                        'actions' => ['search', 'getall', 'loadactions', 'create', 'update', 'view', 'delete'],
+                        'allow' => true,
+                        'roles' => ['Site', 'Client'],
+                    ],
+                    [
+                        'actions' => ['get-permission'],
+                        'allow' => true,
+                        'roles' => ['Client', 'Site']
+                    ]
+                ]
+        ];
+        
+        return $behaviors;
+    }
+    
+    public function actionGetPermission() {
+        if (!$_POST) {
+            
+            $post = $_GET['modules'];
+            
+            $roleDetails = \yii::$app->user->identity->role_details;
+            $permissions = [];
+            
+            if($roleDetails->isAdmin) {
+                $data = \backend\models\ModulesActions::find()->andWhere(['module_name' => $post, 'status' => 1])->all();
+                
+                foreach($data as $d)
+                    $permissions[$d['action']] = true;
+            }
+            else {
+                $data = \backend\models\RoleSettings::find()->andWhere(['role_id' => $roleDetails->id, 'module' => $post])->joinWith("roles")->one();
+                
+                foreach(json_decode($data['role_params']) as $k => $d) {
+                    if($d==1)
+                        $permissions[$k] = true; 
+                }
+            }
+            
+            return [$post => $permissions];
+            
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
+    }
+    
     public function actionSearch() {
         if (!$_POST) {
             

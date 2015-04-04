@@ -44,7 +44,7 @@ class TagProcess extends \yii\db\ActiveRecord
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['company_id', 'default', 'value' => \yii::$app->user->identity->company_id],
             ['created_by', 'default', 'value' => \yii::$app->user->id],
-            [['created_date'], 'safe'],
+            [['option_type', 'created_date'], 'safe'],
         ];
     }
     

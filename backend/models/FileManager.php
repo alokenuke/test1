@@ -8,7 +8,7 @@ use Yii;
  */
 class FileManager extends Model
 {
-    public $company, $file_type, $filename, $destination;
+    public $company, $file_type, $filename, $destination, $pathConstants;
     private $_user;
     
     public function __construct($company="") {
@@ -16,10 +16,8 @@ class FileManager extends Model
             $this->company = $company;
         else
             $this->company = \yii::$app->user->identity->company_id;
-    }
-    
-    public function getLocalPath($type) {
-        $pathConstants = [
+        
+        $this->pathConstants = [
             "" => "",
             "project_image" => "projectImage",
             "barcode" => "tagsImages/barCode",
@@ -32,8 +30,37 @@ class FileManager extends Model
             "attachments" => "attachments",
             "temp" => "temp",
             "browse" => "browse",
+            "databackup" => "databackup",
         ];
-        return $pathConstants[$type];
+    }
+    
+    public function createFolders($type="") {
+        if($type)
+            return $this->getPath($type);
+        else {
+            foreach($this->pathConstants as $path) {
+                $basePath = \Yii::$app->params['repository'].$this->company;
+                
+                $pathInfo = explode("/", $path);
+                if(count($pathInfo) >0 ) {
+                    foreach($pathInfo as $index => $p) {
+                        if($index > 0)
+                            $p = $pathInfo[0]."/".$p;
+                        
+                        if(!file_exists($basePath."/".$p))
+                            mkdir($basePath."/".$p);
+                    }
+                }
+                else {
+                    if(!file_exists($basePath."/".$path))
+                        mkdir($basePath."/".$path);
+                }
+            }
+        }
+    }
+    
+    public function getLocalPath($type) {
+        return $this->pathConstants[$type];
     }
     
     public function getRootPath() {

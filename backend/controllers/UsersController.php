@@ -25,6 +25,29 @@ class UsersController extends ApiController
         parent::init();
     }
     
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        
+        $behaviors['access'] = [
+                'class' => \backend\models\RoleAccess::className(),
+                'rules' => [
+                    [
+                        'actions' => ['search', 'exports', 'levelusers', 'stats', 'getall', 'multiinsert', 'create', 'update', 'view', 'delete'],
+                        'allow' => true,
+                        'roles' => ['Site', 'Client'],
+                    ],
+                    [
+                        'actions' => ['change-password'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ]
+        ];
+        
+        return $behaviors;
+    }
+    
     public function actionSearch() {
         if (!$_POST) {
             
@@ -323,6 +346,72 @@ class UsersController extends ApiController
             throw new BadRequestHttpException($e->getMessage());
         }
 
+    }
+    
+    public function actionExports() {
+        if (!$_POST) {
+            error_reporting(0);
+            $post = \Yii::$app->request->post();
+            
+            $phpExcel = new \backend\models\GenerateExcel();
+            
+            $phpExcel->createWorksheet();
+            $phpExcel->setDefaultFont('Calibri', 13);
+
+            $default = array(
+                array('label' => 'ID', 'width' => 'auto'),
+                array('label' => 'First Name', 'width' => 'auto'),
+                array('label' => 'Last Name', 'width' => 'auto'),
+                array('label' => 'Username', 'width' => 'auto'),
+                array('label' => 'Designation', 'width' => 'auto'),
+                array('label' => 'Email', 'width' => 'auto'),
+                array('label' => 'Role', 'width' => 'auto'),
+                array('label' => 'Phone Number', 'width' => 'auto'),
+                array('label' => 'Receive Notification', 'width' => 'auto'),
+                array('label' => 'Allow BE', 'width' => 'auto'),
+            );
+
+            $phpExcel->addTableHeader($default, array('name' => 'Cambria', 'bold' => true));
+
+            $phpExcel->setDefaultFont('Calibri', 12);
+            
+            $phpExcel->addTableFooter();
+            /* * ******************************************** */
+
+            //-> Create and add the sheets and also check if the form type is pre-defined or custom
+            $index = 0;
+            $files ;
+            //foreach ($post as $data) {
+                
+                foreach ($post as $dat) {
+                    
+//                    $allow_be = ($dat['allow_be'])?'Yes':'No';
+//                    $status = ($dat['project_status'])?'Active':'Inactive';
+                    
+                    $record = array(
+                        $dat['id'],
+                        $dat['first_name'],
+                        $dat['last_name'],
+                        $dat['username'],
+                        $dat['designation'],
+                        $dat['email'],
+                        $dat['role'],
+                        $dat['contact_number'],
+                        $dat['rec_notification'],
+                        $dat['allow_be'],
+                        );
+                    $phpExcel->addTableRow($record);
+                }
+            //}
+
+            $phpExcel->addTableFooter();
+            
+            $filename = "temp/UserReports-". date("d-m-Y_").\yii::$app->session->id.".xlsx";
+            $phpExcel->output($filename, false, 'S');
+            return $filename;
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
     }
 
 }

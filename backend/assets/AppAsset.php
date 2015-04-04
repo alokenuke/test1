@@ -27,7 +27,7 @@ class AppAsset extends AssetBundle
     ];
     public $js = [
         'js/services.js',
-        'js/app.js',
+        'api/initialize',
         'js/module.js',
         'js/tags.js',
         'js/timeattendance.js',

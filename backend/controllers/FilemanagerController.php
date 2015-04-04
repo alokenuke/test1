@@ -17,6 +17,24 @@ class FilemanagerController extends ApiController
         parent::init();
     }
     
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        
+        $behaviors['access'] = [
+                'class' => \backend\models\RoleAccess::className(),
+                'rules' => [
+                    [
+                        'actions' => ['upload', 'uploadimage', 'uploaddoc', 'download', 'getimage'],
+                        'allow' => true,
+                        'roles' => ['Client', 'Site'],
+                    ]
+                ]
+        ];
+        
+        return $behaviors;
+    }
+    
     public $documentPath = 'temp/';
 
     public function verbs()
