@@ -1,7 +1,7 @@
 <div role="tabpanel" class="tab-pane col-xs-12 active" id="List_Tags">
      <div class="row">
         <div class="col-xs-12 search-box mb-sm-large">
-            <form ng-submit="saveTemplate()" id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form">
+            <form name="frmLabelTemplates" ng-submit="saveTemplate()" id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form">
                 <div class='row'>
                     <div class="col-md-2 col-lg-2">
                         <button type="button" class="btn btn-primary" ng-click="addNewTemplate()">Add New Template</button>
@@ -121,10 +121,18 @@
                      <div class="col-md-6 col-lg-6">
                         
                             <h2 class="col-xs-12 search-title mb-20">Inputs</h2>
-                            <div class="form-group">
-                                <label class="col-sm-6 control-label text-right">QR code/Logo width (mm) :</label>
+                            <div class="form-group" ng-class="{'has-error': !frmLabelTemplates.logo_width.$valid}">
+                                <label class="col-sm-6 control-label text-right">QR code / Bar code /Logo width (mm) :</label>
                                 <div class="col-sm-5">
-                                    <input type="text" class="form-control"  ng-model='label_template.logo_width' />
+                                    <input type="number" name="logo_width" class="form-control"  ng-model='label_template.logo_width' max="{{(label_template.print_type == 'bar'?label_template.cal_label_width:(label_template.cal_label_width > label_template.cal_label_height?label_template.cal_label_height:label_template.cal_label_width)-5)}}" min="10" ng-change="label_template.logo_height=(label_template.print_type=='bar'?label_template.logo_width / 4:label_template.logo_width)" />
+                                    <div class="help-block" ng-if="!frmLabelTemplates.logo_width.$valid">Max: {{(label_template.print_type == 'bar'?label_template.cal_label_width:(label_template.cal_label_width > label_template.cal_label_height?label_template.cal_label_height:label_template.cal_label_width)-5)}}, min: 10</div>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{'has-error': !frmLabelTemplates.logo_height.$valid}">
+                                <label class="col-sm-6 control-label text-right">QR code / Bar code /Logo Height (mm) :</label>
+                                <div class="col-sm-5">
+                                    <input type="number" name="logo_height" class="form-control" ng-model='label_template.logo_height' min="{{(label_template.print_type == 'bar'?frmLabelTemplates.logo_width.$modelValue /4:frmLabelTemplates.logo_width.$modelValue)}}" max="{{frmLabelTemplates.logo_width.$modelValue}}" />
+                                    <div class="help-block" ng-if="!frmLabelTemplates.logo_height.$valid">Max: {{label_template.logo_width}}, min: {{(label_template.print_type == 'bar'?label_template.logo_width /4:label_template.logo_width)}}</div>
                                 </div>
                             </div>
                             <div class="form-group">

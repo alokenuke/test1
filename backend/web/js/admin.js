@@ -52,11 +52,6 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
             controller: 'UserUpdate',
         })
 
-        .when('/user-groups', {
-            templateUrl: path+'user-group/index.html',
-            controller: 'UserGroup'
-        })
-        
         .when('/site/error', {
             templateUrl: path + 'site/error.html',
             controller: 'error'
@@ -270,8 +265,6 @@ app.controller('UserIndex', ['$scope', 'rest', '$location', '$route','$routePara
         $scope.pageChanged = function() {
             updateUserList();
         }
-        
-        rest.setData("usergroups/getall", ['user_groups.id', 'group_name'], {}).success(function(data) {$scope.usergroups = data.items;});
         
         $scope.searchUser = function(){
            updateUserList();

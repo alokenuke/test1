@@ -1,7 +1,8 @@
-app.controller('ProjectIndex', ['$scope', 'rest', '$location', '$route', '$routeParams', 'alertService', '$http', 'breadcrumbsService', 'page_dropdown', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, page_dropdown) {
+app.controller('ProjectIndex', ['$scope', 'rest', '$location', '$route', '$routeParams', 'alertService', '$http', 'breadcrumbsService', 'page_dropdown', 'authorizationService', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, page_dropdown, authorizationService) {
 
         rest.path = "projects";
         $scope.page_dropdown = page_dropdown;
+        $scope.permission = authorizationService.permissionModel.permission.projects;
 
         breadcrumbsService.clearAll();
         breadcrumbsService.setTitle("List Projects");
@@ -10,7 +11,7 @@ app.controller('ProjectIndex', ['$scope', 'rest', '$location', '$route', '$route
 
         var errorCallback = function (data) {
             if (data.status != 401) {
-                alertService.add('error', "Error in processing your request. Please try again.");
+                alertService.add('error', data.name+": "+data.message);
             }
         };
         $scope.projects = [];
@@ -63,7 +64,7 @@ app.controller('ProjectIndex', ['$scope', 'rest', '$location', '$route', '$route
             
             rest.models(criteria).success(function (data) {
                 
-                $http.post("exports/generate-project-reports", data.items).success(function (data) {
+                $http.post("projects/export", data.items).success(function (data) {
                     var tabWindowId = window.open("_new");
                     tabWindowId.location.href = data;
                 }).error(function (data) {
@@ -158,9 +159,10 @@ app.controller('ProjectForm', ['$scope', 'rest', '$location', '$route', '$routeP
         });
     }])
 
-app.controller('ProjectLevel', ['$scope', 'rest', '$location', '$route', '$routeParams', 'alertService', '$http', 'breadcrumbsService', "$modal", '$log', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, $modal, $log) {
+app.controller('ProjectLevel', ['$scope', 'rest', '$location', '$route', '$routeParams', 'alertService', '$http', 'breadcrumbsService', "$modal", '$log', 'authorizationService', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, $modal, $log, authorizationService) {
 
         rest.path = "projectlevel";
+        $scope.permission = authorizationService.permissionModel.permission.projectlevel;
 
         breadcrumbsService.clearAll();
         breadcrumbsService.setTitle("Manage Project Levels");
@@ -430,6 +432,7 @@ app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route', '$routeP
                 tree: [],
                 parent_id: 0,
                 editing: true,
+                type: 0
             });
         }
         else {

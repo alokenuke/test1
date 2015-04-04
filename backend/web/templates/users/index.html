@@ -91,7 +91,7 @@
         </div><!--/search-tag-box-->
     </div><!--/row-->
     <div class="row mt-20">
-        <a href="/#/users/create" class="btn btn-default add-new-btn"><i class="fa fa-plus-circle fa-1x"></i>Create Users</a>
+        <a ng-if="permission.create" href="/#/users/create" class="btn btn-default add-new-btn"><i class="fa fa-plus-circle fa-1x"></i>Create Users</a>
 		<button class="pull-right btn btn-primary btn-lg mt-10" type="button" ng-click="downloadReport()">
             <i class="fa fa-print mr-10 fa-lg"></i>Export listed users
         </button>
@@ -113,7 +113,7 @@
                             <th class="text-center"><a ng-href="" ng-click="sortUser('rec_notification')">Receive Notification <i class="fa fa-sort{{sort.rec_notification}}"></i></a></th>
                             <th class="text-center"><a ng-href="" ng-click="sortUser('allow_be')">Allow BE <i class="fa fa-sort{{sort.allow_be}}"></i></a></th>
 							<th class="text-center"><a ng-href="" ng-click="sortUser('status')">Status<i class="fa fa-sort{{sort.status}}"></i></a></th>
-                            <th class="text-center"></th>
+                            <th class="text-center" ng-if="permission.update || permission.delete"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -133,9 +133,9 @@
 							<td class="text-center">
                                 <span class="label" ng-class="{'label-success': user.status, 'label-danger': !user.status}">{{user.status?"Active":"Inactive"}}</span>
                             </td>
-                            <td class="text-center">
-				<a href="/#/users/update/{{user.id}}" class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></a>
-                                <button type="button" ng-confirm-click="Are you sure to remove this user?" title="Click to remove." ng-click="removeUser(user, $index)"><i class="fa fa-trash"></i></button>
+                            <td class="text-center" ng-if="permission.update || permission.delete">
+				<a ng-if="permission.update" href="/#/users/update/{{user.id}}" class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                <button ng-if="permission.delete" type="button" ng-confirm-click="Are you sure to remove this user?" title="Click to remove." ng-click="removeUser(user, $index)"><i class="fa fa-trash"></i></button>
                             </td>
                         </tr>
                      

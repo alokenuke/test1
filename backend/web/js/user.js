@@ -1,6 +1,7 @@
-app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'page_dropdown', '$modal', '$log', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, page_dropdown, $modal, $log) {
+app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'page_dropdown', '$modal', '$log', 'authorizationService', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, page_dropdown, $modal, $log, authorizationService) {
         
     rest.path = "usergroups";
+    $scope.permission = authorizationService.permissionModel.permission.usergroups;
 
     breadcrumbsService.clearAll();
     breadcrumbsService.setTitle("Manage User Groups");
@@ -125,14 +126,14 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
                 scope.users_currentPage = (data._meta.currentPage);
                 scope.users_numPerPage = data._meta.perPage;
                 scope.loading = false;
-                scope.toggle();
+                scope.collapsed = true;
             }).error(function() {
                 errorCallback();
                 scope.loading = false;
             });
         }
         else
-            scope.toggle();
+            scope.collapsed = true;
     }
     
     $scope.assignUsersModal = function (scope) {
@@ -208,9 +209,10 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
     }).error(errorCallback);
 }])
 
-app.controller('UserIndex', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService','page_dropdown', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService,page_dropdown) {
+app.controller('UserIndex', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService','page_dropdown', 'authorizationService', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService,page_dropdown, authorizationService) {
       
         rest.path = "users";
+        $scope.permission = authorizationService.permissionModel.permission.usergroups;
         
         breadcrumbsService.clearAll();
         breadcrumbsService.setTitle("Manage Users");
@@ -294,7 +296,7 @@ app.controller('UserIndex', ['$scope', 'rest', '$location', '$route','$routePara
             rest.models(criteria).success(function (data) {
                 
                 //console.log(data.items);return;
-                $http.post("exports/generate-user-reports", data.items).success(function (data) {
+                $http.post("users/exports", data.items).success(function (data) {
                     var tabWindowId = window.open("_new");
                     tabWindowId.location.href = data;
                 }).error(function (data) {

@@ -50,7 +50,7 @@
                     </button>
                 </div>
                 <div class="wrapper mt-20">
-                    <div class="col-sm-7 col-md-8 col-lg-9 cust-col">
+                    <div class="cust-col" ng-class="{'col-sm-12 col-md-12 col-lg-12': !usergroups, 'col-sm-7 col-md-8 col-lg-9': usergroups}">
                         <div class="row cust-row">
                             <div ng-repeat="project in projects" class="projectbox col-md-6 col-lg-4 cust-col">
                                 <div class="box">
@@ -109,7 +109,7 @@
                             </h3>
                         </div><!--/row-->
                     </div>
-                    <div class="col-sm-5 col-md-4 col-lg-3 cust-col">
+                    <div class="col-sm-5 col-md-4 col-lg-3 cust-col" ng-if="usergroups">
                         <hgroup>
                             <h5 class="project-title mt-0 mb-0">Total User Group: <span class="project-name pull-right">{{usergroups.length}}</span></h5>
                         </hgroup>

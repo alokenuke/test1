@@ -1,8 +1,9 @@
-app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'page_dropdown', '$rootScope', "$modal", "$log",
-                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, page_dropdown, $rootScope, $modal, $log) {
+app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'page_dropdown', '$rootScope', "$modal", "$log", "authorizationService",
+                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, page_dropdown, $rootScope, $modal, $log, authorizationService) {
         $scope.tagsNum = 1;
         rest.path = "tags";
         $scope.page_dropdown = page_dropdown;
+        $scope.permission = authorizationService.permissionModel.permission.tags;
         
         breadcrumbsService.clearAll();
         breadcrumbsService.setTitle("Manage Tags");
@@ -171,7 +172,7 @@ app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParam
 			rest.customModelData("tags/search?expand=tagActivityLog", params).success(function (data) {
                 $scope.data = data.items; 
                 
-                if($scope.data.length > 0 && typeof $scope.select.tag_process != 'undefined' && $scope.select.tag_process[2] && $scope.select.tag_process[2].selected) {
+                if($scope.data.length > 0 && $scope.select.tag_process[1] && $scope.select.tag_process[1].selected) {
                     $scope.allowLogActivity = true;
                 }
                 
@@ -531,15 +532,15 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
                             $scope.search.item[level] = data.items[0];
                             $scope.updateSelectBox('items', projectId, level+1, $scope.search.item[level].id);
                             
-                            if($scope.search['process'] && $scope.search.process[0] && level==2) {
+                            if($scope.search['process'] && $scope.search.process[0] && level==1) {
                                 $scope['processes'].splice(0, ($scope['processes'].length-1));
 
-                                rest.setData("items/getrelatedprocess/"+$scope.search.item[level].id+"?expand=checkProcessError", ['id', 'process_name'], {'process_parent_id': $scope.search.process[0], 'tag_item_id': $scope.search.item[1]}).success(function(data) {
+                                rest.setData("items/getrelatedprocess/"+$scope.search.item[level].id+"?expand=checkProcessError", ['id', 'process_name'], {'tag_process.parent_id': $scope.search.process[0], 'tag_item_id': $scope.search.item[1]}).success(function(data) {
                                     if(data.items.length>0) {
                                         $scope['processes'].push(data.items);
                                         if(data.items.length==1) {
                                             $scope.search.process[1] = data.items[0];
-                                            $scope.updateSelectBox('processes', projectId, 2, data.items[0].id);
+                                            $scope.updateSelectBox('processes', projectId, 1, data.items[0].id);
                                         }
                                     }
                                 });
@@ -550,17 +551,16 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
                 });
             }
             else if(variable=='processes') {
-                if(level==2)
+                if(level == 1) {
                     $scope.tagDetails['tag_process_flow_id'] = parent;
-                
-                if(level < 2) {
+                    
                     $scope[variable].splice(level, ($scope[variable].length-level));
                     
                     if(typeof $scope.search.process != 'undefined')
                         $scope.search.process.splice(level, $scope.search.process.length-level);
                     
-                    if($scope.search.item[1] && level != 1) {
-                        rest.setData("items/getrelatedprocess/"+$scope.search.item[1].id+"?expand=checkProcessError", ['id', 'process_name'], {'process_parent_id': parent}).success(function(data) {
+                    if($scope.search.item[1]) {
+                        rest.setData("items/getrelatedprocess/"+$scope.search.item[1].id+"?expand=checkProcessError", ['id', 'process_name'], {'tag_process.parent_id': parent}).success(function(data) {
                             if(data.items.length>0) {
                                 $scope[variable].push(data.items);
                                 if(data.items.length==1) {
@@ -570,12 +570,23 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
                             }
                         });
                     }
-                    else if(level==1) {
-                        rest.setData("tagprocess/getall?expand=checkProcessError", ['id', 'process_name'], {'parent_id': parent}).success(function(data) {
-                            $scope.process_stages = data.items;
-                        });
+                    else {
+                            rest.setData("tagprocess/getall?expand=checkProcessError", ['id', 'process_name'], {'tag_process.parent_id': parent}).success(function(data) 
+                            {
+                                if(data.items.length>0) {
+                                    $scope[variable].push(data.items);
+                                    if(data.items.length==1) {
+                                        $scope.search.process[level] = data.items[0];
+                                        $scope.updateSelectBox('processes', projectId, level+1, data.items[0].id);
+                                    }
+                                }
+                            });
                     }
                 }
+                else
+                    rest.setData("tagprocess/getall?expand=checkProcessError", ['id', 'process_name'], {'parent_id': parent}).success(function(data) {
+                        $scope.process_stages = data.items;
+                    });
             }
         }
         
@@ -869,7 +880,7 @@ app.controller('TagsUpdate', ['$scope', 'rest', '$location', '$route','$routePar
                 if($scope.search['process'] && $scope.search.process[0] && level==1) {
                     $scope['processes'].splice(0, ($scope['processes'].length-1));
 
-                    rest.setData("items/getrelatedprocess/"+parent, ['id', 'process_name'], {'process_parent_id': $scope.search.process[0], 'tag_item_id': $scope.search.item[1]}).success(function(data) {
+                    rest.setData("items/getrelatedprocess/"+parent, ['id', 'process_name'], {'tag_process.parent_id': $scope.search.process[0], 'tag_item_id': $scope.search.item[1]}).success(function(data) {
                         if(data.items.length>0)
                             $scope['processes'].push(data.items);
                     });
@@ -877,14 +888,14 @@ app.controller('TagsUpdate', ['$scope', 'rest', '$location', '$route','$routePar
             }
             else if(variable=='processes') {
                 
-                if(level==2)
+                if(level==1)
                     $scope.tagDetails['tag_process_flow_id'] = parent;
                 
                 if($scope.search['item'] && $scope.search.item[1]) {
                     $scope[variable].splice(level, ($scope[variable].length-level-1));
                     
                     if(level < 1) {   
-                        rest.setData("items/getrelatedprocess/"+$scope.search.item[1].id, ['id', 'process_name'], {'process_parent_id': parent}).success(function(data) {
+                        rest.setData("items/getrelatedprocess/"+$scope.search.item[1].id, ['id', 'process_name'], {'tag_process.parent_id': parent}).success(function(data) {
                             if(data.items.length>0)
                                 $scope[variable].push(data.items);
                         });
@@ -1196,12 +1207,12 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
                             if($scope.search['process'] && $scope.search.process[0] && level==1) {
                                 $scope['processes'].splice(0, ($scope['processes'].length-1));
 
-                                rest.setData("items/getrelatedprocess/"+$scope.search.item[level].id+"?expand=checkProcessError", ['id', 'process_name'], {'process_parent_id': $scope.search.process[0], 'tag_item_id': $scope.search.item[1]}).success(function(data) {
+                                rest.setData("items/getrelatedprocess/"+$scope.search.item[level].id+"?expand=checkProcessError", ['id', 'process_name'], {'tag_process.parent_id': $scope.search.process[0], 'tag_item_id': $scope.search.item[1]}).success(function(data) {
                                     if(data.items.length>0) {
                                         $scope['processes'].push(data.items);
                                         if(data.items.length==1) {
                                             $scope.search.process[1] = data.items[0];
-                                            $scope.updateSelectBox('processes', projectId, 2, data.items[0].id);
+                                            $scope.updateSelectBox('processes', projectId, 1, data.items[0].id);
                                         }
                                     }
                                 });
@@ -1212,17 +1223,16 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
                 });
             }
             else if(variable=='processes') {
-                if(level==2)
+                if(level == 1) {
                     $scope.tagDetails['tag_process_flow_id'] = parent;
-                
-                if($scope.search['item'] && $scope.search.item[1]) {
+                    
                     $scope[variable].splice(level, ($scope[variable].length-level));
                     
                     if(typeof $scope.search.process != 'undefined')
                         $scope.search.process.splice(level, $scope.search.process.length-level);
                     
-                    if(level == 1) {
-                        rest.setData("items/getrelatedprocess/"+$scope.search.item[1].id+"?expand=checkProcessError", ['id', 'process_name'], {'process_parent_id': parent}).success(function(data) {
+                    if($scope.search.item[1]) {
+                        rest.setData("items/getrelatedprocess/"+$scope.search.item[1].id+"?expand=checkProcessError", ['id', 'process_name'], {'tag_process.parent_id': parent}).success(function(data) {
                             if(data.items.length>0) {
                                 $scope[variable].push(data.items);
                                 if(data.items.length==1) {
@@ -1232,15 +1242,26 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
                             }
                         });
                     }
-                    else if(level>1) {
-                        rest.setData("tagprocess/getall?expand=checkProcessError", ['id', 'process_name'], {'parent_id': parent}).success(function(data) {
-                            $scope.process_stages = data.items;
-                        });
+                    else {
+                            rest.setData("tagprocess/getall?expand=checkProcessError", ['id', 'process_name'], {'tag_process.parent_id': parent}).success(function(data) 
+                            {
+                                if(data.items.length>0) {
+                                    $scope[variable].push(data.items);
+                                    if(data.items.length==1) {
+                                        $scope.search.process[level] = data.items[0];
+                                        $scope.updateSelectBox('processes', projectId, level+1, data.items[0].id);
+                                    }
+                                }
+                            });
                     }
                 }
+                else
+                    rest.setData("tagprocess/getall?expand=checkProcessError", ['id', 'process_name'], {'parent_id': parent}).success(function(data) {
+                        $scope.process_stages = data.items;
+                    });
             }
         }
-
+        
         $scope.saveTagDetails = function() {
             if(!$scope.selectedTags || $scope.selectedTags.length == 0){
                 alertService.clearAll();
@@ -1558,10 +1579,10 @@ app.controller('TagsUpdateMaster', ['$scope', 'rest', '$location', '$route','$ro
                         $scope[variable].push(data.items);
                 });
                 
-                if($scope.search['process'] && $scope.search.process[0] && level==2) {
+                if($scope.search['process'] && $scope.search.process[0] && level==1) {
                     $scope['processes'].splice(0, ($scope['processes'].length-1));
 
-                    rest.setData("items/getrelatedprocess/"+parent, ['id', 'process_name'], {'process_parent_id': $scope.search.process[0], 'tag_item_id': $scope.search.item[1]}).success(function(data) {
+                    rest.setData("items/getrelatedprocess/"+parent, ['id', 'process_name'], {'tag_process.parent_id': $scope.search.process[0], 'tag_item_id': $scope.search.item[1]}).success(function(data) {
                         if(data.items.length>0)
                             $scope['processes'].push(data.items);
                     });
@@ -1569,14 +1590,14 @@ app.controller('TagsUpdateMaster', ['$scope', 'rest', '$location', '$route','$ro
             }
             else if(variable=='processes') {
                 
-                if(level==2)
+                if(level==1)
                     $scope.tagDetails['tag_process_flow_id'] = parent;
                 
                 if($scope.search['item'] && $scope.search.item[1]) {
                     $scope[variable].splice(level, ($scope[variable].length-level-1));
                     
                     if(level < 1) {   
-                        rest.setData("items/getrelatedprocess/"+$scope.search.item[1].id, ['id', 'process_name'], {'process_parent_id': parent}).success(function(data) {
+                        rest.setData("items/getrelatedprocess/"+$scope.search.item[1].id, ['id', 'process_name'], {'tag_process.parent_id': parent}).success(function(data) {
                             if(data.items.length>0)
                                 $scope[variable].push(data.items);
                         });
@@ -1787,9 +1808,10 @@ app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParam
         });
     }])
 
-app.controller('TagItems', function($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, page_dropdown, $modal, $log) {
+app.controller('TagItems', function($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, page_dropdown, $modal, $log, authorizationService) {
     
     rest.path = "items";
+    $scope.permission = authorizationService.permissionModel.permission.items;
     
     alertService.clearAll();
     breadcrumbsService.clearAll();

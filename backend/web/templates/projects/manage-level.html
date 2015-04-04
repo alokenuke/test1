@@ -7,11 +7,11 @@
                     <div class="col-md-12">
                         <div class="row">
                             <div class="col-lg-12">
-                                <button class='btn btn-primary' ng-click="newSubItem(list, 'top')">
+                                <button ng-if="permission.create" class='btn btn-primary' ng-click="newSubItem(list, 'top')">
                                     Create Level Group
                                 </button>
                                 <div class='row' style='padding:20px;'>
-                                    <div class="alert alert-info" ng-if="flagUpdatedLevels">
+                                    <div ng-if="permission.create" class="alert alert-info" ng-if="flagUpdatedLevels">
                                         <span>
                                             We have noted the updates in level positions. Click 'Save Now' to save. 
                                             <button ng-disabled="loadingSaveLevelPosition" class='btn btn-primary' ng-click="saveLevelPosition()">
@@ -39,7 +39,6 @@
                                         <ol ui-tree-nodes ng-model="list" >
                                             <li ng-repeat="item in list" ui-tree-node ng-include="'items_renderer.html'"></li>
                                         </ol>
-                                        <span ng-if="list.length==0">No data available.</span>
                                         <span ng-if="!list"><i class="fa fa-refresh"></i>Loading...</span>
                                     </div>
                                 </div>
@@ -57,14 +56,14 @@
         <div ng-hide="view.editorEnabled"><a class="btn btn-success btn-xs" ng-click="$parent.toggle($parent)">
             <span class="fa" ng-class="{'fa-chevron-right': $parent.collapsed, 'fa-chevron-down': !$parent.collapsed}"></span></a>
             {{view.editableValue}}
-            <a class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this level? This action cannot be undone."><span class="fa fa-trash"></span></a>
-            <a class="pull-right btn btn-primary btn-xs" nodrag ng-click="$parent.newSubItem($parent, '')" style="margin-right: 8px;">
+            <a ng-if="permission.delete" class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this level? This action cannot be undone."><span class="fa fa-trash"></span></a>
+            <a ng-if="permission.create" class="pull-right btn btn-primary btn-xs" nodrag ng-click="$parent.newSubItem($parent, '')" style="margin-right: 8px;">
                 <span class="fa fa-plus"></span>
             </a>
-            <a class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
+            <a ng-if="permission.edit" class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
                 <span class="fa fa-pencil"></span>
             </a>
-            <a ng-show="view.parent_id==0" class="pull-right btn btn-primary btn-xs" nodrag 
+            <a ng-if="permission.assignprojects" ng-show="view.parent_id==0" class="pull-right btn btn-primary btn-xs" nodrag 
                ng-click="$parent.showProjectsModal(view)" style="margin-right: 8px;">
                 Projects
             </a>

@@ -175,104 +175,118 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-lg-7" id="label_template">
-                        <div class="form-group">
-                            <label class="col-sm-4 col-lg-3 control-label text-right">Label Template:</label>
-                            <div class="col-sm-6">
-                                <select class="form-control" ng-model="print.label_template" ng-required="true"
-                                    ng-options="template.template_name for template in templates">
-                               </select>
-                            </div>
-                        </div>
-                    </div>
                 </div><!--/row-->
                 <div class="row mt-20">
                     <div class="col-sm-10 text-center">
-                        <button class="btn btn-primary mb-sm-5" type="submit">View Labels</button>
+                        <button class="btn btn-primary mb-sm-5" type="submit">Search Tags</button>
                         <button class="btn btn-primary mb-sm-5" type="button" ng-click="clearFilter();">Clear Filter</button>
                     </div> 
                 </div>
             </form>
-            <div id="TaskContentBlock" class="row" ng-if="labels"><!-- .span12 -->
-                <div class="col-sm-12">
-                    <form class="search-box " role="form" ng-submit="printLabel()">
-                        <div class="form-inline">
-                            <div class="mt-10 mb-10 pb-10 clearfix" style='border-bottom: 1px solid #ccc'>
-                                <div class="pull-left pl-20">
-                                    <div class="form-group">
-                                        <label>
-                                            <input type="checkbox" ng-change="checkAll(selectAll)" ng-model="selectAll" /> All 
-                                        </label>
+        </div>
+    </div>
+        <div id="TaskContentBlock" class="row"><!-- .span12 -->
+            <div class="clearfix table-responsive table-responsive-cust">
+                <div class="pull-left mt-20">
+                    <div class="col-md-6 col-lg-12">
+                        <div>Total Selected Tags: {{temp | size}}</div>
+                        <form id="frmPrintLabel" class="form-wrapper form-horizontal form-horizontal-type1" role="form" ng-submit="printLabels()">
+                            <div id="label_template">
+                                <div class="form-group">
+                                    <label class="pull-left pl-15 control-label text-right">Label Template:</label>
+                                    <div class="col-xs-5">
+                                        <select class="form-control" ng-model="label_template" ng-required="true"
+                                            ng-options="template.template_name for template in templates">
+                                       </select>
                                     </div>
-                                    <div class="form-group">
-                                        <button class="btn btn-primary" type="submit"><i class="fa fa-print"></i> Print Label</button>
-                                    </div>
-                                </div>
-                                <div class="mt-5 text-center">
-                                    &nbsp;&nbsp;<i class="fa fa-list-alt fa-lg mr-10 mt-5"></i><br />
-                                    <strong>List Of Tags</strong>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="body slide" ng-hide="collapsed" id="actionTable">
-                            <div class="clearfix">
-                                <div class="clearfix pl-20" ng-repeat="label in labels track by $index" style="border-bottom: 1px solid #ccc;">
-                                    <div class="col-sm-4" ng-if="label.uid">
-                                        <input type="checkbox" ng-model="label.isSelected" ng-change="checkLabel(label)">
-                                        <strong>UID:</strong>{{label.uid}}
-                                        <br><br>
-                                        <img style='width: 15em' ng-src="/filemanager/getimage?type={{basePrintType[(print.label_template.print_type+'_code')]}}&file={{((print.label_template.print_type+'_code')=='nfc_code'?'nfc':label.uid)}}.png"><br>
-                                        <img width="150" height="20" alt="" src="/images/logo.png"><br>
-                                        <strong>www.sitetrack-nfc.com</strong>  
-                                    </div>
-                                    <div class="col-sm-8 mt-15">
-                                        <div>&nbsp;</div>
-                                        <div ng-if="print.label_template.id==0 || print.label_template.checked_labels.company_name">
-                                            <strong>Company Name: </strong>{{company.company_name}}
-                                        </div>
-                                        <div ng-if="print.label_template.id==0 || print.label_template.checked_labels.client_name">
-                                            <strong>Client Name: </strong>{{search.project.client_name}}
-                                        </div>
-                                        <div ng-if="print.label_template.id==0 || print.label_template.checked_labels.client_location">
-                                            <strong>Client Location: </strong>{{search.project.client_address}} {{search.project.client_city}}
-                                        </div>
-                                        <div ng-if="print.label_template.id==0 || print.label_template.checked_labels.main_contractor">
-                                            <strong>Main Contractor: </strong>{{search.project.main_contractor}}
-                                        </div>
-                                        <div ng-if="print.label_template.id==0 || print.label_template.checked_labels.project_name">
-                                            <strong>Project Name: </strong>{{search.project.project_name}}
-                                        </div>
-                                        <div ng-if="print.label_template.id==0 || print.label_template.checked_labels.project_location">
-                                            <strong>Area: </strong>{{search.project.project_location}}
-                                        </div>
-                                        <div ng-if="print.label_template.id==0 || print.label_template.checked_labels.project_level">
-                                            <strong>Project Level:</strong><span ng-repeat="project_level in label.project_level track by $index">
-                                                {{project_level}} <strong ng-if="label.project_level.length !== ($index + 1)">&nbsp;>&nbsp;</strong>
-                                            </span>
-                                        </div>
-                                        <div ng-if="print.label_template.id==0 || print.label_template.checked_labels.tag_item">
-                                            <strong>Item: </strong><span ng-repeat="item in label.itemObj track by $index">
-                                                {{item.item_name}} <strong ng-if="label.itemObj.length !== ($index + 1)">&nbsp;>&nbsp;</strong>
-                                            </span>
-                                        </div>
-                                        <div ng-if="print.label_template.id==0 || print.label_template.checked_labels.process">
-                                            <strong>Process: </strong><span ng-repeat="process in label.processObj track by $index">
-                                                {{process.process_name}} <strong ng-if="label.processObj.length !== ($index + 1)">&nbsp;>&nbsp;</strong>
-                                            </span>
-                                        </div>
-                                        <div ng-if="print.label_template.id==0 || print.label_template.checked_labels.tag_description">
-                                            <strong>Task Summary: </strong>{{label.tag_description}}
-                                        </div>
+                                    <div class="col-xs-4">
+                                        <button class="btn btn-primary mb-sm-5" type="submit">Print Selected Tags</button>
                                     </div>
                                 </div>
                             </div>
-                            <div class="pl-20" ng-if="!labels || labels.length==0">
-                                No label available for your search
-                            </div>
-                        </div>
-                    </form>       
-                </div><!-- /label list container -->
+                        </form>
+                    </div>
+                </div>
+                <div class="pull-right">
+                    <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
+                    <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px" ng-change="setPageLimit()" ng-model="numPerPage" ng-options="k as v for (k,v) in page_dropdown">
+                    </select>
+                </div>
+                
+                <div class="clearfix"></div>
+                <table class="table table-bordered" id="rt1">
+                    <thead>
+                        <tr>
+                            <th class="text-center">
+                                <input type="checkbox" ng-change="selectAllTags(data, allSelected)" ng-model="allSelected" />
+                            </th>
+                            <th class="text-center">Type</th>
+                            <th class="text-center" style="width: 15%;">Project Level</th>
+                            <th class="text-center">
+                                <a href="" ng-click="order('uid')">UID <i class="fa fa-sort{{sort.uid}}"></i></a>
+                            </th>
+                            <th class="text-center" style="width: 10%;">Item Type</th>
+                            <th class="text-center" style="width: 15%;">
+                                <a href="" ng-click="order('tag_name')">Tag Name <i class="fa fa-sort{{sort.tag_name}}"></i></a>
+                            </th>
+                            <th class="text-center" style="width: 15%;">
+                                <a href="" ng-click="order('tag_description')">Tag Description <i class="fa fa-sort{{sort.tag_description}}"></i></a>
+                            </th>
+                            <th class="text-center">
+                                <a href="" ng-click="order('product_code')">Products Code <i class="fa fa-sort{{sort.product_code}}"></i></a>
+                            </th>
+                            <th class="text-center" style="width: 15%;">
+                                Last status updated
+                            </th>
+                            <th class="text-center" style="width: 125px;">Actions</th>
+                            <!-- <th class="text-center"></th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-if="!data">
+                            <td colspan="10">
+                                Refine your search to view tags.
+                            </td>
+                        </tr>
+                        <tr ng-repeat="dat in data">
+                            <td class="text-center">
+                                <input type="checkbox" ng-model="dat.isSelected" ng-change="selectTag(dat)" ng-init="dat.isSelected = (temp[''+dat.id]?true:false)" />
+                            </td>
+                            <td class="text-center {{dat.type}}">{{dat.type}}</td>
+                            <td class="text-center multi-level">
+                                <div class="level-item">{{dat.project_name}}</div>
+                                <div class="level-item" ng-repeat="project_level in dat.project_level" ng-class="{'last-child': dat.project_level.length === ($index + 1)}">
+                                    {{project_level}}
+                                </div>
+                            </td>
+                            <td class="text-center">{{dat.uid}}</td>
+                            <td class="text-center">{{dat.itemDetails.item_name}}</td>
+                            <td class="text-center">{{dat.tag_name}}</td>
+                            <td class="text-center">{{dat.tag_description}}</td>
+                            <td class="text-center">{{(dat.product_code?dat.product_code:"-")}}</td>
+                            <td class="text-center">
+                                <div ng-if="dat.tagActivityLog.stageInfo">
+                                    {{dat.tagActivityLog.stageInfo.process_name}} - {{dat.tagActivityLog.answer.process_name}}<br/>
+                                    <small>({{dat.tagActivityLog.loggedBy.first_name}}{{dat.tagActivityLog.loggedBy.last_name}}  {{dat.tagActivityLog.logged_date}})</small>
+                                </div>
+                                <div ng-if="!dat.tagActivityLog.stageInfo">
+                                    Not started
+                                </div>
+                            </td>
+                            <td class="text-center" style="padding: 0;">
+                                <a href="/#/tags/{{dat.id}}" class="btn icon-btn mr-0" title="Tag analysis" target="_blank"><i class="fa fa-list-alt fa-lg"></i></a>
+                                <a class="btn icon-btn mr-0" image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}}" type="YmFyY29kZQ==" imageUrl="{{dat.uid}}.png" openlightbox title="Bar code"><i class="fa fa-barcode fa-lg"></i></a>
+                                <a class="btn icon-btn mr-0"  image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}} " type="cXJjb2Rl" imageUrl="{{dat.uid}}.png" openlightbox title="QR code"><i class="fa fa-qrcode fa-lg"></i></a><br />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="clearfix"></div>
+                <div class="pull-right">                    
+                    <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
+                    <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px" ng-change="setPageLimit()" ng-model="numPerPage" ng-options="k as v for (k,v) in page_dropdown">
+                    </select>
+                </div>
             </div>
-        </div><!--/search-tag-box-->
-    </div><!--/row-->
-</div><!--/tab-content-->
+        </div><!--/row-->
+</div><!--/search-tag-box-->

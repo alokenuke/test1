@@ -3,7 +3,7 @@
         <div class="col-md-12">
             <div class="row"    >
                 <div class="col-lg-12">
-                    <button class='btn btn-primary' ng-click="newSubItem(list, 'top')">
+                    <button ng-if="permission.create" class='btn btn-primary' ng-click="newSubItem(list, 'top')">
                         Add New User Group
                     </button>
                     <div class='row' style='padding:20px;'>
@@ -25,7 +25,6 @@
                                     </ol>
                                 </li>
                             </ol>
-                            <span ng-if="list.length == 0">No data available.</span>
                             <span ng-if="!list"><i class="fa fa-refresh"></i>Loading...</span>
                         </div>
                     </div>
@@ -175,11 +174,11 @@
         <span class="fa" ng-class="{'fa-chevron-right': !view.collapsed, 'fa-chevron-down': view.collapsed}"></span></a>
         {{view.editableValue}}
         &nbsp;&nbsp; <a class="btn-info" ng-show="view.loading"><i class="fa fa-refresh"></i> Loading users..</a>
-        <a class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this level? This action cannot be undone."><span class="fa fa-trash"></span></a>
-        <a class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
+        <a ng-if="permission.delete" class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this level? This action cannot be undone."><span class="fa fa-trash"></span></a>
+        <a ng-if="permission.edit" class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
             <span class="fa fa-pencil"></span>
         </a>
-        <a class="pull-right btn btn-primary btn-xs" ng-click="$parent.loadUsers(view)" style="margin-right: 8px;">
+        <a ng-if="permission.assignusers" class="pull-right btn btn-primary btn-xs" ng-click="$parent.loadUsers(view)" style="margin-right: 8px;">
             <i class="fa fa-user"></i> Users
         </a>
     </div>
@@ -199,13 +198,13 @@
         <div ng-hide="view.editorEnabled"><a class="btn btn-success btn-xs" ng-click="$parent.toggle($parent)">
             <span class="fa" ng-class="{'fa-plus': $parent.collapsed, 'fa-minus': !$parent.collapsed}"></span></a>
             {{view.editableValue}}
-            <a class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this group? On removing this group, all related levels will be removed."><span class="fa fa-trash"></span></a>
+            <a ng-if="permission.delete" class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this group? On removing this group, all related levels will be removed."><span class="fa fa-trash"></span></a>
             
-            <a class="pull-right btn btn-primary btn-xs" ng-click="$parent.newSubItem(view, 'user_group')" style="margin-right: 8px;"><span class="fa fa-plus"></span></a>
-            <a class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
+            <a ng-if="permission.create" class="pull-right btn btn-primary btn-xs" ng-click="$parent.newSubItem(view, 'user_group')" style="margin-right: 8px;"><span class="fa fa-plus"></span></a>
+            <a ng-if="permission.edit" class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
                 <span class="fa fa-pencil"></span>
             </a>
-            <a class="pull-right btn btn-primary btn-xs" ng-click="$parent.showProjectsModal(view)" style="margin-right: 8px;">Projects</a>
+            <a ng-if="permission.assignprojects" class="pull-right btn btn-primary btn-xs" ng-click="$parent.showProjectsModal(view)" style="margin-right: 8px;">Projects</a>
         </div>
         <div ng-show="view.editorEnabled" class="slide">
             <form class="form-inline" ng-submit="$parent.saveItem($parent, view.editableValue);">

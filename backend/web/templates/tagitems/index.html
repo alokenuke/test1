@@ -6,7 +6,7 @@
                 <div class="col-md-12">
                     <div class="row">
                       <div class="col-lg-12">
-                          <button class='btn btn-primary' ng-click="newSubItem(list, 'top')">
+                          <button ng-if="permission.create" class='btn btn-primary' ng-click="newSubItem(list, 'top')">
                               Add Tag Item Group
                           </button>
                           <div class='row' style='padding:20px;' ng->
@@ -18,10 +18,10 @@
                                             <a class="btn btn-success btn-xs" data-nodrag ng-click="loadItems(item)"><span class="fa" ng-class="{'fa-chevron-right': !item.collapsed, 'fa-chevron-down': item.collapsed}"></span></a>
                                             {{item.item_name}}
                                             &nbsp;&nbsp; <a class="btn-info" ng-show="item.loading"><i class="fa fa-refresh"></i> Loading items..</a>
-                                            <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeItem(this)" ng-confirm-click="Are you sure to delete this group? All items and sub-items will be removed."><span class="fa fa-trash"></span></a>
-                                            <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newSubItem(item, 'item_'+item.parent_id)" style="margin-right: 8px;"><span class="fa fa-plus"></span></a>
-                                            <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(item)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
-                                            <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="showProjectsModal(item)" style="margin-right: 8px;">Projects</a>
+                                            <a ng-if="permission.delete" class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeItem(this)" ng-confirm-click="Are you sure to delete this group? All items and sub-items will be removed."><span class="fa fa-trash"></span></a>
+                                            <a ng-if="permission.create" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newSubItem(item, 'item_'+item.parent_id)" style="margin-right: 8px;"><span class="fa fa-plus"></span></a>
+                                            <a ng-if="permission.edit" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(item)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
+                                            <a ng-if="permission.assignprojects" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="showProjectsModal(item)" style="margin-right: 8px;">Projects</a>
                                         </div>
                                         <div ng-show="item.editing">
                                             <form class="form-inline" role="form" ng-submit="saveItem(item, item.tempTitle);">
@@ -41,10 +41,10 @@
                                                     <a class="btn btn-success btn-xs" data-nodrag ng-click="loadItems(item)"><span class="fa" ng-class="{'fa-chevron-right': !item.collapsed, 'fa-chevron-down': item.collapsed}"></span></a>
                                                     {{item.item_name}}
                                                     &nbsp;&nbsp; <a class="btn-info" ng-show="item.loading"><i class="fa fa-refresh"></i> Loading items..</a>
-                                                    <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeItem(this)" ng-confirm-click="Are you sure to delete this item? All related sub items will be removed."><span class="fa fa-trash"></span></a>
-                                                    <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newSubItem(item, 'item_'+item.parent_id)" style="margin-right: 8px;"><span class="fa fa-plus"></span></a>
-                                                    <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(item)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
-                                                    <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="linkProcess(item)" style="margin-right: 8px;">Assign Process Flow</a>
+                                                    <a ng-if="permission.delete" class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeItem(this)" ng-confirm-click="Are you sure to delete this item? All related sub items will be removed."><span class="fa fa-trash"></span></a>
+                                                    <a ng-if="permission.create" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newSubItem(item, 'item_'+item.parent_id)" style="margin-right: 8px;"><span class="fa fa-plus"></span></a>
+                                                    <a ng-if="permission.edit" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(item)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
+                                                    <a ng-if="permission.assignprocess" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="linkProcess(item)" style="margin-right: 8px;">Assign Process Flow</a>
                                                 </div>
                                                 <div ng-show="item.editing">
                                                     <form class="form-inline" role="form" ng-submit="saveItem(item, item.tempTitle);">
@@ -62,9 +62,9 @@
                                                     <div ui-tree-handle ng-class="'item_'+item.parent_id">
                                                         <div ng-hide="item.editing">
                                                             {{item.item_name}}
-                                                            <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeItem(this)" ng-confirm-click="Are you sure to delete this group? This action can not be undone."><span class="fa fa-trash"></span></a>
+                                                            <a ng-if="permission.delete" class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeItem(this)" ng-confirm-click="Are you sure to delete this group? This action can not be undone."><span class="fa fa-trash"></span></a>
 
-                                                            <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(item)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
+                                                            <a ng-if="permission.edit" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(item)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
                                                         </div>
                                                         <div ng-show="item.editing">
                                                             <form class="form-inline" role="form" ng-submit="saveItem(item, item.tempTitle);">
@@ -83,7 +83,6 @@
                                      </ol>
                                   </li>
                                 </ol>
-                                <span ng-if="list.length==0">No data available.</span>
                                 <span ng-if="!list"><i class="fa fa-refresh"></i>Loading...</span>
                             </div>
                           </div>
