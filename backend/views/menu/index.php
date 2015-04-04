@@ -25,7 +25,21 @@ $this->params['breadcrumbs'][] = $this->title;
             'label',
             'url:url',
             [
-                'attribute' => 'parent.label',
+                'format' => 'html',
+                'label' => 'Modules',
+                'value' => function ($model) {
+                    return str_replace(",", "<br />", $model->modules);
+                },
+            ],
+            [
+                'format' => 'html',
+                'label' => 'Actions',
+                'value' => function ($model) {
+                    return str_replace(",", "<br />", $model->actions);
+                },
+            ],
+            [
+                'attribute' => 'parent_id',
                 'label' => 'Parent',
                 'value' => function ($model) {
                     return $model['parent'] ? $model['parent']->label : '';

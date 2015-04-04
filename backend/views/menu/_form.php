@@ -8,24 +8,29 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="menu-form">
+<div class="clearfix menu-form">
+    <div class="col-sm-1"></div>
+    <div class="col-sm-9">
+        <?php $form = ActiveForm::begin(); ?>
 
-    <?php $form = ActiveForm::begin(); ?>
+        <?= $form->field($model, 'label')->textInput(['maxlength' => 128]) ?>
 
-    <?= $form->field($model, 'label')->textInput(['maxlength' => 128]) ?>
+        <?= $form->field($model, 'url')->textInput(['maxlength' => 256]) ?>
 
-    <?= $form->field($model, 'url')->textInput(['maxlength' => 256]) ?>
+        <?= $form->field($model, 'parent_id')->dropDownList(yii\helpers\ArrayHelper::map(\backend\models\Menu::find()->all(), "id", "label"), ['prompt'=>'- Parent-']) ?>
 
-    <?= $form->field($model, 'parent_id')->dropDownList(yii\helpers\ArrayHelper::map(\backend\models\Menu::find()->all(), "id", "label"), ['prompt'=>'- Parent-']) ?>
+        <?= $form->field($model, 'modules')->textarea() ?>
+        
+        <?= $form->field($model, 'actions')->textarea() ?>
+        
+        <?= $form->field($model, 'status')->checkbox() ?>
 
-    <?= $form->field($model, 'status')->checkbox() ?>
-    
-    <?= $form->field($model, 'position')->input("number") ?>
+        <?= $form->field($model, 'position')->input("number") ?>
 
-    <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <div class="form-group">
+            <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        </div>
+
+        <?php ActiveForm::end(); ?>
     </div>
-
-    <?php ActiveForm::end(); ?>
-
 </div>
