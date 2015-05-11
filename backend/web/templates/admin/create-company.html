@@ -57,7 +57,7 @@
                         <label class="col-sm-4 col-md-5 control-label">Expiry Date :</label>
                         <div class="col-sm-8 col-md-7" ng-class="{ 'has-error': serverError.expiry_date}">
                             <div class="input-group">
-                                <input type="text" style="padding:6px 6px;" name="q" placeholder="Expiry date..." class="form-control search-control" datepicker-popup="{{format}}" ng-model="company.expiry_date" is-open="datepickers.fromDate" max-date="today" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" close-text="Close" autocomplete="off">
+                                <input type="text" style="padding:6px 6px;" name="q" placeholder="Expiry date..." class="form-control search-control" datepicker-popup="{{format}}" ng-model="company.expiry_date" is-open="datepickers.fromDate" min-date="today" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" close-text="Close" autocomplete="off">
                                 <div class="input-group-btn">
                                     <button type="button" class="btn btn-primary search-btn" ng-click="openCalendar($event, 'fromDate')"><i class="fa fa-calendar"></i></button>
                                 </div>
@@ -149,7 +149,7 @@
             <div class="row mt-45 mb-30">
                 <div class="col-sm-12 text-center">
                     <button class="btn btn-primary btn-lg mr-10 mb-sm-5 btn-plr-medium" type="submit">Save</button>
-                    <a href="/#/companies" class="btn btn-danger btn-lg btn-plr-medium">Cancel</a>
+                    <a href="/#/" class="btn btn-danger btn-lg btn-plr-medium">Cancel</a>
                 </div>
             </div>
         </form> 

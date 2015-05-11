@@ -5,11 +5,11 @@
             <div class="col-md-12">
                 <div class="row">
                     <div class="col-lg-12">
-                        <button class='btn btn-primary' ng-click="newSubItem(list, 'top')">
+                        <button ng-if="permission.create" class='btn btn-primary' ng-click="newSubItem(list, 'top')">
                             Create Tag Process Type
                         </button>
                         <div class='row' style='padding:20px;'>
-                            <div class="alert alert-info" ng-if="flagUpdatedLevels" style="position: sticky; z-index: 9999; top: 0px;">
+                            <div class="alert alert-info" ng-if="flagUpdatedLevels && permission.create" style="position: sticky; z-index: 9999; top: 0px;">
                                 <span>
                                     We have noted the updates in process positions or modification in flag (default or completion). Click 'Save Now' to save all updates. 
                                     <button ng-disabled="loadingSaveLevels" class='btn btn-primary' ng-click="saveProcessLevels()">
@@ -79,14 +79,14 @@
                 <span class="fa" ng-class="{'fa-chevron-right': $parent.collapsed, 'fa-chevron-down': !$parent.collapsed}"></span>
             </a>
             {{view.editableValue}}
-            <a class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this process type? This action cannot be undone."><span class="fa fa-trash"></span></a>
-            <a class="pull-right btn btn-primary btn-xs" nodrag ng-click="$parent.newSubItem($parent, '')" style="margin-right: 8px;">
+            <a ng-hide="!$parent.permission.delete" class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this process type? This action cannot be undone."><span class="fa fa-trash"></span></a>
+            <a ng-hide="!$parent.permission.create" class="pull-right btn btn-primary btn-xs" nodrag ng-click="$parent.newSubItem($parent, '')" style="margin-right: 8px;">
                 <span class="fa fa-plus"></span>
             </a>
-            <a class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
+            <a ng-hide="!$parent.permission.update" class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
                 <span class="fa fa-pencil"></span>
             </a>
-            <a ng-show="view.parent_id==0" class="pull-right btn btn-primary btn-xs" nodrag 
+            <a ng-show="$parent.permission.assignprojects" class="pull-right btn btn-primary btn-xs" nodrag 
                ng-click="$parent.showProjectsModal(view)" style="margin-right: 8px;">
                 Projects
             </a>
@@ -108,16 +108,16 @@
             <a class="btn btn-success btn-xs" ng-click="$parent.toggle($parent)">
                 <span class="fa" ng-class="{'fa-chevron-right': $parent.collapsed, 'fa-chevron-down': !$parent.collapsed}"></span></a>
                 {{view.editableValue}}
-            <a class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this process? This action cannot be undone.">
+            <a ng-hide="!$parent.permission.delete" class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this process? This action cannot be undone.">
                 <span class="fa fa-trash"></span>
             </a>
-            <a class="pull-right btn btn-primary btn-xs" nodrag ng-click="$parent.newSubItem($parent, '')" style="margin-right: 8px;">
+            <a ng-hide="!$parent.permission.create" class="pull-right btn btn-primary btn-xs" nodrag ng-click="$parent.newSubItem($parent, '')" style="margin-right: 8px;">
                 <span class="fa fa-plus"></span>
             </a>
-            <a class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
+            <a ng-hide="!$parent.permission.update" class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
                 <span class="fa fa-pencil"></span>
             </a>
-            <a class="pull-right btn btn-primary btn-xs" nodrag style="margin-right: 8px;" ng-click="$parent.setFlag(view, 'hierarchy')" tooltip-html-unsafe="{{$parent.tooltip.hierarchy_compulsory}}" >
+            <a ng-show="$parent.permission.create" class="pull-right btn btn-primary btn-xs" nodrag style="margin-right: 8px;" ng-click="$parent.setFlag(view, 'hierarchy')" tooltip-html-unsafe="{{$parent.tooltip.hierarchy_compulsory}}" >
                 <span class="fa fa-question-circle"></span> Hierarchy C. <i class="fa fa-check-square" ng-if="view.flagHierarchy"></i>
             </a>
         </div>
@@ -140,18 +140,14 @@
             </a>
             {{$parent.$index+1}}. &nbsp; &nbsp;{{view.editableValue}}
             (<u>{{process_stage_type[view.option_type]}}</u>)
-            <a class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this status? This action cannot be undone."><span class="fa fa-trash"></span></a>
+            <a ng-hide="!$parent.permission.delete" class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this status? This action cannot be undone."><span class="fa fa-trash"></span></a>
             <span ng-click="$parent.newSubItem($parent, '')">
                 <a class="pull-right btn btn-primary btn-xs" ng-if="view.option_type!='3' && view.option_type!='5'" nodrag  style="margin-right: 8px;">
                     <span class="fa fa-plus"></span>
                 </a>
             </span>
-            <a class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
+            <a ng-hide="!$parent.permission.update" class="pull-right btn btn-primary btn-xs" ng-click="enableEditor()" style="margin-right: 8px;">
                 <span class="fa fa-pencil"></span>
-            </a>
-            <a ng-show="view.parent_id==0" class="pull-right btn btn-primary btn-xs" nodrag 
-               ng-click="$parent.showProjectsModal(view)" style="margin-right: 8px;">
-                Projects
             </a>
         </div>
         <div ng-show="view.editorEnabled" class="slide">
@@ -179,10 +175,10 @@
                 <button type="button" class="btn btn-primary btn-xs" ng-class="{'showFlag': $parent.getFlag($parent, 'completion'), 'hide': $parent.getFlag($parent, 'default')}" ng-click="$parent.setFlag($parent, 'completion')"><i class="fa fa-check-square" ng-if="$parent.getFlag($parent, 'completion')"></i> Completion Flag</button>
             </span>
             <span class="pull-right">
-                <a class="btn btn-primary btn-xs" nodrag ng-click="enableEditor(this)">
+                <a ng-hide="!$parent.permission.update" class="btn btn-primary btn-xs" nodrag ng-click="enableEditor(this)">
                     <span class="fa fa-pencil"></span>
                 </a>
-                <a class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this option? This action cannot be undone.">
+                <a ng-hide="!$parent.permission.delete" class="pull-right btn btn-danger btn-xs" ng-click="$parent.removeItem($parent)" ng-confirm-click="Are you sure to remove this option? This action cannot be undone.">
                     <span class="fa fa-trash"></span>
                 </a>
             </span>

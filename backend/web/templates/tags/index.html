@@ -271,7 +271,7 @@
                                     </div>
                                 </td>
                                 <td class="text-center" style="padding: 0;">
-                                    <a ng-if="permission['get-tag']" href="/#/tags/{{dat.id}}" class="btn icon-btn mr-0" title="Tag analysis"><i class="fa fa-list-alt fa-lg"></i></a>
+                                    <a ng-if="permission['view']" href="/#/tags/{{dat.id}}" class="btn icon-btn mr-0" title="Tag analysis"><i class="fa fa-list-alt fa-lg"></i></a>
                                     <a class="btn icon-btn mr-0" image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}}" type="YmFyY29kZQ==" imageUrl="{{dat.uid}}.png" openlightbox title="Bar code"><i class="fa fa-barcode fa-lg"></i></a>
                                     <a class="btn icon-btn mr-0"  image-header="Tag - {{dat.tag_name}}" image-footer="UID - {{dat.uid}} " type="cXJjb2Rl" imageUrl="{{dat.uid}}.png" openlightbox title="QR code"><i class="fa fa-qrcode fa-lg"></i></a><br />
                                     <a class="btn icon-btn mr-0" href="/reportsdownload/print-tag-report/{{dat.id}}-{{print.report_template.id}}" target="_new" title="Print Report"><i class="fa fa-print fa-lg"></i></a>

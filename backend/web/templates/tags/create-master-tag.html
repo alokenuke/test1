@@ -82,6 +82,7 @@
                                 <span ng-hide="tagDetails.project_id">Select a project first</span>
                             </span>
                             <span ng-if="(processes.length && tagDetails.project_id && search.process[0] && !search.item[1])">Select an item type first</span>
+                            <span class="alert-danger" ng-if="(processes.length && tagDetails.project_id && search.process[0] && search.item[1] && !search.process[1] && !processes[1].length)">No process associated with selected item!</span>
                             <input ng-model="tagDetails.tag_process_flow_id" type="hidden" ng-required="true" />
                             
                             <div class="help-block help-block-error" ng-show="search.process[1].checkProcessError">We have noted some errors on this process. Please visit Manage > Tag Process Flow for further information on the issue.</div>

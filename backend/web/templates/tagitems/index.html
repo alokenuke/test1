@@ -20,7 +20,7 @@
                                             &nbsp;&nbsp; <a class="btn-info" ng-show="item.loading"><i class="fa fa-refresh"></i> Loading items..</a>
                                             <a ng-if="permission.delete" class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeItem(this)" ng-confirm-click="Are you sure to delete this group? All items and sub-items will be removed."><span class="fa fa-trash"></span></a>
                                             <a ng-if="permission.create" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newSubItem(item, 'item_'+item.parent_id)" style="margin-right: 8px;"><span class="fa fa-plus"></span></a>
-                                            <a ng-if="permission.edit" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(item)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
+                                            <a ng-if="permission.update" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(item)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
                                             <a ng-if="permission.assignprojects" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="showProjectsModal(item)" style="margin-right: 8px;">Projects</a>
                                         </div>
                                         <div ng-show="item.editing">
@@ -43,7 +43,7 @@
                                                     &nbsp;&nbsp; <a class="btn-info" ng-show="item.loading"><i class="fa fa-refresh"></i> Loading items..</a>
                                                     <a ng-if="permission.delete" class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeItem(this)" ng-confirm-click="Are you sure to delete this item? All related sub items will be removed."><span class="fa fa-trash"></span></a>
                                                     <a ng-if="permission.create" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newSubItem(item, 'item_'+item.parent_id)" style="margin-right: 8px;"><span class="fa fa-plus"></span></a>
-                                                    <a ng-if="permission.edit" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(item)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
+                                                    <a ng-if="permission.update" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(item)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
                                                     <a ng-if="permission.assignprocess" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="linkProcess(item)" style="margin-right: 8px;">Assign Process Flow</a>
                                                 </div>
                                                 <div ng-show="item.editing">
@@ -64,7 +64,7 @@
                                                             {{item.item_name}}
                                                             <a ng-if="permission.delete" class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="removeItem(this)" ng-confirm-click="Are you sure to delete this group? This action can not be undone."><span class="fa fa-trash"></span></a>
 
-                                                            <a ng-if="permission.edit" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(item)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
+                                                            <a ng-if="permission.update" class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="updateItem(item)" style="margin-right: 8px;"><span class="fa fa-pencil"></span></a>
                                                         </div>
                                                         <div ng-show="item.editing">
                                                             <form class="form-inline" role="form" ng-submit="saveItem(item, item.tempTitle);">

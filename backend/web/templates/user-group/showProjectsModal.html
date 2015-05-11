@@ -31,7 +31,7 @@
                         </thead>
                         <tbody>
                             <tr ng-repeat="project in selectedProjects">
-                                <td class="text-center"><button class="btn icon-btn" ng-click="unassignProjects(project.id, $index)"><i class="fa fa-trash fa-lg"></i></button></td>
+                                <td class="text-center"><button class="btn icon-btn" ng-click="unassignProjects(project, $index)"><i class="fa fa-trash fa-lg"></i></button></td>
                                 <td class="text-center">{{$index+1}}</td>
                                 <td class="text-center">{{project.project_name}}</td>
                                 <td class="text-center">{{project.project_location}} {{project.project_city}}, {{project.project_country}}</td>
@@ -172,7 +172,9 @@
         <div class="clearfix">
             <div class="pull-right">
                 <div align="right">
-                    <button class="btn btn-danger mb-sm-5" ng-click="close()">Done</button>
+                    <button class="pull-right btn btn-success" ng-click="close()">
+                        Close
+                    </button>
                 </div>
             </div>
         </div>

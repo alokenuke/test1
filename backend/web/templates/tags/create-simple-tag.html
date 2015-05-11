@@ -78,13 +78,13 @@
                                   <div ng-bind-html="p.process_name" ng-click="updateSelectBox('processes', tagDetails.project_id, $parent.$index+1, p.id)"></div>
                               </ui-select-choices>
                             </ui-select>
-                            
                             <span ng-if="!(processes.length && tagDetails.project_id)">
                                 <a ng-href="/#/tag-process-flow" ng-hide="(processes.length && tagDetails.project_id) || !tagDetails.project_id">Click to manage process.</a>
                                 <span ng-hide="tagDetails.project_id">Select a project first</span>
                             </span>
                             <span ng-if="(processes.length && tagDetails.project_id && search.process[0] && !search.item[1])">Select an item type first</span>
-                            <input ng-model="tagDetails.tag_process_flow_id" type="hidden" ng-required="true" />
+                            
+                            <span class="alert-danger" ng-if="(processes.length && tagDetails.project_id && search.process[0] && search.item[1] && !search.process[1] && !processes[1].length)">No process associated with selected item!</span>
                             
                             <div class="help-block help-block-error" ng-show="search.process[1].checkProcessError">We have noted some errors on this process. Please visit Manage > Tag Process Flow for further information on the issue.</div>
                             

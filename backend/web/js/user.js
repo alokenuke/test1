@@ -133,7 +133,7 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
             });
         }
         else
-            scope.collapsed = true;
+            scope.collapsed = !scope.collapsed;
     }
     
     $scope.assignUsersModal = function (scope) {
@@ -212,7 +212,7 @@ app.controller('UserGroup', ['$scope', 'rest', '$location', '$route','$routePara
 app.controller('UserIndex', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService','page_dropdown', 'authorizationService', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService,page_dropdown, authorizationService) {
       
         rest.path = "users";
-        $scope.permission = authorizationService.permissionModel.permission.usergroups;
+        $scope.permission = authorizationService.permissionModel.permission.users;
         
         breadcrumbsService.clearAll();
         breadcrumbsService.setTitle("Manage Users");
@@ -247,6 +247,8 @@ app.controller('UserIndex', ['$scope', 'rest', '$location', '$route','$routePara
                 alertService.clearAll();
                 alertService.add("success", "User removed.");
                 $scope.users.splice($index, 1);
+            }).error(function (data) {
+                errorCallback(data)
             });
         }
         
@@ -360,8 +362,7 @@ app.controller('UserCreate',
             alertService.clearAll();
             $http.post('/users/multiinsert', {'User':$scope.users}).success(function(data) {
                 if(data=="Success") {
-                    alertService.add("success", "Users created.");
-                    alert("All users created.");
+                    alertService.add("success", "All users created.");
                     $location.path('/users').replace();
                 }
             }).error(function(data) {
@@ -382,6 +383,7 @@ app.controller('UserCreate',
         }
             
         $scope.onFileSelect = function($files,index) {
+            $scope.serverError.photo = "";
             //$files: an array of files selected, each file has name, size, and type.
             for (var i = 0; i < $files.length; i++) {
                 var file = $files[i];
@@ -395,6 +397,8 @@ app.controller('UserCreate',
                     // file is uploaded successfully
                     //console.log(data);
                     $scope.users[index].photo = data;
+                }).error(function(data) {
+                    $scope.serverError.photo = data;
                 });
             }
         }; 
@@ -542,6 +546,17 @@ app.controller('UserCreate',
         $scope.getAllProjects();
     }
     
+    $scope.selectAllProjects = function(data, allSelected) {
+        angular.forEach(data, function(v) {
+            v['isSelected'] = allSelected;
+            if (allSelected) {
+                $scope.temp[""+v.id] = v.id;
+            }
+            else
+                $scope.temp[""+v.id] = undefined;
+        });
+    }
+    
     $scope.selectProject = function(scope) {
         if (scope['isSelected']) {
             $scope.temp[""+scope.id] = scope.id;
@@ -561,9 +576,10 @@ app.controller('UserCreate',
     };
     
     $scope.unassignProjects = function(project, index) {
-        $http.post('/usergroups/unassignprojects/'+itemScope.id, {'Projects':[project]}).success(function(data) {
+        $http.post('/usergroups/unassignprojects/'+itemScope.id, {'Projects':[project.id]}).success(function(data) {
             if(data>0)
                 $scope.selectedProjects.splice(index, 1);
+            $scope.allProjects.push(push);
         }).error(function(data) {
             console.log(data);
             alert("Invalid Request");
@@ -614,6 +630,7 @@ app.controller('UserUpdate',
         });
         
         $scope.onFileSelect = function($files) {
+            $scope.serverError.photo = "";
             //$files: an array of files selected, each file has name, size, and type.
             for (var i = 0; i < $files.length; i++) {
                 var file = $files[i];
@@ -627,7 +644,9 @@ app.controller('UserUpdate',
                     // file is uploaded successfully
                     //console.log(data);
                     $scope.user.photo = data;
-					photoState = true;
+                    photoState = true;
+                }).error(function(data) {
+                    $scope.serverError.photo = data;
                 });
             }
         }; 

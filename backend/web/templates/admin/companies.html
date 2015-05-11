@@ -1,14 +1,58 @@
 <div role="tabpanel" class="tab-pane col-xs-12 active" id="List_Tags">
     <div class="row">
+        <div class="col-xs-12">
+            <div class="row">
+                <div class="primary-title-box">
+                    <h3 class="primary-title mt-0">
+                        Active Project : 
+                        <span class="pull-right">
+                            {{stats.projects.count}}
+                        </span>
+                    </h3>
+                </div>
+                <div class="primary-title-box">
+                    <h3 class="primary-title mt-0">
+                        Total Tags : 
+                        <span class="pull-right">
+                            {{stats.tags.count}}
+                        </span>
+                    </h3>
+                </div>
+                <div class="primary-title-box">
+                    <h3 class="primary-title mt-0">
+                        Total Users : 
+                        <span class="pull-right">
+                            {{stats.users.count}}
+                        </span>
+                    </h3>
+                </div>
+                <div class="primary-title-box">
+                    <h3 class="primary-title mt-0">
+                        Total Items : 
+                        <span class="pull-right">
+                            {{stats.items.count}}
+                        </span>
+                    </h3>
+                </div>
+                <div class="primary-title-box">
+                    <h3 class="primary-title mt-0">
+                        Data : 
+                        <span class="pull-right">
+                            {{stats.data.count}}
+                        </span>
+                    </h3>
+                </div>
+            </div><!--/wrapper-->
+        </div>
         <div class="col-xs-12 search-box mb-sm-large">
             <div class="row">
-                <h2 class="col-xs-12 search-title">Search Users
-                    <button class="pull-right btn icon-btn" ng-click="showSearchBox=!showSearchBox;">
+                <h2 class="col-xs-12 search-title clickable" ng-click="showSearchBox = !showSearchBox;">Search Companies
+                    <button class="pull-right btn icon-btn">
                         <i ng-class="{'fa fa-sort-desc fa-2x': !showSearchBox,'fa fa-sort-asc fa-2x': showSearchBox}"></i>
                     </button>
                 </h2>
             </div><!--/row-->
-            <form ng-submit="searchCompany()" id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form" ng-class="{'ng-hide':showSearchBox}">
+            <form ng-submit="searchCompany()" id="form" class="form-horizontal form-horizontal-typ1 form-wrapper slide" role="form" ng-class="{'ng-hide':!showSearchBox}">
                 <div class="row">
                     <div class="col-md-6 col-lg-5">
                         <div class="form-group">
@@ -23,7 +67,7 @@
                             <label class="col-sm-4 control-label text-right">Company Owner :</label>
                             <div class="col-sm-6">
 
-      <input type="text" class="form-control" ng-model="$search.company_owner" /> 
+                                <input type="text" class="form-control" ng-model="$search.company_owner" /> 
                             </div>
                         </div>
                     </div>
@@ -42,21 +86,21 @@
                     </div>
                     <div class="col-md-6 col-lg-5">
                         <div class="form-group">
-                            <label class="col-sm-4 control-label">Membership :</label>
+                            <label class="col-sm-4 control-label">Plan :</label>
                             <div class="col-sm-6" ng-class="{ 'has-error': serverError.email}">
                                 <select class="form-control" ng-model="$search.membership_id" ng-options="membership.id as membership.name for membership in memberships" >
-                                    <option value="">-- Filter by membership--</option>
+                                    <option value="">-- Filter by plan--</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                 </div><!--/row-->
-                
+
                 <div class="row mt-20">
-                   <div class="col-sm-10 text-center">
-                       <button class="btn btn-primary mb-sm-5" type="submit">Search</button>
+                    <div class="col-sm-10 text-center">
+                        <button class="btn btn-primary mb-sm-5" type="submit">Search</button>
                         <button class="btn btn-primary mb-sm-5" ng-click="$search = {}">Clear Search</button>
-                   </div> 
+                    </div> 
                 </div>
             </form>
         </div><!--/search-tag-box-->
@@ -74,8 +118,12 @@
                             <th class="text-center">
                                 <a ng-href="" ng-click="sortCompany('company_name')">Company Name <i class="fa fa-sort{{sort.company_name}}"></i></a>
                             </th>
-                            <th class="text-center"><a ng-href="" ng-click="sortCompany('company_owner')">Company Owner<i class="fa fa-sort{{sort.company_owner}}"></i></a></th>
-                            <th class="text-center"><a ng-href="" ng-click="sortCompany('membership_id')">Membership<i class="fa fa-sort{{sort.membership_id}}"></i></a></th>
+                            <th class="text-center">Active Projects</th>
+                            <th class="text-center">Total Tags</th>
+                            <th class="text-center">Total Users</th>
+                            <th class="text-center">Total Items</th>
+                            <th class="text-center">Data</th>
+                            <th class="text-center"><a ng-href="" ng-click="sortCompany('membership_id')">Plan<i class="fa fa-sort{{sort.membership_id}}"></i></a></th>
                             <th class="text-center"><a ng-href="" ng-click="sortCompany('expiry_date')">Expiry Date <i class="fa fa-sort{{sort.expiry_date}}"></i></a></th>
                             <th class="text-center"><a ng-href="" ng-click="sortCompany('company_status')">Company Status <i class="fa fa-sort{{sort.company_status}}"></i></a></th>
                             <th class="text-center"></th>
@@ -83,9 +131,23 @@
                     </thead>
                     <tbody>
                         <tr ng-repeat="company in companies">
-                            <td class="text-center">{{$index+1}}</td>
+                            <td class="text-center">{{$index + 1}}</td>
                             <td>{{company.company_name}}</td>
-                            <td>{{company.company_owner}}</td>
+                            <td class="text-center">
+                                {{company.stats.projects.count}}
+                            </td>
+                            <td class="text-center">
+                                {{company.stats.tags.count}}
+                            </td>
+                            <td class="text-center">
+                                {{company.stats.users.count}}
+                            </td>
+                            <td class="text-center">
+                                {{company.stats.items.count}}
+                            </td>
+                            <td class="text-center">
+                                {{company.stats.data.count}}
+                            </td>
                             <td>{{company.membership.name}}</td>
                             <td>{{company.expiry_date}}</td>
                             <td class="text-center">
@@ -94,24 +156,24 @@
                                 </span>
                             </td>
                             <td class="text-center">
-				<a href="/#/company/update/{{company.id}}" class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                                <a href="/#/company/update/{{company.id}}" class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></a>
                                 <button type="button" ng-confirm-click="Are you sure to remove this company?" title="Click to remove." ng-click="removeCompany(company, $index)"><i class="fa fa-trash"></i></button>
                             </td>
                         </tr>
-                     
+
                     </tbody>
                 </table>
                 <div class="pull-right">                    
-                        <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
-                        <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px" ng-change="setPageLimit()" ng-model="numPerPage" ng-options="k as v for (k,v) in page_dropdown">
-                        </select>
+                    <pagination total-items="totalCount" ng-model="currentPage" items-per-page="numPerPage" class="pagination-sm" boundary-links="true" rotate="false" num-pages="pageCount" ng-change="pageChanged()"></pagination>
+                    <select class="form-control pull-right" style="width: 60px;margin: 20px 2px;height: 28px;padding: 3px" ng-change="setPageLimit()" ng-model="numPerPage" ng-options="k as v for (k,v) in page_dropdown">
+                    </select>
                 </div>
             </div>
         </div>          
     </div><!--/row-->
 </div>
 <div class="modal hide fade" id="lightBoxModal">
-   <div class="modal-body">
-      <p>Body: </p>
-   </div>
+    <div class="modal-body">
+        <p>Body: </p>
+    </div>
 </div>

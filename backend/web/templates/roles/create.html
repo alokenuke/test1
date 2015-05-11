@@ -47,7 +47,7 @@
                                         ng-true-value="1"
                                         ng-false-value="0"
                                         ng-init="action.isSelected=role.roleSettings[module][action.action]"
-                                      > {{action.action | titlecase}}
+                                      > {{(action.action=='list'?"List Assigned":action.action) | titlecase}}
                                 </label>
                             </accordion-group>
                         </accordion>

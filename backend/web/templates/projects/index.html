@@ -114,7 +114,7 @@
         </div><!--/search-tag-box-->
     </div><!--/row-->
     <div class="row mt-20">
-        <a ng-if="premission.create" href="/#/projects/create" class="btn btn-default add-new-btn"><i class="fa fa-plus-circle fa-1x"></i>Add New Project</a>
+        <a ng-if="permission.create" href="/#/projects/create" class="btn btn-default add-new-btn"><i class="fa fa-plus-circle fa-1x"></i>Add New Project</a>
 	<button ng-if="permission.export" class="pull-right btn btn-primary btn-lg mt-10" type="button" ng-click="downloadReport()">
             <i class="fa fa-print mr-10 fa-lg"></i>Export Project
         </button>
@@ -147,7 +147,7 @@
                             <th class="text-center">
                                 <a href="" ng-click="order('project_status')">Status <i class="fa fa-sort{{sort.project_status}}"></i></a>
                             </th>
-                            <th class="text-center" ng-if="premission.edit || premission.delete">Actions</th>
+                            <th class="text-center" ng-if="permission.update || permission.delete">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -162,11 +162,11 @@
                             <td class="text-center">
                                 <span class="label" ng-class="{'label-success': project.project_status, 'label-danger': !project.project_status}">{{project.project_status?"Active":"Not Active"}}</span>
                             </td>
-                            <td class="text-center" ng-if="premission.edit || premission.delete">
-                                <a ng-if="premission.edit" class="btn icon-btn" href="/#/projects/update/{{project.id}}" >
+                            <td class="text-center" ng-if="permission.update || permission.delete">
+                                <a ng-if="permission.update" class="btn icon-btn" href="/#/projects/update/{{project.id}}" >
                                     <i class="fa fa-pencil-square-o fa-lg"></i>
                                 </a>
-                                <button ng-if="premission.delete" ng-click="deleteProject(project.id)" class="btn icon-btn" ng-confirm-click="Are you sure to delete this project.">
+                                <button ng-if="permission.delete" ng-click="deleteProject(project.id)" class="btn icon-btn" ng-confirm-click="Are you sure to delete this project.">
                                     <i class="fa fa-trash fa-lg"></i>
                                 </button>
                             </td>

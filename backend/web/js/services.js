@@ -15,8 +15,8 @@ appServices.factory('alertService', function ($rootScope, $timeout) {
         var alertPos = $rootScope.alerts.push({'type': type, 'msg': msg});
         window.scrollTo(0, 0);
         $timeout(function () {
-            angular.element("#alertMessages .alert:nth-child(" + alertPos + ")").remove();
             $rootScope.alerts.splice(alertPos, 1);
+            angular.element("#alertMessages .alert:nth-child(" + alertPos + ")").remove();
         }, 10000);
     };
 

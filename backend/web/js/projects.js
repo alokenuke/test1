@@ -100,6 +100,7 @@ app.controller('ProjectForm', ['$scope', 'rest', '$location', '$route', '$routeP
         }
 
         $scope.onFileSelect = function ($files, modelName) {
+            $scope.serverError.photo = "";
             //$files: an array of files selected, each file has name, size, and type.
             for (var i = 0; i < $files.length; i++) {
                 var file = $files[i];
@@ -113,6 +114,8 @@ app.controller('ProjectForm', ['$scope', 'rest', '$location', '$route', '$routeP
                     // file is uploaded successfully
                     //console.log(data);
                     $scope.project[modelName] = data;
+                }).error(function(data) {
+                    $scope.serverError.photo = data;
                 });
             }
         };
@@ -193,7 +196,7 @@ app.controller('ProjectLevel', ['$scope', 'rest', '$location', '$route', '$route
                 $log.info('Modal dismissed at: ' + new Date());
             });
         };
-
+        
         var errorCallback = function (data) {
             if (data.status != 401) {
                 alertService.add('error', "Error in processing your request. Please try again.");
@@ -298,10 +301,11 @@ app.controller('ProjectLevel', ['$scope', 'rest', '$location', '$route', '$route
     }]);
 
 
-app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route', '$routeParams', 'alertService', '$http', 'breadcrumbsService', "$modal", "$log", 'tooltip', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, $modal, $log, tooltip) {
+app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route', '$routeParams', 'alertService', '$http', 'breadcrumbsService', "$modal", "$log", 'tooltip', 'authorizationService', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, $modal, $log, tooltip, authorizationService) {
     
     rest.path = "tagprocess";
     $scope.tooltip = tooltip;
+    $scope.permission = authorizationService.permissionModel.permission.tagprocess;
 
     alertService.clearAll();
     breadcrumbsService.clearAll();
@@ -413,11 +417,19 @@ app.controller('ProcessFlow', ['$scope', 'rest', '$location', '$route', '$routeP
     };
 
     $scope.removeItem = function(item) {
+        alertService.clearAll();
         var scope = item.$modelValue;
         $http.delete("/tagprocess/"+scope.id).success(function(data) {
             console.log("removed-"+scope.id);
+            item.remove();
+        }).error(function(data) {
+            if(typeof data == 'object')
+                angular.forEach(data, function(v) {
+                    alertService.add("error", v['message']);
+                });
+            else
+                alertService.add("error", data);
         });
-        item.remove();
     }
 
     $scope.toggle = function (scope) {
@@ -523,6 +535,17 @@ app.controller('projectLevelProjectsPopup', function ($scope, $modalInstance, re
         $scope.search = {};
         $scope.getAllProjects();
     }
+    
+    $scope.selectAllProjects = function(data, allSelected) {
+        angular.forEach(data, function(v) {
+            v['isSelected'] = allSelected;
+            if (allSelected) {
+                $scope.temp[""+v.id] = v.id;
+            }
+            else
+                $scope.temp[""+v.id] = undefined;
+        });
+    }
 
     $scope.selectProject = function (scope) {
         if (scope['isSelected']) {
@@ -543,9 +566,10 @@ app.controller('projectLevelProjectsPopup', function ($scope, $modalInstance, re
     };
 
     $scope.unassignProjects = function (project, index) {
-        $http.post('/projectlevel/unassignprojects/' + itemScope.id, {'Projects': [project]}).success(function (data) {
+        $http.post('/projectlevel/unassignprojects/' + itemScope.id, {'Projects': [project.id]}).success(function (data) {
             if (data > 0)
                 $scope.selectedProjects.splice(index, 1);
+            $scope.allProjects.push(project);
         }).error(function (data) {
             console.log(data);
             alert("Invalid Request");
@@ -608,6 +632,17 @@ app.controller('ProcessProjectsPopup', function ($scope, $modalInstance, rest, $
         $scope.search = {};
         $scope.getAllProjects();
     }
+    
+    $scope.selectAllProjects = function(data, allSelected) {
+        angular.forEach(data, function(v) {
+            v['isSelected'] = allSelected;
+            if (allSelected) {
+                $scope.temp[""+v.id] = v.id;
+            }
+            else
+                $scope.temp[""+v.id] = undefined;
+        });
+    }
 
     $scope.selectProject = function (scope) {
         if (scope['isSelected']) {
@@ -628,9 +663,10 @@ app.controller('ProcessProjectsPopup', function ($scope, $modalInstance, rest, $
     };
 
     $scope.unassignProjects = function (project, index) {
-        $http.post('/tagprocess/unassignprojects/' + itemScope.id, {'Projects': [project]}).success(function (data) {
+        $http.post('/tagprocess/unassignprojects/' + itemScope.id, {'Projects': [project.id]}).success(function (data) {
             if (data > 0)
                 $scope.selectedProjects.splice(index, 1);
+            $scope.allProjects.push(project);
         }).error(function (data) {
             console.log(data);
             alert("Invalid Request");

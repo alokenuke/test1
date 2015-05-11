@@ -21,7 +21,7 @@
                             </td>
                             <td class="text-center">
 <a href="/#/roles/update/{{role.id}}" class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></a>
-                                <button class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
+                                <button ng-click='removeRole(role, $index)' ng-confirm-click="Are you sure to delete the role. Assigned users would not be able to login." class="btn icon-btn"><i class="fa fa-trash fa-lg"></i></button>
                             </td>
                         </tr>
                     </tbody>

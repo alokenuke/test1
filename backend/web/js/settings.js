@@ -35,7 +35,7 @@ app.controller('RolesIndex', ['$scope', 'rest', '$location', '$route','$routePar
         
         updateUserList();
         
-		$scope.removeRole =  function(model, $index) {
+        $scope.removeRole =  function(model, $index) {
             
             rest.deleteById(model);
             

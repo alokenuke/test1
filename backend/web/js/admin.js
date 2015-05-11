@@ -7,13 +7,15 @@ app.constant('page_dropdown', {
     '40': "40",
     '50': "50"
 });
-app.run(function($http, $window, $rootScope, $location, $route) {
-    delete $window.sessionStorage.token;
-    if(!$window.sessionStorage.token) {
-        $http.get("/api/gettoken").success(function(data) {
-          $window.sessionStorage.token = data.token; 
-        });
-    }
+app.run(function() {
+    var elm = angular.element('<h4 style="margin: 0;padding-top: 10px;position:fixed; top: 0;width: 100%;background-color: #000;color: #fff;height: 40px;z-index: 9999;"><center>Welcome to Site Track Admin</center></h4>');
+    
+    var body = angular.element(document).find('body').eq(0);
+    
+    body.css({'margin-top': "30px"});
+
+    body.prepend(elm);
+    
 });
 
 app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($locationProvider, $routeProvider, $httpProvider) {
@@ -28,7 +30,7 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
         })
                 
         .when('/', {
-            templateUrl: path+'admin/dashboard.html',
+            templateUrl: path+'admin/companies.html',
             controller: 'SiteIndex',
         })
         
@@ -40,6 +42,10 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
         .when('/users', {
             templateUrl: path+'users/index.html',
             controller: 'UserIndex'
+        })
+        .when('/login-logs', {
+            templateUrl: path+'reports/employee-logs.html',
+            controller: 'LoginLogs'
         })
         
         .when('/users/create', {
@@ -87,11 +93,6 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
             controller: 'RolesUpdate'
         })
         
-        .when('/companies', {
-            templateUrl: path+'admin/companies.html',
-            controller: 'Companies'
-        })
-        
         .when('/create-company', {
             templateUrl: path+'admin/create-company.html',
             controller: 'CreateCompany'
@@ -125,20 +126,84 @@ app.config(['$locationProvider', '$routeProvider', '$httpProvider', function ($l
     //$locationProvider.html5Mode(true).hashPrefix('!');
 }]);
 
-app.controller('SiteIndex', ['$scope', 'rest', 'breadcrumbsService', '$http', "$location", function ($scope, rest, breadcrumbsService, $http, $location) {
+app.controller('SiteIndex', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService','page_dropdown', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService,page_dropdown) {
         
-    breadcrumbsService.clearAll();
-    breadcrumbsService.setTitle("SiteTrack - Owner Admin - Dashboard");    
-    breadcrumbsService.headTitle(" ");
-    
-    if($location.$$path!='/login') {
-        if($location.$$path=='/') {
+    if($location.$$path != '/login') {
+        if ($location.$$path == '/') {
+            rest.path = "company";
+
+            breadcrumbsService.clearAll();
+            breadcrumbsService.setTitle("SiteTrack - Owner Admin - Manage Clients");
+            breadcrumbsService.headTitle(" ");
+
+            $scope.page_dropdown = page_dropdown;
+            $scope.$search = {};
+            
             $http.post("company/stats").success(function (data) {
                 $scope.stats = data;
             });
-            $http.post("company/getall?expand=stats,membership").success(function (data) {
-                $scope.companies = data.items;
+
+            $scope.searchCompany = function () {
+                updateCompanyList();
+            }
+
+
+            $scope.sortCompany = function (elm) {
+                $scope.sortBy = elm;
+                if (typeof $scope.sort !== 'undefined' && typeof $scope.sort[elm] !== 'undefined' && $scope.sort[elm].search("-up") !== -1) {
+                    $scope.sort[elm] = "-down";
+                    $scope.sortBy = "-" + elm;
+                }
+                else {
+                    $scope.sort = [];
+                    $scope.sort[elm] = "-up";
+                }
+                updateCompanyList();
+            };
+
+            $scope.pageChanged = function () {
+                updateCompanyList();
+            }
+
+            var errorCallback = function (data) {
+                if (data.status != 401) {
+                    if (typeof data !== 'object')
+                    {
+                        alertService.clearAll();
+                        alertService.add("error", data);
+                    }
+                    else
+                        alertService.add('error', "Error in processing your request. Please try again.");
+                }
+
+            };
+
+            $scope.removeCompany = function (model, $index) {
+
+                rest.deleteById(model);
+
+                $scope.companies.splice($index, 1);
+            }
+
+            $scope.setPageLimit = function () {
+                updateCompanyList();
+            }
+            var updateCompanyList = function () {
+                var params = {'search': $scope.$search, 'sort': $scope.sortBy, 'page': $scope.currentPage, 'limit': $scope.numPerPage};
+                rest.customModelData("company/search?expand=membership,stats", params).success(function (data) {
+                    $scope.companies = data.items;
+                    $scope.totalCount = data._meta.totalCount;
+                    $scope.pageCount = data._meta.pageCount;
+                    $scope.currentPage = (data._meta.currentPage);
+                    $scope.numPerPage = data._meta.perPage;
+                }).error(errorCallback);
+            }
+
+            rest.setData("membership/getall", [], {'project_status': null}).success(function (data) {
+                $scope.memberships = data.items;
             });
+
+            $scope.sortCompany("-id");
         }
     }
 }]);
@@ -301,8 +366,8 @@ app.controller('UserIndex', ['$scope', 'rest', '$location', '$route','$routePara
     }])
 
 app.controller('UserCreate',
-['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService','$upload',
-    function ($scope, rest, $location, $route, $rootScope, alertService, $http, breadcrumbsService,$upload) {
+['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService',
+    function ($scope, rest, $location, $route, $rootScope, alertService, $http, breadcrumbsService) {
         
         rest.path = "users";
         $scope.user = {};
@@ -354,82 +419,6 @@ app.controller('UserCreate',
             } 
         }
  }])
- 
-app.controller('Companies', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService','page_dropdown', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService,page_dropdown) {
-      
-        rest.path = "company";
-        
-        breadcrumbsService.clearAll();
-        breadcrumbsService.setTitle("SiteTrack - Owner Admin - Manage Companies");
-        breadcrumbsService.headTitle("Manage Companies");
-        breadcrumbsService.add("/#/", "Home");
-        breadcrumbsService.add("/#/companies", "Manage - Companies");
-        
-        $scope.page_dropdown = page_dropdown;
-        $scope.$search = {};
-        
-        $scope.searchCompany = function(){
-           updateCompanyList();
-        }
-        
-        
-        $scope.sortCompany = function(elm) {
-            $scope.sortBy = elm;
-            if(typeof $scope.sort !== 'undefined' && typeof $scope.sort[elm] !== 'undefined' && $scope.sort[elm].search("-up")!==-1) {
-                $scope.sort[elm] = "-down";
-                $scope.sortBy = "-"+elm;
-            }
-            else {
-                $scope.sort = [];
-                $scope.sort[elm] = "-up";
-            }
-            updateCompanyList();
-        };
-               
-        $scope.pageChanged = function() {
-            updateCompanyList();
-        }
-        
-        var errorCallback = function (data) {
-            if(data.status!=401) {
-                if(typeof data !== 'object')
-                {
-                    alertService.clearAll();
-                    alertService.add("error", data);
-                }
-                else
-                    alertService.add('error', "Error in processing your request. Please try again.");
-            }
-                
-        };
-        
-        $scope.removeCompany =  function(model, $index) {
-           
-            rest.deleteById(model);
-            
-            $scope.companies.splice($index, 1);
-        }
-        
-        $scope.setPageLimit = function(){
-            updateCompanyList();
-        }
-        var updateCompanyList = function() {
-            var params = {'search': $scope.$search, 'sort': $scope.sortBy, 'page':$scope.currentPage, 'limit': $scope.numPerPage};
-            rest.customModelData("company/search?expand=membership", params).success(function (data) {
-                $scope.companies = data.items;
-                $scope.totalCount = data._meta.totalCount;
-                $scope.pageCount = data._meta.pageCount;
-                $scope.currentPage = (data._meta.currentPage);
-                $scope.numPerPage = data._meta.perPage;
-            }).error(errorCallback);
-        }
-        
-        rest.setData("membership/getall", [], {'project_status': null}).success(function (data) {
-            $scope.memberships = data.items;
-        });
-        
-        $scope.sortCompany("-id");
-    }])
 
 app.controller('CreateCompany', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService','page_dropdown','$upload', function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService,page_dropdown,$upload) {
       
@@ -450,12 +439,14 @@ app.controller('CreateCompany', ['$scope', 'rest', '$location', '$route','$route
             $event.stopPropagation();
             $scope.datepickers[which]= true;
         };
+        $scope.today = new Date();
         $scope.dateOptions = {formatYear: 'yy',startingDay: 1};
         $scope.formats = ['dd MMM yyyy'];
         $scope.format = $scope.formats[0];
         
 
         $scope.onFileSelect = function ($files) {
+            $scope.serverError.company_logo = "";
             //$files: an array of files selected, each file has name, size, and type.
             for (var i = 0; i < $files.length; i++) {
                 var file = $files[i];
@@ -468,6 +459,8 @@ app.controller('CreateCompany', ['$scope', 'rest', '$location', '$route','$route
                 }).success(function (data, status, headers, config) {
                     // file is uploaded successfully
                     $scope.company.company_logo = data;
+                }).error(function(data) {
+                    $scope.serverError.company_logo = data;
                 });
             }
         };
@@ -492,7 +485,7 @@ app.controller('CreateCompany', ['$scope', 'rest', '$location', '$route','$route
                 $http.post('company/savecompany',{'company':$scope.company,'user':$scope.user}).success(function (data) {
                     alertService.clearAll();
                     alertService.add("success", "Project details updated.");
-                    $location.path('/companies').replace();
+                    $location.path('/').replace();
                 }).error(function (data) {
                     alertService.clearAll();
                     alertService.add("error", "Validation Error");
@@ -506,7 +499,7 @@ app.controller('CreateCompany', ['$scope', 'rest', '$location', '$route','$route
                 $http.post('company/savecompany',{'company':$scope.company,'user':$scope.user}).success(function (data) {
                     alertService.clearAll();
                     alertService.add("success", "New Company Created.");
-                    $location.path('/companies').replace();
+                    $location.path('/').replace();
                 }).error(function (data) {
                     alertService.clearAll();
                     alertService.add("error", "Validation Error");
@@ -607,6 +600,12 @@ app.controller('RolesAdd', ['$scope', 'rest', '$location', '$route','$routeParam
             $scope.role['moduleactions'] = $scope.moduleactions;
             rest.postModel($scope.role).success(function(data) {
                 $location.path("/sites-roles");
+            }).error(function (data) {
+                alertService.clearAll();
+                alertService.add("error", "Validation Error");
+                angular.forEach(data, function (v) {
+                    $scope.serverError[v['field']] = v['message'];
+                });
             });
         }
         
@@ -657,18 +656,22 @@ app.controller('MembershipIndex', ['$scope', 'rest', '$location', '$route','$rou
         rest.path = "membership";
         $scope.page_dropdown = page_dropdown;
         breadcrumbsService.clearAll();
-        breadcrumbsService.setTitle("SiteTrack - Owner Admin - Manage Membership");
-        breadcrumbsService.headTitle("Manage Membership");
+        breadcrumbsService.setTitle("SiteTrack - Owner Admin - Manage Plans");
+        breadcrumbsService.headTitle("Manage Plans");
         breadcrumbsService.add("/#/", "Home");
-        breadcrumbsService.add("/#/sites-membership", "Manage Membership");
+        breadcrumbsService.add("/#/sites-membership", "Manage Plans");
         
         $scope.pageChanged = function() {
             updateMembership();
         }
         var errorCallback = function (data) {
-            if(data.status!=401) {
-                alertService.add('error', "Error in processing your request. Please try again.");
+            if(typeof data !== 'object')
+            {
+                alertService.clearAll();
+                alertService.add("error", data);
             }
+            else
+                alertService.add('error', "Error in processing your request. Please try again.");
         };
         
         $scope.setPageLimit = function(){
@@ -690,12 +693,104 @@ app.controller('MembershipIndex', ['$scope', 'rest', '$location', '$route','$rou
         updateMembership();
         
         $scope.removeMembership = function (model, $index) {
-
-            rest.deleteById(model);
-            $scope.memberships.splice($index, 1);
+            rest.deleteById(model).success(function(data) {
+                $scope.memberships.splice($index, 1);
+            }).error(errorCallback);
         }
         
     }])
+
+app.controller('LoginLogs', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService', 'page_dropdown', '$rootScope',
+                function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService, page_dropdown, $rootScope) {
+        
+        $scope.tagsNum = 1;
+        rest.path = "reports";
+        $scope.page_dropdown = page_dropdown;
+        
+        breadcrumbsService.clearAll();
+        breadcrumbsService.setTitle("Employee Logs");
+        breadcrumbsService.add("/#/", "Home");
+        breadcrumbsService.add("/#/reports/employee-logs", "Employee Logs");
+        
+        $scope.datepickers = {fromDate: false,toDate: false}
+        $scope.openCalendar = function($event, which) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.datepickers[which]= true;
+        };
+        $scope.dateOptions = {formatYear: 'yy',startingDay: 1};
+        $scope.formats = ['dd MMM, yyyy', 'dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
+        $scope.format = $scope.formats[0];
+        
+        $scope.search = {};
+        $scope.sort = [];
+        $scope.sortBy = "";
+        $scope.showSearchBox = true;
+        $scope.time = Date.now() / 1000;
+                
+        $scope.setSearch = function() {
+            updateList();
+        }
+        
+        $scope.clearSearch = function() {
+            $scope.search = {};
+            updateList();
+        }
+        
+        $scope.pageChanged = function() {
+            updateList();
+        }
+        
+        $scope.setPageLimit = function(){
+            updateList();
+        }
+       
+        var updateList = function() {
+            if(typeof $scope.search.date_range !== 'undefined') {
+                $monthArr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                $fromDate = $scope.search.date_range.from_date;
+                if(typeof $fromDate === 'date')
+                    $scope.search.date_range.from_date = $fromDate.getDate()+" "+$monthArr[$fromDate.getMonth()]+", "+$fromDate.getFullYear();
+                
+                $toDate = $scope.search.date_range.to_date;
+                if(typeof $toDate === 'date')
+                    $scope.search.date_range.to_date = $toDate.getDate()+" "+$monthArr[$toDate.getMonth()]+", "+$toDate.getFullYear();
+            }
+            var params = {'search': $scope.search, 'sort': $scope.sortBy, 'limit': $scope.numPerPage, 'page':$scope.currentPage, };
+            rest.customModelData("reports/employee-logs?field=login_location,login_ip,created_on,request_from,expire_on,expiry_status&expand=user", params).success(function (data) {
+                $scope.data = data.items;
+                $scope.totalCount = data._meta.totalCount;
+                $scope.pageCount = data._meta.pageCount;
+                $scope.currentPage = (data._meta.currentPage);
+                $scope.numPerPage = data._meta.perPage;
+            }).error(errorCallback);
+        }
+        updateList();
+        
+        var errorCallback = function (data) {
+            if(data.status!=401) {
+                alertService.add('error', "Error in processing your request. Please try again.");
+            }
+        };
+		$scope.downloadReport = function() {
+            
+            criteria = {'search': $scope.search,'da':'all'};
+            
+            rest.customModelData("reports/employee-logs?field=login_location,login_ip,created_on,request_from,expire_on,expiry_status&expand=user", criteria).success(function (data) {
+                
+                $http.post("exports/generate-employee-logs-reports", data.items).success(function (data) {
+                    var tabWindowId = window.open("_new");
+                    tabWindowId.location.href = data;
+                }).error(function (data) {
+                    errorCallback(data)
+                });
+
+
+            }).error(errorCallback);
+        }
+
+    }])
+
 
 app.controller('MembershipAdd', ['$scope', 'rest', '$location', '$route','$routeParams', 'alertService', '$http', 'breadcrumbsService','page_dropdown','$location',
                 function ($scope, rest, $location, $route, $routeParams, alertService, $http, breadcrumbsService,page_dropdown,$location) {
