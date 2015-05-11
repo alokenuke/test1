@@ -28,7 +28,7 @@ class TagActivityLogController extends ApiController
                 'class' => \backend\models\RoleAccess::className(),
                 'rules' => [
                     [
-                        'actions' => ['search', 'get-log', 'logactivity', 'multiple-log-activity', 'index', 'create', 'update', 'view', 'delete'],
+                        'actions' => ['search', 'get-log', 'logactivity', 'multiple-logactivity', 'index', 'create', 'update', 'view', 'delete'],
                         'allow' => true,
                         'roles' => ['Client'],
                     ]

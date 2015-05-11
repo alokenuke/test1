@@ -114,28 +114,16 @@ class CustomSerializer extends Serializer {
             return $models;
         } else {    
             
-            if ($pagination !== false) { 
-                if($this->tokenDetails->request_from != 'webapp'){ 
-                    $models=  array_slice($models, 0, 5);
-                $result = [
-                    $this->collectionEnvelope =>$models,
-                ];
-                } else {
-                $result = [
-                    $this->collectionEnvelope => array_merge($models, $this->serializePagination($pagination)),
-                ];
-                }
-            } 
-            else
-            {
-                $result = [
-                    $this->collectionEnvelope => $models,
-                ];
+            $result = [
+                $this->collectionEnvelope => $models,
+            ];
+            if ($pagination !== false) {
+                $result =  array_merge($result, $this->serializePagination($pagination));
             }
             
-            
-            unset($result['_links']);
-            $result = array_merge($result, array('status'=>$this->status,'msg'=>$this->msg ));
+//            $paginationSerialize = $this->serializePagination($pagination);
+//            unset($paginationSerialize['_links']);
+            $result = array_merge($result, array('status'=>$this->status,'msg'=>$this->msg));
             return $result;
         }
     }

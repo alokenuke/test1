@@ -53,7 +53,7 @@ class UsersController extends ApiController
             
             $post = \Yii::$app->request->post();
             
-            $model = new $this->modelClass;
+            $model = new User();
             
             $query = $model->find();
             
@@ -63,8 +63,7 @@ class UsersController extends ApiController
             if(isset($post['search'])) {
                 foreach($post['search'] as $key => $val)
                     if($key=="name") {
-                            $query->orwhere(['like', 'first_name', $val]);
-                            $query->orwhere(['like', 'last_name', $val]);
+                            $query->andWhere("first_name like :name OR last_name like :name", [':name' => "%$val%"]);
                     } else if( $key == "usergroups" && $val['id']){
                             $query->leftJoin('rel_user_levels_users rel_ul', 'rel_ul.user_id=user.id')->andWhere(["rel_ul.user_group_id" => $val['id']]);
                     }else if(is_array ($val)) {

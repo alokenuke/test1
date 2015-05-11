@@ -28,7 +28,7 @@ class TimeattendanceController extends ApiController
                 'class' => \backend\models\RoleAccess::className(),
                 'rules' => [
                     [
-                        'actions' => ['search', 'getall', 'save', 'index', 'create', 'update', 'view', 'delete'],
+                        'actions' => ['search', 'getall', 'scan', 'save', 'index', 'create', 'update', 'view', 'delete'],
                         'allow' => true,
                         'roles' => ['Client'],
                     ],
@@ -36,6 +36,61 @@ class TimeattendanceController extends ApiController
         ];
         
         return $behaviors;
+    }
+    
+    public function actionScan() {
+        if (!$_POST) {
+            
+            $params = \Yii::$app->request->post();
+            
+            $uid = $params["uid"];
+            
+            $model = new $this->modelClass;
+            
+            $model = $model->find()->andWhere(['uid' => $uid])->one();
+            
+            if($model) {
+                $assignment = \backend\models\TimeattendanceAssignment::findOne(['tag_id' => $model->id, 'user_id' => \yii::$app->user->identity->id]);
+                if($assignment) {
+                    $loggedIn = \backend\models\TimeattendanceLog::find()->andWhere(['tag_id' => $model->id, 'logged_by' => \yii::$app->user->identity->id])->andWhere(['>', 'login_time', date("Y-m-d H:i:s", strtotime("-12 hours"))])->andWhere(["logout_time" => NULL])->andWhere(["status" => 1])->one();
+
+                    if($loggedIn) {
+                        $loggedIn->logout_time = date("Y-m-d H:i:s");
+                        if($loggedIn->save())
+                            return "Successfully logged out.";
+                        else
+                            return $loggedIn;
+                    }
+                    else
+                    {
+                        $timeAttendanceLog = new \backend\models\TimeattendanceLog();
+                        $timeAttendanceLog->tag_id = $model->id;
+                        $timeAttendanceLog->location = json_encode(["lat" => $params["location"]["lat"], "long" => $params["location"]["long"]]);
+                        $timeAttendanceLog->device = $params["device"];
+                        $timeAttendanceLog->logged_by = \yii::$app->user->identity->id;
+                        $timeAttendanceLog->login_time = date("Y-m-d H:i:s");
+                        $timeAttendanceLog->status = 1;
+                        if($timeAttendanceLog->save())
+                            return "Successfully logged in.";
+                        else
+                            return $timeAttendanceLog;
+                    }
+                }
+                else
+                {
+                    $model->addError("uid", "This tag is not assigned to you.");
+                    return $model;
+                }
+            }
+            else
+            {
+                $model = new $this->modelClass;
+                $model->addError("uid", "Invalid UID.");
+                return $model;
+            }
+        } else {
+            throw new \yii\web\HttpException(404, 'Invalid Request');
+        }
     }
     
     public function actionSearch() {
@@ -133,7 +188,8 @@ class TimeattendanceController extends ApiController
             
             $model->setAttribute("tag_name", $post['tag']['tag_name']);
             $model->setAttribute("tag_description", $post['tag']['tag_description']);
-            $model->setAttribute('uid', $model->generateUID(10));
+            if(!$model->id)
+                $model->setAttribute('uid', $model->generateUID(10));
             $model->setAttribute('project_id', $post['project_id']);
             $model->setAttribute('project_level_id', $post['project_level_id']);
             $model->setAttribute('user_group_id', $post['user_group_id']);

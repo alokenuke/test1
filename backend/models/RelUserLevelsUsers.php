@@ -32,6 +32,7 @@ class RelUserLevelsUsers extends \yii\db\ActiveRecord
     {
         return [
             [['company_id', 'user_group_id', 'user_level_id', 'user_id', 'assigned_by'], 'required'],
+            ['user_id', 'unique', 'targetAttribute' => ['user_id', 'user_group_id']],
             [['company_id', 'user_group_id', 'user_level_id', 'user_id', 'assigned_by'], 'integer'],
             [['user_id'], 'unique', 'targetAttribute' => ['company_id', 'user_group_id', 'user_level_id', 'user_id']],
             [['created_date'], 'safe']

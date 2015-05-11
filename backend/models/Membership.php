@@ -36,9 +36,40 @@ class Membership extends \yii\db\ActiveRecord
             [['name', 'limit_data', 'limit_items', 'status'], 'required'],
             [['limit_active_projects', 'limit_tags', 'limit_users', 'limit_data', 'limit_items', 'status'], 'integer'],
             ['name', 'unique'],
+            ['status', 'validateStatus'],
             [['modified_date'], 'safe'],
             [['name'], 'string', 'max' => 128]
         ];
+    }
+    
+    /**
+     * Validates the status.
+     * This method serves as the inline validation for status field.
+     * System would not allow disabling the status if company exists
+     *
+     * @param string $attribute the attribute currently being validated
+     * @param array $params the additional name-value pairs given in the rule
+     */
+    public function validateStatus($attribute, $params)
+    {
+        if (!$this->hasErrors()) {
+            if($this->$attribute == 0) {
+                $companyObj = Company::findOne(['membership_id' => $this->id]);
+
+                if($companyObj) {
+                    $this->addError($attribute, 'You can\'t disable this membership since, there are one or more companies with this membership assigned.');
+                    return;
+                }
+            }
+            else if($this->$attribute == 1) {
+                $companyObj = Company::findOne(['membership_id' => $this->id]);
+
+                if($companyObj) {
+                    $this->addError($attribute, "This membership can't be deleted since there are one or more companies are assigned.");
+                    return;
+                }
+            }
+        }
     }
     
     public function fields() {
@@ -70,5 +101,18 @@ class Membership extends \yii\db\ActiveRecord
             'status' => 'Status',
             'modified_date' => 'Modified Date',
         ];
+    }
+    
+    public function actDelete() {
+        
+        $companyObj = Company::findOne(['membership_id' => $this->id]);
+        
+        if($companyObj) {
+            return "This membership can't be deleted since there are one or more companies are assigned.";
+        }
+        
+        $this->status = 2;
+        $return = $this->save(FALSE);
+        return $return;
     }
 }

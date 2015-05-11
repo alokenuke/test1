@@ -193,8 +193,7 @@ class User extends ActiveRecord implements IdentityInterface
     //default scope to check company_id
     public static function find()
     {
-        
-        if(\yii::$app->requestedRoute!='user/create' && \yii::$app->requestedRoute!='users/multiinsert' && \yii::$app->requestedRoute != "company/savecompany") {
+        if(!\Yii::$app->user && \yii::$app->requestedRoute!='user/create' && \yii::$app->requestedRoute!='users/multiinsert' && \yii::$app->requestedRoute != "company/savecompany") {
             if(isset(\yii::$app->user->identity) && \yii::$app->user->identity->company_id > 0)
                 return parent::find()->where(['user.company_id' => \yii::$app->user->identity->company_id])->andWhere(['<>', 'user.status', self::STATUS_DELETED]);
             else
@@ -449,7 +448,7 @@ class User extends ActiveRecord implements IdentityInterface
         $roleObj = Roles::findOne($this->role);
         
         if($roleObj->role_name=='Super Admin') {
-            return "This user can't be removed.";
+            return "You can not delete company owner account.";
         }
         else if($this->id == \yii::$app->user->id)
             return "You cannot remove yourself.";

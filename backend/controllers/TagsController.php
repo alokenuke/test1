@@ -54,7 +54,7 @@ class TagsController extends ApiController
                 
                 $tagDetails = $tagModel->toArray([], ["tagActivityLog"]);
                 
-                $tagProcessFlow = \backend\models\TagProcess::findOne(['id' => $tagModel->tag_process_flow_id]);
+                $tagProcessFlow = \backend\models\TagProcess::findOne(['tag_process.id' => $tagModel->tag_process_flow_id]);
                 
                 $params = (array) json_decode($tagProcessFlow->params);
                 
@@ -78,7 +78,7 @@ class TagsController extends ApiController
                     
                         $assignedProcessDetails = \backend\models\TagProcess::find()
                                 ->select(['position'])
-                                ->andWhere(["id" => [$tagAssignment->process_stage_from, $tagAssignment->process_stage_to]])
+                                ->andWhere(["tag_process.id" => [$tagAssignment->process_stage_from, $tagAssignment->process_stage_to]])
                                 ->orderBy("position")
                                 ->all();
                         
@@ -248,13 +248,23 @@ class TagsController extends ApiController
                             $query->andWhere([$key => $val]);
                     }
             }
+            
+            if(!\yii::$app->user->identity->role_details->isAdmin) {
+                $roleSettings = \backend\models\RoleSettings::findOne(['role_id' => \yii::$app->user->identity->role, 'module' => 'tags']);
+                $allowedActions = (array) json_decode($roleSettings->role_params);
 
+                if($allowedActions["list-all"]!=1 && $allowedActions["list"]==1) {
+                    $query->join("inner Join", "tag_assignment", "tags.id = tag_assignment.tag_id");
+                }
+                $query->andWhere(['`tag_assignment`.`user_id`' => \yii::$app->user->identity->id]);
+            }
+            
             if(isset($post['excludeTags'])) {
                 $tagIds = [];
                 foreach($post['excludeTags'] as $tag)
                     $tagIds[] = $tag['id'];
                 
-                $query->andWhere(['not in', 'id', $tagIds]);
+                $query->andWhere(['not in', 'tags.id', $tagIds]);
             }
                         $pageLimit = 20;
             if(isset($post['sort']) && $post['sort'])
@@ -273,6 +283,7 @@ class TagsController extends ApiController
                         'pageSize'=>$pageLimit
                     ),
                 ]);
+                
             } catch (Exception $ex) {
                 throw new \yii\web\HttpException(500, 'Internal server error');
             }
@@ -430,7 +441,7 @@ class TagsController extends ApiController
     
     public function actionUpdatesimpletags($id) {
         
-        $model = \backend\models\Tags::findOne(['id' => $id]);
+        $model = \backend\models\Tags::findOne(['tags.id' => $id]);
         
         if (!$_POST && $model) {
             
@@ -654,7 +665,7 @@ class TagsController extends ApiController
         $post = \yii::$app->request->post('tagDetails');
         $relatedTag = $post['relatedTags'];
 
-            $model = $model = \backend\models\Tags::findOne(['id' => $id]);
+            $model = $model = \backend\models\Tags::findOne(['tags.id' => $id]);
             $connection = \Yii::$app->db;
             $transaction = $connection->beginTransaction();
             $model->type = "mT";
@@ -670,8 +681,8 @@ class TagsController extends ApiController
         try {
 
             $hasError = false;
-
-            if ($model->save()) { 
+            
+            if ($model->save()) {
                 \backend\models\RelatedTags::deleteAll(['master_tag_id' => $model->id]);
                 foreach($relatedTag as $rTag)
                 {
@@ -681,7 +692,7 @@ class TagsController extends ApiController
                     $relatedTagModel->save();
                 }
 
-                $validate[$key]['id'] = $model->id;
+                $validate = [];
 
                 foreach($post['tag_assignment'] as $i => $v) {
                         $tagAssignmentModel = \backend\models\TagAssignment::findOne(['user_id' => (int) $v['user_id'], 'tag_id' => $id]);

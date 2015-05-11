@@ -19,7 +19,7 @@ class ImportsController extends ApiController
                 'class' => \backend\models\RoleAccess::className(),
                 'rules' => [
                     [
-                        'actions' => ['employee-logs', 'import-projects', 'users'],
+                        'actions' => ['employee-logs', 'import-projects', 'import-users'],
                         'allow' => true,
                         'roles' => ['Client'],
                     ]
@@ -166,7 +166,7 @@ class ImportsController extends ApiController
                 //}
             }
             $transaction->commit();
-            return 'success';
+            return 'All projects Imported!';
         } else {
             throw new \yii\web\HttpException(404, 'Invalid Request');
         }
@@ -175,6 +175,9 @@ class ImportsController extends ApiController
    public function actionImportUsers(){
        if (!$_POST) {
             error_reporting(0);
+            ini_set('memory_limit','32M');
+            ini_set('max_execution_time', 100);
+            
             $post = \Yii::$app->request->post('data');
             
             $post = $post['user_files'];
@@ -201,8 +204,6 @@ class ImportsController extends ApiController
                 'I'=>'receive_notification',
                 'J'=>'allow_be'
             ];
-
-
 
             $r = -1;
             $namedDataArray = array();
@@ -233,7 +234,7 @@ class ImportsController extends ApiController
                 //}
             }
             $transaction->commit();
-            return 'success';
+            return 'All users created!';
         } else {
             throw new \yii\web\HttpException(404, 'Invalid Request');
         }

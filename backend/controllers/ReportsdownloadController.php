@@ -263,7 +263,6 @@ class ReportsdownloadController extends ApiController
                 while (1) {
                     //-----------------------------Print Label-----------------------------------------------------------------
                     //$pdf->AddPage();
-                    
                     $content .= "<div style='width: 100%;'>";
 
                     for ($vindex = 0; $vindex < $data['numberVertical']; $vindex++) {
@@ -704,7 +703,7 @@ class ReportsdownloadController extends ApiController
     public function actionPrintTagReport($tagId, $reportTemplate)
     {
         
-        $tagQueryObj = \backend\models\Tags::find()->andWhere(['id' => $tagId]);
+        $tagQueryObj = \backend\models\Tags::find()->andWhere(['tags.id' => $tagId]);
         
         $_GET['expand'] = "project_level,itemObj,processObj,userGroup,company,project";
         
@@ -827,7 +826,7 @@ class ReportsdownloadController extends ApiController
             return "Please select a tag to generate report.";
         }
             
-        $tagQueryObj = \backend\models\Tags::find()->andWhere(['id' => $tagIds]);
+        $tagQueryObj = \backend\models\Tags::find()->andWhere(['tags.id' => $tagIds]);
         $_GET['expand'] = "project_level,itemObj,processObj,userGroup,company,project";
         $dataProvider = new ActiveDataProvider([
             'query' => $tagQueryObj,

@@ -78,7 +78,7 @@ class Menu extends \yii\db\ActiveRecord
                     
                     foreach($roleSettings as $roleSetting) {
                         $assignedRoles = (array) json_decode($roleSetting->role_params);
-                        
+                        if(count($actions) > 0)
                         foreach($actions as $act) {
                             if(isset($assignedRoles[$act]) && $assignedRoles[$act] == 1) {
                                 $hasAccess = true;

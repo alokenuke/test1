@@ -97,7 +97,38 @@ class Items extends \yii\db\ActiveRecord
     }
     
     public function actDelete() {
-        $this->status = 2;
-        return $this->save();
+        
+        $hasActiveTag = false;
+        
+        $getChild = $this->find()->andWhere(['parent_id' => $this->id])->all();
+        
+        foreach($getChild as $childItem) {
+            $subChildItems = \yii\helpers\ArrayHelper::getColumn($this->find()->andWhere(['parent_id' => $childItem->id])->all(), "id", false);
+            $subChildItems[] = $childItem->id;
+            
+            if(count($subChildItems) > 0) {
+                $getTags = Tags::find()->andWhere(['tag_item_id' => $subChildItems, 'tag_status' => 1])->andWhere(['<>', 'completed', 1])->one();
+
+                if($getTags) {
+                    $hasActiveTag = true;
+                    break;
+                }
+            }
+        }
+        if(!$hasActiveTag) {
+            $getTags = Tags::find()->andWhere(['tag_item_id' => $this->id, 'tag_status' => 1])->andWhere(['<>', 'completed', 1])->one();
+            if($getTags) {
+                $hasActiveTag = true;
+            }
+        }
+        
+        if($hasActiveTag) {
+            $this->addError("status", "This item can't be deleted, because there are more than 1 active tags available using this item.");
+        }
+        
+        if(!$this->hasErrors()) {
+            $this->status = 2;
+            return $this->save();
+        }
     }
 }

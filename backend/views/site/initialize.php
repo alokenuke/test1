@@ -2,7 +2,7 @@
     use \yii;  
 ?>
 <script>
-    var app = angular.module('siteTrackApp', ['ngRoute','ui.bootstrap', 'ngResource', 'appApp.services', 'ui.select', 'ngSanitize', 'ui.tree', 'angularFileUpload', 'angular-loading-bar']);
+    var app = angular.module('siteTrackApp', ['ngRoute','ui.bootstrap', 'ngAnimate', 'ngResource', 'appApp.services', 'ui.select', 'ngSanitize', 'ui.tree', 'angularFileUpload', 'angular-loading-bar']);
     
     var routeForUnauthorizedAccess = '/noaccess';
 
@@ -24,12 +24,12 @@
     });
     
     app.constant('tooltip', {
-        'from_task_process': "This tooltip related to 'from task process'.",
-        'to_task_process': "This tooltip related to 'to task process'.",
-        'mandatory': "This tooltip related to 'mandatory'.",
-        'email_notification': "This tooltip related to 'email notification'.",
-        'allow_be': "This tooltip is related to 'Allow BE'.",
-        'hierarchy_compulsory': "This tooltip is related to 'Hierarchy Compulsory'.",
+        'from_task_process': "Select the specific Process flow level the user is assigned from.",
+        'to_task_process': "Select the specific Process flow level the user is assigned up to.",
+        'mandatory': "A Process Flow Level update from this individual is mandatory to move ahead to the next process level.",
+        'email_notification': "Receive notification of the Tag updates as per the options set herewith.",
+        'allow_be': "If a user is allowed BE (Backend Edit), they can make Tag updates/edits via website, else only from the mobile application.",
+        'hierarchy_compulsory': "When Process Flow is made Hierarchy Compulsory, the Tag can be updated only in sequence of the flow from Top (First) to Bottom (Last).",
     });
 
     app.constant('page_dropdown', {
@@ -136,7 +136,7 @@
                     //controller (in this case superUserController ) is invoked for a route 
                     //only after the promises mentioned under it are resolved.
                     permission: function(authorizationService, $route) {
-                        return authorizationService.permissionCheck("users", "list");
+                        return authorizationService.permissionCheck("users", "list-all");
                     },
                 }
             })
@@ -211,7 +211,7 @@
                     //controller (in this case superUserController ) is invoked for a route 
                     //only after the promises mentioned under it are resolved.
                     permission: function(authorizationService, $route) {
-                        return authorizationService.permissionCheck("projects", "list");
+                        return authorizationService.permissionCheck("projects", "list-all");
                     },
                 }
             })
@@ -256,7 +256,7 @@
                     //controller (in this case superUserController ) is invoked for a route 
                     //only after the promises mentioned under it are resolved.
                     permission: function(authorizationService, $route) {
-                        return authorizationService.permissionCheck("projectlevel", "list");
+                        return authorizationService.permissionCheck("projectlevel", "list-all");
                     },
                 }
             })
@@ -271,7 +271,7 @@
                     //controller (in this case superUserController ) is invoked for a route 
                     //only after the promises mentioned under it are resolved.
                     permission: function(authorizationService, $route) {
-                        return authorizationService.permissionCheck("usergroups", "list");
+                        return authorizationService.permissionCheck("usergroups", "list-all");
                     },
                 }
             })
@@ -286,7 +286,7 @@
                     //controller (in this case superUserController ) is invoked for a route 
                     //only after the promises mentioned under it are resolved.
                     permission: function(authorizationService, $route) {
-                        return authorizationService.permissionCheck("items", "list");
+                        return authorizationService.permissionCheck("items", "list-all");
                     },
                 }
             })
@@ -301,7 +301,7 @@
                     //controller (in this case superUserController ) is invoked for a route 
                     //only after the promises mentioned under it are resolved.
                     permission: function(authorizationService, $route) {
-                        return authorizationService.permissionCheck("timeattendance", "list");
+                        return authorizationService.permissionCheck("timeattendance", "list-all");
                     },
                 }
             })
@@ -376,7 +376,7 @@
                     //controller (in this case superUserController ) is invoked for a route 
                     //only after the promises mentioned under it are resolved.
                     permission: function(authorizationService, $route) {
-                        return authorizationService.permissionCheck("tagprocess", "list");
+                        return authorizationService.permissionCheck("tagprocess", "list-all");
                     },
                 }
             })

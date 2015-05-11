@@ -46,10 +46,14 @@ class LoginForm extends Model
             $user = $this->getUser();
             if (!$user || !$user->validatePassword($this->password)) {
                 $this->addError($attribute, 'Incorrect username or password.');
+                return;
             }
-		
-            if ($this->device == 'webapp' && !$user || !$user->allow_be) {
+            
+            if ($this->device == 'webapp' && !$user->allow_be) {
                 $this->addError("password", 'You are not allowed to login through backend. Please contact your administrator.');
+            }
+            else if($this->device == 'mobile' && $user->company_id == 0) {
+                $this->addError("password", 'You are not allowed to login through mobile.');
             }
             else {
                 if($user->company_id > 0) {
@@ -149,7 +153,7 @@ class LoginForm extends Model
         if ($this->_user === false) {
             $this->_user = User::findByUsername($this->username);
         }
-
+        
         return $this->_user;
     }
 }

@@ -28,9 +28,14 @@ class ReportsController extends ApiController
                 'class' => \backend\models\RoleAccess::className(),
                 'rules' => [
                     [
-                        'actions' => ['search', 'labels', 'timeattendancelabels', 'employee-logs', 'generate-tag-reports', 'generate-tag-reports-by-id', 'generate-time-attendance-reports', 'generate-user-reports', 'generate-employee-logs-reports'],
+                        'actions' => ['search', 'labels', 'timeattendancelabels', 'generate-tag-reports', 'generate-tag-reports-by-id', 'generate-time-attendance-reports', 'generate-user-reports', 'generate-employee-logs-reports'],
                         'allow' => true,
                         'roles' => ['Client'],
+                    ],
+                    [
+                        'actions' => ['employee-logs'],
+                        'allow' => true,
+                        'roles' => ['Client', 'Site'],
                     ],
                 ]
         ];

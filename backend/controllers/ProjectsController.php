@@ -272,7 +272,7 @@ class ProjectsController extends ApiController
                     
                     $result['completedTags'][] = Tags::find()->andWhere(['completed' => '1', 'project_id' => $post['project']])->andWhere(['<=', 'completed_date', $date])->count();
 
-                    $result['totalTags'][] = Tags::find()->andWhere(['project_id' => $post['project']])->andWhere(['<=', 'created_date', $date])->count();
+                    $result['totalTags'][] = Tags::find()->andWhere(['project_id' => $post['project']])->andWhere(['<=', 'tags.created_date', $date])->count();
                 }
                 
                 return $result;

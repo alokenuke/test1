@@ -162,12 +162,19 @@ class RoleAccess extends \yii\base\ActionFilter
         else if($role == $roleDetails->type) {
             $action = Yii::$app->controller->action->id;
             if($action == 'search' || $action == 'getall')
-                $action = 'list';
+                $action = ['list', 'list-all'];
             $controller = Yii::$app->controller->id;
             $roleSettings = RoleSettings::find()->andWhere(['role_id' => $roleDetails->id, 'module' => $controller])->one();
             if($roleSettings) {
                 $actions = json_decode($roleSettings->role_params);
-                if(isset($actions->$action) && $actions->$action == 1) {
+                if(is_array($action)) {
+                    foreach($action as $act) {
+                        if(isset($actions->$act) && $actions->$act == 1)
+                                return true;
+                    }
+                    return false;
+                }
+                else if(isset($actions->$action) && $actions->$action == 1) {
                     return true;
                 }
                 else {

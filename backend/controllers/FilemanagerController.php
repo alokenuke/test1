@@ -56,7 +56,11 @@ class FilemanagerController extends ApiController
         
         if(!in_array($mimeType, $fileManager->getAllowedTypes())) {
             Yii::$app->getResponse()->setStatusCode(422, 'Data Validation Failed.');
-            return "You have uploaded a unsupported file of type ".$mimeType.". Please try again.";
+            return "You have uploaded an unsupported file of type ".$mimeType.". Please try again.";
+        }
+        else if(($fileManager->getAllowedFileSize($mimeType) * 1024 * 1024) < $_FILES['file']['size']) {
+            Yii::$app->getResponse()->setStatusCode(422, 'Data Validation Failed.');
+            return "Max file size is ".$fileManager->getAllowedFileSize($mimeType)."MB. Please try again.";
         }
         
         $postdata = fopen( $_FILES[ 'file' ][ 'tmp_name' ], "r" );
@@ -88,7 +92,20 @@ class FilemanagerController extends ApiController
     
     public function actionUploadimage() {
         
+        $fileManager = new \backend\models\FileManager();
+        
         $uploadedFile = $_FILES['upload'];
+        
+        $mimeType = $_FILES['upload']['type'];
+        
+        if(!in_array($mimeType, $fileManager->getAllowedTypes())) {
+            Yii::$app->getResponse()->setStatusCode(422, 'Data Validation Failed.');
+            return "You have uploaded a unsupported file of type ".$mimeType.". Please try again.";
+        }
+        else if(($fileManager->getAllowedFileSize($mimeType) * 1024 * 1024) < $_FILES['upload']['size']) {
+            Yii::$app->getResponse()->setStatusCode(422, 'Data Validation Failed.');
+            return "Max file size is ".$fileManager->getAllowedFileSize($mimeType)."MB. Please try again.";
+        }
         
         $type = str_replace("image/", "", $uploadedFile['type']);
         
@@ -133,6 +150,19 @@ class FilemanagerController extends ApiController
         
         $extension = end(explode('.', $_FILES['file']['name']));
         
+        $fileManager = new \backend\models\FileManager();
+        
+        $mimeType = $_FILES['file']['type'];
+        
+        if(!in_array($mimeType, $fileManager->getAllowedTypes())) {
+            Yii::$app->getResponse()->setStatusCode(422, 'Data Validation Failed.');
+            return "You have uploaded an unsupported file of type ".$mimeType.". Please try again.";
+        }
+        else if(($fileManager->getAllowedFileSize($mimeType) * 1024 * 1024) < $_FILES['file']['size']) {
+            Yii::$app->getResponse()->setStatusCode(422, 'Data Validation Failed.');
+            return "Max file size is ".$fileManager->getAllowedFileSize($mimeType)."MB. Please try again.";
+        }
+        
         if(in_array($extension, ['csv', 'xls', 'xlsx'])) {
             
             $fileManager = new \backend\models\FileManager();
@@ -149,7 +179,9 @@ class FilemanagerController extends ApiController
             Yii::$app->getResponse()->setStatusCode(422, 'Invalid image format.');
             return 'error';
         }
-    }    public function actionDownload() {
+    }    
+    
+    public function actionDownload() {
         $type = base64_decode($_GET['type']);
         $filename = $_GET['file'];
                 

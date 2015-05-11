@@ -213,8 +213,33 @@ class TagProcess extends \yii\db\ActiveRecord
     }
     
     public function actDelete() {
-        $this->status = 2;
-        return $this->save();
+        $hasActiveTag = false;
+        
+        $process_id = 0;
+        if($this->type==0) {
+            $processFlowObj = $this->find()->andWhere(['parent_id' => $this->id])->all();
+            $process_id = \yii\helpers\ArrayHelper::getColumn($processFlowObj, "id" ,false);
+        }
+        else if($this->type==1)
+            $process_id = $this->id;
+        else if($this->type==2)
+            $process_id = $this->parent_id;
+        else if($this->type==3)
+        {
+            $processStage = $this->find()->andWhere(['id' => $this->parent_id])->one();
+            $process_id = $processStage->parent_id;
+        }
+        
+        $hasActiveTag = Tags::find()->andWhere(['tag_process_flow_id' => $process_id, 'tag_status' => 1])->andWhere(['<>', 'completed', 1])->one();
+        
+        if($hasActiveTag) {
+            $this->addError("status", "This process can't be deleted, because there are more than 1 active tags available using this process.");
+        }
+        
+        if(!$this->hasErrors()) {
+            $this->status = 2;
+            return $this->save();
+        }
     }
     public function getParentProcess() {
         return $this->hasOne(TagProcess::className(), ['id' => 'parent_id']);

@@ -49,8 +49,8 @@ class Tags extends \yii\db\ActiveRecord
             [['project_id', 'project_level_id', 'user_group_id', 'company_id', 'tag_status', 'created_by'], 'integer'],
             [['created_date', 'modified_date'], 'safe'],
             
-            ['uid', 'unique', 'targetAttribute' => ['company_id', 'uid']],
-            ['tag_name', 'unique', 'targetAttribute' => ['company_id', 'tag_name']],
+            ['uid', 'unique', 'targetAttribute' => ['uid']],
+            ['tag_name', 'unique', 'targetAttribute' => ['tag_name']],
             
             [['product_code'], 'string', 'max' => 128],
             [['tag_name'], 'string', 'max' => 256],
@@ -102,7 +102,7 @@ class Tags extends \yii\db\ActiveRecord
     // default scope to check company_id
     public static function find()
     {
-        $query = parent::find()->where(['tags.company_id' => \yii::$app->user->identity->company_id, 'tags.tag_status' => 1]);
+        $query = parent::find()->where(['tags.company_id' => \yii::$app->user->identity->company_id, 'tags.tag_status' => 1])->joinWith("project");
         
         return $query;
     }
@@ -254,6 +254,45 @@ class Tags extends \yii\db\ActiveRecord
 
                 return $tagAssignment;
             },
+            'processAssigned' => function() {
+                
+                $tagProcessFlow = \backend\models\TagProcess::findOne(['tag_process.id' => $this->tag_process_flow_id]);
+                
+                $params = (array) json_decode($tagProcessFlow->params);
+                
+                $_GET['expand'] = "childOptions";
+                
+                if(!$params['flagHierarchy'] || \Yii::$app->user->identity->role_details->isAdmin) {
+                    $processAssigned = TagProcess::find()->andWhere(['parent_id' => $tagProcessFlow->id])->orderBy("position");
+                }
+                else {
+                    $assignments = TagAssignment::findOne(['tag_id' => $this->id, 'user_id' => Yii::$app->user->identity->id]);
+                
+                    if(!$assignments)
+                        return;
+
+                    $tagProcessFrom = TagProcess::findOne(['id' => $assignments->process_stage_from]);
+                    $tagProcessTo = TagProcess::findOne(['id' => $assignments->process_stage_to]);
+
+                    $processAssigned = TagProcess::find()->andWhere(['between', 'position', $tagProcessFrom->position, $tagProcessTo->position])->andWhere(['parent_id' => $tagProcessFlow->id])->orderBy("position");
+                }
+                                
+                $processAssigned->joinWith = [];
+                
+                $provider = "";
+                try {
+                        $provider = new \yii\data\ActiveDataProvider ([
+                            'query' => $processAssigned,
+                            'pagination'=> false,
+                        ]);
+                } catch (Exception $ex) {
+                    throw new \yii\web\HttpException(500, 'Internal server error');
+                }
+
+                $serializer = new \backend\models\CustomSerializer();
+
+                return $serializer->serialize($provider);
+            },
             'itemDetails',
             'userGroup',
             'tagAssignment',
@@ -336,8 +375,22 @@ class Tags extends \yii\db\ActiveRecord
     
     public function getRelatedTags()
     {
-        return $this->hasMany(Tags::className(), ['id'=>'tag_id'])
+        $_GET['expand'] = "project_level,itemDetails";
+        $query = $this->hasMany(Tags::className(), ['id'=>'tag_id'])
                 ->viaTable('related_tags', ['master_tag_id'=>'id']);
+        
+        $provider = "";
+        try {
+                $provider = new \yii\data\ActiveDataProvider ([
+                    'query' => $query                        
+                ]);
+        } catch (Exception $ex) {
+            throw new \yii\web\HttpException(500, 'Internal server error');
+        }
+
+        $serializer = new \backend\models\CustomSerializer();
+
+        return $serializer->serialize($provider);
     }
 	
     

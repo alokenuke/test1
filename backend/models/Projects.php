@@ -66,7 +66,7 @@ class Projects extends \yii\db\ActiveRecord
     
     public static function find()
     {
-        $query = parent::find()->andWhere(['company_id' => \yii::$app->user->identity->company_id])->andWhere(['project_status' => 1]);
+        $query = parent::find()->andWhere(['projects.company_id' => \yii::$app->user->identity->company_id])->andWhere(['project_status' => 1]);
         
         return $query;
     }
@@ -154,10 +154,10 @@ class Projects extends \yii\db\ActiveRecord
             'stats' => function() {
                 $return = array();
                 $return['sTags']['count'] = Tags::find()->andWhere(['type' => 'sT', 'project_id' => $this->id])->count();
-                $return['sTags']['activities'] = TagActivityLog::find()->andWhere(['tag_id' => Tags::find()->select("id")->andWhere(['type' => 'sT', 'project_id' => $this->id])])->count();
+                $return['sTags']['activities'] = TagActivityLog::find()->andWhere(['tag_id' => Tags::find()->select("tags.id")->andWhere(['type' => 'sT', 'project_id' => $this->id])])->count();
                 
                 $return['mTags']['count'] = Tags::find()->andWhere(['type' => 'mT', 'project_id' => $this->id])->count();
-                $return['mTags']['activities'] = TagActivityLog::find()->andWhere(['tag_id' => Tags::find()->select("id")->andWhere(['type' => 'mT', 'project_id' => $this->id])])->count();
+                $return['mTags']['activities'] = TagActivityLog::find()->andWhere(['tag_id' => Tags::find()->select("tags.id")->andWhere(['type' => 'mT', 'project_id' => $this->id])])->count();
                 
                 $return['levels']['count'] = ProjectLevel::find()->andWhere(['parent_id' => 0, 'project_id' => $this->id])->count();
                 $return['sublevels']['count'] = ProjectLevel::find()->andWhere(['parent_id' => ProjectLevel::find()->select("project_level.id")->andWhere(['parent_id' => 0, 'project_id' => $this->id])])->count();
@@ -201,16 +201,16 @@ class Projects extends \yii\db\ActiveRecord
                 
                 if(isset($post['duration'])) {
                     if($post['duration']=='7days') {
-                        $query->andWhere(['between', 'created_date', date("Y-m-d", strtotime("-7 days")), date("Y-m-d H:i:s")]);
+                        $query->andWhere(['between', 'tags.created_date', date("Y-m-d", strtotime("-7 days")), date("Y-m-d H:i:s")]);
                     }
                     else if($post['duration']=='1month') {
-                        $query->andWhere(['between', 'created_date', date("Y-m-d", strtotime("-1 month")), date("Y-m-d H:i:s")]);
+                        $query->andWhere(['between', 'tags.created_date', date("Y-m-d", strtotime("-1 month")), date("Y-m-d H:i:s")]);
                     }
                     else if($post['duration']=='3months') {
-                        $query->andWhere(['between', 'created_date', date("Y-m-d", strtotime("-3 months")), date("Y-m-d H:i:s")]);
+                        $query->andWhere(['between', 'tags.created_date', date("Y-m-d", strtotime("-3 months")), date("Y-m-d H:i:s")]);
                     }
                     else if($post['duration']=='1year') {
-                        $query->andWhere(['between', 'created_date', date("Y-m-d", strtotime("-1 year")), date("Y-m-d H:i:s")]);
+                        $query->andWhere(['between', 'tags.created_date', date("Y-m-d", strtotime("-1 year")), date("Y-m-d H:i:s")]);
                     }
                 }
                 

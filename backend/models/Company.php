@@ -38,7 +38,7 @@ class Company extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['company_name', 'company_owner', 'company_logo', 'company_status', 'expiry_date', 'membership_id'], 'required'],
+            [['company_name', 'company_owner', 'company_status', 'expiry_date', 'membership_id'], 'required'],
             [['company_status'], 'integer'],
             ['company_name', 'unique'],
             ['company_status', 'default', 'value' => self::STATUS_ACTIVE],
@@ -59,13 +59,6 @@ class Company extends \yii\db\ActiveRecord
             
             if(isset($changedAttributes['company_logo']) && $changedAttributes['company_logo'] && file_exists($projectPath.$changedAttributes['company_logo']))
                 unlink($projectPath.$changedAttributes['company_logo']);
-        }
-        
-        if(isset($changedAttributes['membership_id'])){
-            $model = new CompanyMembershipLogs();
-            $data = ['company_id'=> $this->id,'membership_id'=>$this->membership_id];
-            $model->setAttributes($data);
-            $model->save(false);
         }
         
         if($insert) {
@@ -121,6 +114,17 @@ class Company extends \yii\db\ActiveRecord
             $userGroupProjectModel->assigned_by = \yii::$app->user->id;
             $userGroupProjectModel->save(0);
             
+            $model = new CompanyMembershipLogs();
+            $data = ['company_id'=> $this->id,'membership_id'=>$this->membership_id, 'expiry_date' => $this->expiry_date, 'created_by' => \yii::$app->user->identity->id];
+            $model->setAttributes($data);
+            $model->save(false);
+            
+        }
+        else if(isset($changedAttributes['membership_id'])){
+            $model = new CompanyMembershipLogs();
+            $data = ['company_id'=> $this->id,'membership_id'=>$this->membership_id, 'expiry_date' => $this->expiry_date, 'created_by' => \yii::$app->user->identity->id];
+            $model->setAttributes($data);
+            $model->save(false);
         }
         
         parent::afterSave($insert, $changedAttributes);
@@ -162,10 +166,10 @@ class Company extends \yii\db\ActiveRecord
             },
             'stats' => function() {
                 $return = array();
-                $return['projects']['count'] = Projects::find()->where(['company_id' => $this->id])->count();
-                $return['tags']['count'] = Tags::find()->where(['company_id' => $this->id])->count();
-                $return['users']['count'] = User::find()->where(['company_id' => $this->id])->andWhere(['user.status' => 1])->count();
-                $return['items']['count'] = Items::find()->where(['company_id' => $this->id])->count();
+                $return['projects']['count'] = Projects::find()->where(['projects.company_id' => $this->id])->count();
+                $return['tags']['count'] = Tags::find()->where(['tags.company_id' => $this->id])->count();
+                $return['users']['count'] = User::find()->where(['user.company_id' => $this->id])->andWhere(['user.status' => 1])->count();
+                $return['items']['count'] = Items::find()->where(['tag_items.company_id' => $this->id])->count();
                 
                 $fileManager = new \backend\models\FileManager($this->id);
 

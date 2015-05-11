@@ -29,6 +29,12 @@ AppAsset::register($this);
         </div>
         <?php echo $this->render("footer")?>
     <?php $this->endBody() ?>
+    <?php if(!\yii::$app->user->isGuest && Yii::$app->getRequest()->getUserIP() != "::1") { ?>
+        <script type="text/javascript" src="http://assets.freshdesk.com/widget/freshwidget.js"></script>
+        <script type="text/javascript">
+                FreshWidget.init("", {"queryString": "&widgetType=popup", "utf8": "✓", "widgetType": "popup", "buttonType": "text", "buttonText": "Customer Support", "buttonColor": "white", "buttonBg": "#58abe1", "alignment": "2", "offset": "350px", "formHeight": "500px", "url": "https://sitetrack.freshdesk.com"} );
+        </script>
+    <?php } ?>
 </body>
 </html>
 <?php $this->endPage() ?>

@@ -36,9 +36,12 @@ class DeleteAction extends \yii\rest\DeleteAction
         if ($result === false) {
             throw new ServerErrorHttpException('Failed to delete the object for unknown reason.');
         }
-        else if(is_object ($result)) {
-            Yii::$app->getResponse()->setStatusCode(422);
+        else if($result !== true) {
+            Yii::$app->getResponse()->setStatusCode(422, 'Data Validation Failed.');
             return $result;
+        }
+        else if($model->getErrors()) {
+            return $model;
         }
         Yii::$app->getResponse()->setStatusCode(204);
     }

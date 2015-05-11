@@ -123,7 +123,17 @@ class UserGroups extends \yii\db\ActiveRecord
     }
     
     public function actDelete() {
-        $this->group_status = 2;
-        return $this->save();
+        $hasActiveTag = false;
+        
+        $hasActiveTag = Tags::find()->andWhere(['user_group_id' => $process_id, 'tag_status' => 1])->andWhere(['<>', 'completed', 1])->one();
+        
+        if($hasActiveTag) {
+            $this->addError("status", "This user group can't be deleted, because there are more than 1 active tags available using this user group.");
+        }
+        
+        if(!$this->hasErrors()) {
+            $this->status = 2;
+            return $this->save();
+        }
     }
 }

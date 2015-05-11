@@ -258,9 +258,9 @@ class CompanyController extends ApiController
             $company->addError ("expiry_date", "Invalid expiry date.");
         
         if($company->save()){
-           if (isset($data['company']['id']) && $data['company']['id'] > 0) {
-                $role = \backend\models\Roles::findOne(['company_id' => $data['company']['id'], 'isAdmin' => 1]);
-            } else { 
+            $role = \backend\models\Roles::find()->where(['company_id' => $company->id, 'isAdmin' => 1])->one();
+            
+            if(!$role) {
                 $role = new \backend\models\Roles();
                 $role->role_name = 'Super Admin';
                 $role->type = 'Client';
@@ -270,9 +270,11 @@ class CompanyController extends ApiController
                 $role->created_date = date('Y-m-d');
                 $role->save();
             }
-            
-            if(isset($data['user']['id']) && $data['user']['id']>0)
+            if(isset($data['user']['id']) && $data['user']['id']>0) {
                 $user = \backend\models\User::findOne($data['user']['id']);
+                if(!$user->role)
+                    $user->role = $role->id;
+            }
             else {
                 $user = new \backend\models\User();
                 $user->role = $role->id;
@@ -285,7 +287,7 @@ class CompanyController extends ApiController
                 return $user;
             }
             
-            if(!$data['company']['id']) {
+            if(!isset($data['company']['id'])) {
                 $company->sampleTagParams['user_id'] = $user->id;
                 $company->createSampleTags($company->id);
             }
