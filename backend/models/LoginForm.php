@@ -116,7 +116,7 @@ class LoginForm extends Model
                         $authToken->login_latlong = "Not available";
                     }
                     else {
-                        $authToken->login_location = $locationDetails['geoplugin_region']." (".$locationDetails['geoplugin_countryName'].")";
+                        $authToken->login_location = $locationDetails['geoplugin_region']." (".$locationDetails['geoplugin_countryCode'].")";
                         
                         if($this->location)
                             $authToken->login_latlong = $this->location['lat'].",".$this->location['long'];
