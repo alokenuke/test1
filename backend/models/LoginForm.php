@@ -107,7 +107,7 @@ class LoginForm extends Model
                 
                 if(!$locationDetails) {
                     if($this->location)
-                        $locationDetails = unserialize(file_get_contents("http://www.geoplugin.net/extras/location.gp?format=php&lat=$this->location[lat]&long=$this->location[long]"));
+                        $locationDetails = unserialize(file_get_contents("http://www.geoplugin.net/extras/location.gp?format=php&lat=".$this->location[lat]."&long=".$this->location[long]));
                     else
                         $locationDetails = unserialize(file_get_contents("http://www.geoplugin.net/php.gp?ip=".$authToken->login_ip));
                     
