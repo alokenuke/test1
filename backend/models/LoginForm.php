@@ -107,9 +107,9 @@ class LoginForm extends Model
                 
                 if(!$locationDetails) {
                     if($this->location)
-                        $locationDetails = unserialize(file_get_contents("http://www.geoplugin.net/extras/location.gp?format=php&lat=".$this->location['lat']."&long=".$this->location['long']));
+                        $locationDetails = json_decode(file_get_contents("http://www.geoplugin.net/extras/location.gp?format=json&lat=".$this->location['lat']."&long=".$this->location['long']));
                     else
-                        $locationDetails = unserialize(file_get_contents("http://www.geoplugin.net/php.gp?ip=".$authToken->login_ip));
+                        $locationDetails = json_decode(file_get_contents("http://www.geoplugin.net/json.gp?ip=".$authToken->login_ip));
                     
                     if(empty($locationDetails['geoplugin_region'])) {
                         $authToken->login_location = "Not available";
