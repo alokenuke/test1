@@ -89,7 +89,7 @@ class LoginForm extends Model
             $authToken->created_on = time();
             
             $authToken->login_ip = Yii::$app->getRequest()->getUserIP();
-            
+               
             if($authToken->login_ip != "::1") {
                 
                 $lastLoginQry = UserTokens::find()
@@ -100,7 +100,7 @@ class LoginForm extends Model
                 if($this->location)
                     $lastLoginQry = $lastLoginQry->andWhere(['login_latlong' => $authToken->login_location['lat'].",".$authToken->login_location['long']]);
                 else
-                    $lastLoginQry = $lastLoginQry->andWhere(['login_ip' => $authToken->login_ip]);
+                    $lastLoginQry = $lastLoginQry->andWhere(['login_ip' => $authToken->login_ip])->andWhere("0");
                 
                 // Check if similar ip detected by system in last 6 months
                 $locationDetails = $lastLoginQry->one();
