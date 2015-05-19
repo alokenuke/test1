@@ -454,6 +454,7 @@ class User extends ActiveRecord implements IdentityInterface
             return "You cannot remove yourself.";
         
         $this->status = 2;
+        $this->email = "Deleted".$this->id."-".$this->email;
         $return = $this->save(FALSE);
         return $return;
     }
