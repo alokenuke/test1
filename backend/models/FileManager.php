@@ -245,4 +245,18 @@ class FileManager extends Model
         return $fileSizes[$mime];
     }
     
+    public function removeDirectory($dir) {
+        $dir = \Yii::$app->params['repository'].$dir;
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($files as $fileinfo) {
+            $todo = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+            $todo($fileinfo->getRealPath());
+        }
+
+        rmdir($dir);
+    }
 }

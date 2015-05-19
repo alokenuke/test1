@@ -207,6 +207,13 @@ class Company extends \yii\db\ActiveRecord
     
     public function actDelete() {
         $this->company_status = 2;
+        
+        $connection = \yii::$app->db;
+        $connection->createCommand("Update user set email = concat('Deleted".$this->id."-', email), status = 2 where company_id = ".$this->id)->execute();
+        
+        $fileManager = new FileManager();
+        $fileManager->removeDirectory($this->id);
+        
         return $this->save();
     }
     
