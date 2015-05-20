@@ -156,6 +156,7 @@
                                 </span>
                             </td>
                             <td class="text-center">
+                                <button type="button" ng-confirm-click="Are you sure to reset password for super admin for this company?" title="Click to reset password." ng-click="resetPassword(company)">Reset <i class="fa fa-key"></i></button>
                                 <a href="/#/company/update/{{company.id}}" class="btn icon-btn"><i class="fa fa-pencil-square-o fa-lg"></i></a>
                                 <button type="button" ng-confirm-click="Are you sure to remove this company?" title="Click to remove." ng-click="removeCompany(company, $index)"><i class="fa fa-trash"></i></button>
                             </td>

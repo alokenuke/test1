@@ -177,6 +177,12 @@ app.controller('SiteIndex', ['$scope', 'rest', '$location', '$route','$routePara
                 }
 
             };
+            
+            $scope.resetPassword = function (model) {
+                rest.customModelData("site/request-password-reset", {'email': model.user.email, '_csrf': angular.element("meta[name='csrf-token']").attr("content")}).success(function() {
+                    alertService.add('success', "Reset password email is sent to super user of the company '"+model.company_name+"' .");
+                }).error(errorCallback);
+            }
 
             $scope.removeCompany = function (model, $index) {
 
@@ -190,7 +196,7 @@ app.controller('SiteIndex', ['$scope', 'rest', '$location', '$route','$routePara
             }
             var updateCompanyList = function () {
                 var params = {'search': $scope.$search, 'sort': $scope.sortBy, 'page': $scope.currentPage, 'limit': $scope.numPerPage};
-                rest.customModelData("company/search?expand=membership,stats", params).success(function (data) {
+                rest.customModelData("company/search?expand=membership,stats,user", params).success(function (data) {
                     $scope.companies = data.items;
                     $scope.totalCount = data._meta.totalCount;
                     $scope.pageCount = data._meta.pageCount;
