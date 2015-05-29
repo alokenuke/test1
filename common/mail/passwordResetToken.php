@@ -14,12 +14,18 @@ Hello <?= Html::encode($user->first_name) ?> <?= Html::encode($user->last_name) 
 We have received a New Password request for your user account "<?= Html::encode($user->username) ?>".<br /><br />
 
 Please <?= Html::a(Html::encode("CLICK HERE"), $resetLink) ?> to reset your password.<br /><br />
+
 Or <br /><br />
-Copy and Paste the following text in your browser address window and press ‘Enter’. <br />
-<?= Html::a(Html::encode($resetLink), $resetLink) ?><br />
-In the event that you have not made any such request, your old password is still functional for you to log-in. You also need to contact your primary SiteTrack account admin at <?= Html::encode($user->adminEmail) ?> for security reasons.<br /><br />
+
+Copy and Paste the following text in your browser address window and press ‘Enter’. <br /><br />
+<?= Html::a(Html::encode($resetLink), $resetLink) ?><br /><br />
+
+In the event that you have not made any such request, your old password is still functional for you to log-in. You also need to contact your primary SiteTrack account admin at <?= Html::encode(\backend\models\User::getAdminEmail($user->company_id)) ?> for security reasons.<br /><br />
+
 If you have any questions or concerns, please write to us at support@sitetrack-nfc.com indicating your Company Name and Username.<br /><br />
+
 For your reference, The SiteTrack Backend login URL is https://admin.sitetrack-nfc.com . <br /><br />
+
 Great to have you on-board with us. Do let us know if we could be of any further assistance.<br /><br />
 
 SiteTrack Admin<br />
