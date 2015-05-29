@@ -87,7 +87,7 @@ class User extends ActiveRecord implements IdentityInterface
         $this->last_name = ucwords($this->last_name);
         $this->designation = ucwords($this->designation);
         
-        if($this->photo) {
+        if($this->photo && \yii::$app->user->identity) {
             $fileManager = new FileManager();
 
             if(isset($this->photo)) {
