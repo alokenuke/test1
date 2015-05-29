@@ -32,6 +32,7 @@ class User extends ActiveRecord implements IdentityInterface
     public $role_details;
     public $newPassword = "";
     public $company;
+    public $adminEmail;
     
     /**
      * @inheritdoc
@@ -457,5 +458,14 @@ class User extends ActiveRecord implements IdentityInterface
         $this->email = "Deleted".$this->id."-".$this->email;
         $return = $this->save(FALSE);
         return $return;
+    }
+    
+    public function getAdminEmail() {
+        $company = $this->company_id;
+        
+        $superUserRole = Roles::findOne(['role_name' => 'Super Admin', 'isAdmin' => '1', 'company_id' => $company]);
+        
+        return User::findOne(['role' => $superUserRole, 'company_id' => $company])->email;
+        
     }
 }
