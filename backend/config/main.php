@@ -16,7 +16,7 @@ return [
     'components' => [
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
-            'useFileTransport'=>true,
+            'useFileTransport'=>false,
             'transport' => [
                 'class' => 'Swift_SmtpTransport',
                 'host' => 'smtp.gmail.com',
@@ -29,8 +29,13 @@ return [
         'response' => [
             'class' => 'yii\web\Response',
             'on beforeSend' => function ($event) {
+                if(isset($event->sender))
+                    $response = $event->sender;
                 if (isset($response) && $response->data && $response->format != 'html') {
                     $response->data["statusCode"] = $response->statusCode;
+                }
+                if($response->statusCode == 401 && Yii::$app->user->isGuest) {
+                    $response->data["message"] = "LOGIN REQUIRED";
                 }
             },
         ],
