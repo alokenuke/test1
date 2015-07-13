@@ -179,7 +179,7 @@ app.controller('SiteIndex', ['$scope', 'rest', '$location', '$route','$routePara
             };
             
             $scope.resetPassword = function (model) {
-                rest.customModelData("site/request-password-reset", {'email': model.user.email, '_csrf': angular.element("meta[name='csrf-token']").attr("content")}).success(function() {
+                rest.customModelData("site/request-password-reset", {"PasswordResetRequestForm": {'email': model.user.email}, '_csrf': angular.element("meta[name='csrf-token']").attr("content")}).success(function() {
                     alertService.add('success', "Reset password email is sent to super user of the company '"+model.company_name+"' .");
                 }).error(errorCallback);
             }
