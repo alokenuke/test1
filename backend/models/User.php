@@ -463,7 +463,7 @@ class User extends ActiveRecord implements IdentityInterface
     public static function getAdminEmail($company) {        
         $superUserRole = Roles::findOne(['role_name' => 'Super Admin', 'isAdmin' => '1', 'company_id' => $company]);
         
-        return User::findOne(['role' => $superUserRole->id, 'company_id' => $company])->email;
+        return ($superUserRole?User::findOne(['role' => $superUserRole->id, 'company_id' => $company])->email:"");
         
     }
 }

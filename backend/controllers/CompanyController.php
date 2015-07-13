@@ -15,12 +15,12 @@ class CompanyController extends ApiController
     public $partialMatchFields;
         
     public function init() {
+        
         $this->modelClass = 'backend\models\Company';
         
         $this->partialMatchFields = ['company_name', 'company_owner'];
                 
         parent::init();
-        
         //$this->checkRoleAccess("company", \yii::$app->requestedAction);
         
     }
@@ -204,7 +204,6 @@ class CompanyController extends ApiController
     
     public function actionStats() {
         if (!$_POST) {
-            
             $company = new \backend\models\Company();
             
             $return = [];
