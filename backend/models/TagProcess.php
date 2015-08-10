@@ -238,7 +238,7 @@ class TagProcess extends \yii\db\ActiveRecord
         
         if(!$this->hasErrors()) {
             $this->status = 2;
-            return $this->save();
+            return $this->save(0);
         }
     }
     public function getParentProcess() {
