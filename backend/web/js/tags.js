@@ -185,7 +185,12 @@ app.controller('TagIndex', ['$scope', 'rest', '$location', '$route','$routeParam
         
         var errorCallback = function (data) {
             if(data.status!=401) {
-                if(typeof data !== 'object')
+                if(data.status == 500)
+                {
+                    alertService.clearAll();
+                    alertService.add("error", data.message);
+                }
+                else if(typeof data !== 'object')
                 {
                     alertService.clearAll();
                     alertService.add("error", data);
@@ -650,16 +655,21 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
                     $scope.working = false;
                 }).error(function(data) {
                     alertService.clearAll();
-                    if(typeof data == 'object')
-                        angular.forEach(data, function(val) {
-                            angular.forEach(val, function(v) {
+                    if (data.message != "")
+                    {
+                        alertService.clearAll();
+                        alertService.add("error", data.message);
+                    }
+                    else if (typeof data == 'object')
+                        angular.forEach(data, function (val) {
+                            angular.forEach(val, function (v) {
                                 alertService.add('error', v[0]);
                             })
                         })
                     else
                         alertService.add("error", data);
-                            $scope.working = false;
-                        });
+                    $scope.working = false;
+                });
             }
             else {
                 alertService.clearAll();
@@ -670,7 +680,12 @@ app.controller('TagsCreate', ['$scope', 'rest', '$location', '$route','$routePar
         
         var errorCallback = function (data) {
             if(data.status!=401) {
-                if(typeof data !== 'object')
+                if(data.status == 500)
+                {
+                    alertService.clearAll();
+                    alertService.add("error", data.message);
+                }
+                else if(typeof data !== 'object')
                 {
                     alertService.clearAll();
                     alertService.add("error", data);
@@ -994,7 +1009,12 @@ app.controller('TagsUpdate', ['$scope', 'rest', '$location', '$route','$routePar
         
         var errorCallback = function (data) {
             if(data.status!=401) {
-                if(typeof data !== 'object')
+                if(data.status == 500)
+                {
+                    alertService.clearAll();
+                    alertService.add("error", data.message);
+                }
+                else if(typeof data !== 'object')
                 {
                     alertService.clearAll();
                     alertService.add("error", data);
@@ -1388,7 +1408,12 @@ app.controller('TagsCreateMaster', ['$scope', 'rest', '$location', '$route','$ro
         
         var errorCallback = function (data) {
             if(data.status!=401) {
-                if(typeof data !== 'object')
+                if(data.status == 500)
+                {
+                    alertService.clearAll();
+                    alertService.add("error", data.message);
+                }
+                else if(typeof data !== 'object')
                 {
                     alertService.clearAll();
                     alertService.add("error", data);
@@ -1762,7 +1787,12 @@ app.controller('TagsUpdateMaster', ['$scope', 'rest', '$location', '$route','$ro
         
         var errorCallback = function (data) {
             if(data.status!=401) {
-                if(typeof data !== 'object')
+                if(data.status == 500)
+                {
+                    alertService.clearAll();
+                    alertService.add("error", data.message);
+                }
+                else if(typeof data !== 'object')
                 {
                     alertService.clearAll();
                     alertService.add("error", data);
@@ -1821,7 +1851,12 @@ app.controller('TagsView', ['$scope', 'rest', '$location', '$route','$routeParam
         
         var errorCallback = function (data) {
             if(data.status!=401) {
-                if(typeof data !== 'object')
+                if(data.status == 500)
+                {
+                    alertService.clearAll();
+                    alertService.add("error", data.message);
+                }
+                else if(typeof data !== 'object')
                 {
                     alertService.clearAll();
                     alertService.add("error", data);
@@ -2073,7 +2108,12 @@ app.controller('TagItems', function($scope, rest, $location, $route, $routeParam
     
     var errorCallback = function (data) {
             if(data.status!=401) {
-                if(typeof data !== 'object')
+                if(data.status == 500)
+                {
+                    alertService.clearAll();
+                    alertService.add("error", data.message);
+                }
+                else if(typeof data !== 'object')
                 {
                     alertService.clearAll();
                     alertService.add("error", data);
