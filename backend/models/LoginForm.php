@@ -90,7 +90,7 @@ class LoginForm extends Model
             
             $authToken->login_ip = Yii::$app->getRequest()->getUserIP();
                
-            if($authToken->login_ip != "::1") {
+            if(1 || $authToken->login_ip != "::1") {
                 
                 $lastLoginQry = UserTokens::find()
                         ->andWhere("created_on > ".strtotime("-15 days"))
@@ -114,11 +114,7 @@ class LoginForm extends Model
                     else
                         $url = "http://www.geoplugin.net/json.gp?ip=".$authToken->login_ip;
                     
-                    try {
-                        $locationDetails = json_decode(file_get_contents($url));
-                    }catch(Exception $ex) {
-                        $locationDetails->geoplugin_region = "";
-                    }
+                    $locationDetails = json_decode(@file_get_contents($url));
                     
                     if(empty($locationDetails->geoplugin_region)) {
                         $authToken->login_location = "Not available";
