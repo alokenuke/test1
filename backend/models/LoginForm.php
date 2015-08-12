@@ -106,10 +106,19 @@ class LoginForm extends Model
                 $locationDetails = $lastLoginQry->one();
                 
                 if(!$locationDetails) {
+                    
+                    $url = "";
+                    
                     if($this->location)
-                        $locationDetails = json_decode(file_get_contents("http://www.geoplugin.net/extras/location.gp?format=json&lat=".$this->location['lat']."&long=".$this->location['long']));
+                        $url = "http://www.geoplugin.net/extras/location.gp?format=json&lat=".$this->location['lat']."&long=".$this->location['long'];
                     else
-                        $locationDetails = json_decode(file_get_contents("http://www.geoplugin.net/json.gp?ip=".$authToken->login_ip));
+                        $url = "http://www.geoplugin.net/json.gp?ip=".$authToken->login_ip;
+                    
+                    try {
+                        $locationDetails = json_decode(file_get_contents($url));
+                    }catch(Exception $ex) {
+                        $locationDetails->geoplugin_region = "";
+                    }
                     
                     if(empty($locationDetails->geoplugin_region)) {
                         $authToken->login_location = "Not available";
