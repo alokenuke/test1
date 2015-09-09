@@ -1,6 +1,7 @@
 <?php
 namespace backend\controllers;
 
+use mPDF;
 use yii\filters\auth\QueryParamAuth;
 use yii\rest\ActiveController;
 use yii\data\ActiveDataProvider;
@@ -28,7 +29,7 @@ class TagActivityLogController extends ApiController
                 'class' => \backend\models\RoleAccess::className(),
                 'rules' => [
                     [
-                        'actions' => ['search', 'get-log', 'logactivity', 'multiple-logactivity', 'index', 'create', 'update', 'view', 'delete'],
+                        'actions' => ['search', 'get-log', 'get-log-pdf', 'logactivity', 'multiple-logactivity', 'index', 'create', 'update', 'view', 'delete'],
                         'allow' => true,
                         'roles' => ['Client'],
                     ]
@@ -108,6 +109,70 @@ class TagActivityLogController extends ApiController
             throw new \yii\web\HttpException(404, 'Invalid Request');
         }
     }
+    
+    /** Get the Tag logs as PDF **/
+    public function actionGetLogPdf() {
+      
+      $dataProvider = $this->actionGetLog();
+      
+      $models = $dataProvider->getModels();
+      
+      if(!$models)
+        throw new \yii\web\HttpException(404, 'No data for tag');
+      
+      //generate the PDF
+        $pdf = new mPDF('', array(216, 279));
+        
+        $pdf->SetAutoPageBreak(false);
+        $pdf->HREF = '';
+        $pdf->SetDefaultFont('Arial', 'B', 8);
+        $pdf->SetDefaultFontSize(8);
+        $pdf->SetLeftMargin(5);
+        $pdf->SetRightMargin(5);
+        $pdf->SetTopMargin(5);
+        $pdf->DeflMargin = 5;
+        $pdf->DefrMargin = 5;
+        $pdf->setAutoTopMargin = $pdf->setAutoBottomMargin = false;      
+        
+        $content = '<div><h2>Tag History (#'. \Yii::$app->request->post("uid") .')</h2><table>';
+        $content .= '<tr>
+                        <th style="width: 10%; text-align: left;">stageInfo</th>
+                        <th style="width: 10%; text-align: left;">answer</th>
+                        <th style="width: 15%; text-align: left;">loggedBy</th>
+                        <th style="width: 15%; text-align: left;">comment</th>
+                        <th style="width: 15%; text-align: left;">Attachments</th>
+                        <th style="width: 15%; text-align: left;">device</th>
+                        <th style="width: 15%; text-align: left;">logged_date</th>
+                     </tr>';
+        
+        foreach($models as $model) {
+          
+          $attachments = [];
+          foreach($model->attachments as $attachment) {
+
+            $attachments[] = $attachment['filename'];
+          }          
+          
+          $content .= '<tr>
+                        <td style="text-align: left;">'. $model->stageInfo .'</td>
+                        <td style="text-align: left;">'. $model->answer .'</td>
+                        <td style="text-align: left;">'. $model->loggedBy->first_name.' '.$model->loggedBy->last_name  .'</td>
+                        <td style="text-align: left;">'. $model->comment .'</td>
+                        <td style="text-align: left;">'. join('<br/>', $attachments) .'</td>
+                        <td style="text-align: left;">'. $model->device .'</td>
+                        <td style="text-align: left;">'. $model->logged_date .'</td>
+                      </tr>';
+        }
+        
+        $content .= '</table></div>';
+        
+        $pdf->WriteHTML($content);
+        
+        $file_download = "temp/tag_history_".date("Ymd_His").".pdf";
+        $pdf->Output($file_download, 'f');
+        
+        return $file_download;        
+    } 
     
     public function actionLogactivity() {
         if (!$_POST) {
