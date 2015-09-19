@@ -115,6 +115,10 @@ class TagActivityLogController extends ApiController
       
       $dataProvider = $this->actionGetLog();
       
+      $tagModel = \backend\models\Tags::find()->where(['tags.uid' => \Yii::$app->request->post("uid")])->one();
+      $projectName = $tagModel->fields()['project_name'];
+      $projectName = $projectName();
+      
       $models = $dataProvider->getModels();
       
       if(!$models)
@@ -123,7 +127,7 @@ class TagActivityLogController extends ApiController
       //generate the PDF
         $pdf = new mPDF('', array(216, 279));
         
-        $pdf->SetAutoPageBreak(false);
+        $pdf->SetAutoPageBreak(TRUE);
         $pdf->HREF = '';
         $pdf->SetDefaultFont('Arial', 'B', 8);
         $pdf->SetDefaultFontSize(8);
@@ -134,36 +138,69 @@ class TagActivityLogController extends ApiController
         $pdf->DefrMargin = 5;
         $pdf->setAutoTopMargin = $pdf->setAutoBottomMargin = false;      
         
-        $content = '<div><h2>Tag History (#'. \Yii::$app->request->post("uid") .')</h2><table>';
-        $content .= '<tr>
-                        <th style="width: 10%; text-align: left;">stageInfo</th>
-                        <th style="width: 10%; text-align: left;">answer</th>
-                        <th style="width: 15%; text-align: left;">loggedBy</th>
-                        <th style="width: 15%; text-align: left;">comment</th>
-                        <th style="width: 15%; text-align: left;">Attachments</th>
-                        <th style="width: 15%; text-align: left;">device</th>
-                        <th style="width: 15%; text-align: left;">logged_date</th>
-                     </tr>';
+        $content = '<div style="padding-top: 10px; padding-bottom: 10px;"><h2>
+                            '. $tagModel->type .' | '. $tagModel->uid .' | '. $tagModel->tag_name .' | '. $tagModel->tag_item_id .' | 
+                            '. $projectName .'
+                         </h2><table>';
+        
+        $fileManager = new \backend\models\FileManager();
+        
+        $index = 1;
         
         foreach($models as $model) {
           
           $attachments = [];
+          $attachmentsBlock = '';
+          $stageInfo = '';
+          $answer = '';
+          $includeTr = $index % 2;
+          
           foreach($model->attachments as $attachment) {
 
             $attachments[] = $attachment['filename'];
+            
+            //$pdf->{$attachment['id']} = file_get_contents($basePath.'/repository/'.\Yii::$app->user->identity->company_id.'/attachments/'.$attachment['filename']);
+ 
+            $img = $fileManager->getPath('attachments').'/'.$attachment['filename'];
+            list(, $ext) = $attachment['filename'];
+            
+            if(!in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp']) && !file_exists($img))
+              continue;
+            
+            $attachmentsBlock .= '<span style="margin-rigth: 5px;"> <img width="20mm" height="20mm" src="'. $img .'"></img></span>';
+            //$attachmentsBlock .= '<span style="margin-rigth: 5px;"> <img src="var:'. $attachment['id'] .'"></img></span>';
           }          
           
-          $content .= '<tr>
-                        <td style="text-align: left;">'. $model->stageInfo .'</td>
-                        <td style="text-align: left;">'. $model->answer .'</td>
-                        <td style="text-align: left;">'. $model->loggedBy->first_name.' '.$model->loggedBy->last_name  .'</td>
-                        <td style="text-align: left;">'. $model->comment .'</td>
-                        <td style="text-align: left;">'. join('<br/>', $attachments) .'</td>
-                        <td style="text-align: left;">'. $model->device .'</td>
-                        <td style="text-align: left;">'. $model->logged_date .'</td>
-                      </tr>';
+          if($model->stageInfo)
+            $stageInfo = $model->stageInfo->process_name;
+          
+          $answer = $model->fields()['answer'];
+          $answer = $answer();
+          if(is_object($answer))
+            $answer = $answer->process_name;
+          
+          if($index == 1)
+            $content .= '<tr>';
+          else if($includeTr)
+            $content .= '</tr><tr>';
+          
+          $content .= '<td style="border: 1px solid grey; margin-top:5px; padding: 5px; width: 50%;">
+                        
+                        <div>
+                          <p><label>Process Level:</label> '. $stageInfo .'</p>
+                          <p><label>Comment:</label> '. $model->comment .'</p>
+                          <p><label>Date Time:</label> '. $model->logged_date .'</p>
+                          <p><label>Update By:</label> '. $model->loggedBy->first_name.' '.$model->loggedBy->last_name .'</p>
+                        </div>
+                        
+                        <div>
+                          '. $attachmentsBlock .'
+                        </div>
+                      </td>';
+          
+          $index++;
         }
-        
+        $content .= '</tr>';
         $content .= '</table></div>';
         
         $pdf->WriteHTML($content);
